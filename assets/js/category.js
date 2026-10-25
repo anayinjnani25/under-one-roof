@@ -6,7 +6,7 @@ UOR.ready.then(function () {
 
   var cat = UOR.cat(UOR.query('c')) || UOR.categories[0];
   var items = UOR.inCat(cat.slug);
-  UOR.chrome(cat.slug === 'torans' || cat.slug === 'garlands' ? cat.slug : (cat.slug === 'oxidised' || cat.slug === 'gold-silver') ? 'jewelry' : 'shop');
+  UOR.chrome('products');
 
   document.title = cat.title + ' ' + cat.accent + ' — Under One Roof';
   document.querySelector('.cat-no').textContent = 'Entry No. ' + cat.no + ' — ' + items.length + ' pieces';

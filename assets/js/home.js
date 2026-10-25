@@ -10,7 +10,7 @@ UOR.ready.then(function () {
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
   function backOut(t) { var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
 
-  UOR.chrome('shop');
+  UOR.chrome('home');
 
   if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h) { this.rect(x, y, w, h); };

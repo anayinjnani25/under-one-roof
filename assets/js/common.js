@@ -90,26 +90,214 @@ window.UOR = window.UOR || {};
   UOR.productHref = function (p) { return 'product.html?id=' + p.id; };
 
   // ---- header / footer / drawer
+  var CHEVRON = '<svg class="chev" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
+  var SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>';
+  var IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+
+  // active: 'products' (shelf + product pages), 'categories', 'resources', 'blog', 'about', 'contact', 'account'
   function header(active) {
     var links = [
-      ['index.html#shelf', 'Shop', 'shop'],
-      ['category.html?c=torans', 'Torans', 'torans'],
-      ['category.html?c=garlands', 'Garlands', 'garlands'],
-      ['category.html?c=oxidised', 'Jewelry', 'jewelry']
+      ['index.html#shelf', 'Categories', 'categories'],
+      ['resources.html', 'Resources', 'resources'],
+      ['blog.html', 'Blog', 'blog'],
+      ['about.html', 'About', 'about'],
+      ['contact.html', 'Contact', 'contact']
     ];
+    var shelves = UOR.categories.map(function (c) {
+      return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
+    }).join('');
     return '<a class="brand" href="index.html" aria-label="Under One Roof — home">' +
       '<img class="brand-mark" src="' + UOR.LOGO + '" alt="" width="34" height="34">' +
       '<span class="brand-word">' + WORDMARK + '</span></a>' +
       '<nav class="site-nav" aria-label="Main">' +
-      links.map(function (l, i) {
-        return '<a class="' + (i ? 'nav-opt' : '') + '" href="' + l[0] + '"' + (active === l[2] ? ' aria-current="page"' : '') + '>' + l[1] + '</a>';
+      '<div class="nav-panel" id="nav-panel">' +
+      '<ul class="nav-links">' +
+      '<li class="has-menu"><button class="nav-top menu-toggle' + (active === 'products' ? ' is-current' : '') + '" type="button" aria-expanded="false" aria-controls="menu-products">Products' + CHEVRON + '</button>' +
+      '<ul class="menu" id="menu-products">' + shelves + '<li class="menu-all"><a href="index.html#collection">Every piece →</a></li></ul></li>' +
+      links.map(function (l) {
+        return '<li><a class="nav-top" href="' + l[0] + '"' + (active === l[2] ? ' aria-current="page"' : '') + '>' + l[1] + '</a></li>';
       }).join('') +
+      '</ul></div>' +
+      '<div class="nav-tools">' +
       '<a class="acct-link" href="account.html"' + (active === 'account' ? ' aria-current="page"' : '') + ' aria-label="Sign in or create an account">' + PERSON +
       '<span class="acct-label">Sign in</span></a>' +
       '<button class="wish-btn" type="button" aria-haspopup="dialog" aria-controls="wishlist">' + HEART +
       '<span class="nav-opt">Wishlist</span><span class="wish-count" data-n="' + wishCount() + '">' + wishCount() + '</span>' +
-      '<span class="sr-only"> items in wishlist</span></button></nav>';
+      '<span class="sr-only"> items in wishlist</span></button>' +
+      '<button class="search-btn" type="button" aria-haspopup="dialog" aria-controls="search" aria-keyshortcuts="' + (IS_MAC ? 'Meta+K' : 'Control+K') + '">' + SEARCH +
+      '<span class="search-word">Search</span><kbd>' + (IS_MAC ? '⌘K' : 'Ctrl K') + '</kbd></button>' +
+      '<button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-panel" aria-label="Open menu"><span></span><span></span><span></span></button>' +
+      '</div></nav>';
   }
+
+  // ---- header behaviour: Products dropdown, mobile panel ---------------
+  var navMQ = window.matchMedia('(max-width: 1240px)');
+  function initNav() {
+    var head = document.querySelector('.site-head');
+    var item = head.querySelector('.has-menu'), toggle = item.querySelector('.menu-toggle'), menu = item.querySelector('.menu');
+    var panel = head.querySelector('.nav-panel'), menuBtn = head.querySelector('.menu-btn');
+    var hoverT;
+    function links() { return [].slice.call(menu.querySelectorAll('a')); }
+    function setMenu(open, focusFirst) {
+      item.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open);
+      if (open && focusFirst) links()[0].focus();
+    }
+    toggle.addEventListener('click', function () { setMenu(toggle.getAttribute('aria-expanded') !== 'true'); });
+    // hover opens on desktop pointers only; the panel layout uses click/tap
+    item.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse' || navMQ.matches) return;
+      clearTimeout(hoverT); setMenu(true);
+    });
+    item.addEventListener('pointerleave', function (e) {
+      if (e.pointerType !== 'mouse' || navMQ.matches) return;
+      hoverT = setTimeout(function () { setMenu(false); }, 160);
+    });
+    toggle.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setMenu(true, true); }
+    });
+    menu.addEventListener('keydown', function (e) {
+      var all = links(), i = all.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); all[(i + 1) % all.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) toggle.focus(); else all[i - 1].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); all[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); all[all.length - 1].focus(); }
+    });
+    item.addEventListener('focusout', function (e) {
+      if (!navMQ.matches && !item.contains(e.relatedTarget)) setMenu(false);
+    });
+
+    function setPanel(open) {
+      panel.classList.toggle('open', open);
+      head.classList.toggle('menu-open', open);
+      menuBtn.setAttribute('aria-expanded', open);
+      menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.documentElement.classList.toggle('nav-locked', open);
+      if (open) setTimeout(function () { toggle.focus(); }, 50);
+    }
+    menuBtn.addEventListener('click', function () { setPanel(!panel.classList.contains('open')); });
+    // following an in-page link (e.g. index.html#shelf) should close the panel
+    panel.addEventListener('click', function (e) { if (e.target.closest('a')) { setPanel(false); setMenu(false); } });
+    navMQ.addEventListener('change', function () { setPanel(false); setMenu(false); });
+
+    document.addEventListener('click', function (e) {
+      if (!item.contains(e.target) && !navMQ.matches) setMenu(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (item.classList.contains('open')) { var inMenu = menu.contains(document.activeElement); setMenu(false); if (inMenu) toggle.focus(); }
+      else if (panel.classList.contains('open')) { setPanel(false); menuBtn.focus(); }
+    });
+  }
+
+  // ---- search overlay (Ctrl/⌘ + K) -------------------------------------
+  var searchEl = null, searchOpener = null;
+  function catName(slug) { var c = UOR.cat(slug); return c ? c.title + ' ' + c.accent : ''; }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  function buildSearch() {
+    searchEl = document.createElement('div');
+    searchEl.className = 'search-layer';
+    searchEl.innerHTML = '<div class="search-scrim" data-search-close></div>' +
+      '<div class="search-box" id="search" role="dialog" aria-modal="true" aria-label="Search the shop">' +
+      '<div class="search-field">' + SEARCH +
+      '<input type="search" role="combobox" aria-expanded="true" aria-controls="search-results" aria-autocomplete="list" placeholder="Search torans, jhumkas, garlands…" autocomplete="off" spellcheck="false">' +
+      '<button class="search-esc" type="button" data-search-close aria-label="Close search"><kbd>Esc</kbd></button></div>' +
+      '<ul class="search-results" id="search-results" role="listbox" aria-label="Results"></ul>' +
+      '<p class="search-foot"><span><kbd>↑</kbd><kbd>↓</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></p></div>';
+    document.body.appendChild(searchEl);
+    var input = searchEl.querySelector('input'), list = searchEl.querySelector('.search-results');
+    var hits = [], cur = 0;
+
+    function paint() {
+      var q = norm(input.value).trim(), words = q.split(/\s+/).filter(Boolean);
+      if (!words.length) {
+        hits = UOR.categories.map(function (c) { return { cat: c }; });
+      } else {
+        hits = UOR.products.map(function (p) {
+          var name = norm(p.name), hay = name + ' ' + norm(p.mini) + ' ' + norm(catName(p.cat)) + ' ' + norm(p.desc);
+          if (!words.every(function (w) { return hay.indexOf(w) > -1; })) return null;
+          var score = words.reduce(function (s, w) { return s + (name.indexOf(w) === 0 ? 3 : name.indexOf(w) > -1 ? 2 : 0); }, 0);
+          return { p: p, score: score };
+        }).filter(Boolean).sort(function (a, b) { return b.score - a.score; }).slice(0, 8);
+      }
+      cur = 0;
+      if (!hits.length) {
+        list.innerHTML = '<li class="search-empty">Nothing matches “' + esc(input.value.trim()) + '”. Try a shelf name like <em>toran</em> or <em>jhumka</em>.</li>';
+        input.removeAttribute('aria-activedescendant');
+        return;
+      }
+      list.innerHTML = (words.length ? '' : '<li class="search-hint" role="presentation">Browse a shelf</li>') + hits.map(function (h, i) {
+        if (h.cat) {
+          var f = UOR.byId(h.cat.feature);
+          return '<li role="option" id="sr-' + i + '" class="search-hit"><a href="category.html?c=' + h.cat.slug + '" tabindex="-1">' +
+            '<span class="sr-thumb" style="--bg:' + (f ? f.bg : 'var(--paper)') + '">' + (f ? UOR.art(f) : '') + '</span>' +
+            '<span class="sr-text"><strong>' + h.cat.title + ' <em>' + h.cat.accent + '</em></strong><small>' + UOR.inCat(h.cat.slug).length + ' pieces</small></span></a></li>';
+        }
+        return '<li role="option" id="sr-' + i + '" class="search-hit"><a href="' + UOR.productHref(h.p) + '" tabindex="-1">' +
+          '<span class="sr-thumb" style="--bg:' + h.p.bg + '">' + UOR.art(h.p) + '</span>' +
+          '<span class="sr-text"><strong>' + esc(h.p.name) + '</strong><small>' + esc(h.p.mini) + ' · ' + esc(catName(h.p.cat)) + '</small></span>' +
+          '<span class="sr-price">' + UOR.price(h.p.price) + '</span></a></li>';
+      }).join('');
+      mark();
+    }
+    function mark() {
+      var opts = list.querySelectorAll('[role="option"]');
+      opts.forEach(function (o, i) { o.setAttribute('aria-selected', i === cur); });
+      if (opts[cur]) { input.setAttribute('aria-activedescendant', opts[cur].id); opts[cur].scrollIntoView({ block: 'nearest' }); }
+    }
+    input.addEventListener('input', paint);
+    input.addEventListener('keydown', function (e) {
+      var n = list.querySelectorAll('[role="option"]').length;
+      if (e.key === 'ArrowDown' && n) { e.preventDefault(); cur = (cur + 1) % n; mark(); }
+      else if (e.key === 'ArrowUp' && n) { e.preventDefault(); cur = (cur - 1 + n) % n; mark(); }
+      else if (e.key === 'Enter' && n) {
+        e.preventDefault();
+        var a = list.querySelectorAll('[role="option"] a')[cur];
+        if (a) location.href = a.getAttribute('href');
+      }
+    });
+    list.addEventListener('pointermove', function (e) {
+      var li = e.target.closest('[role="option"]'); if (!li) return;
+      var i = [].indexOf.call(list.querySelectorAll('[role="option"]'), li);
+      if (i !== cur) { cur = i; mark(); }
+    });
+    searchEl.addEventListener('click', function (e) { if (e.target.closest('[data-search-close]')) closeSearch(); });
+    // keep Tab inside the dialog
+    searchEl.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var f = [input, searchEl.querySelector('.search-esc')];
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    });
+    searchEl.paint = paint;
+  }
+  function openSearch() {
+    if (!searchEl) buildSearch();
+    if (searchEl.classList.contains('open')) { searchEl.querySelector('input').focus(); return; }
+    searchOpener = document.activeElement;
+    var input = searchEl.querySelector('input');
+    input.value = '';
+    searchEl.paint();
+    searchEl.classList.add('open');
+    document.documentElement.classList.add('nav-locked');
+    setTimeout(function () { input.focus(); }, 30);
+  }
+  function closeSearch() {
+    if (!searchEl || !searchEl.classList.contains('open')) return;
+    searchEl.classList.remove('open');
+    if (!document.querySelector('.nav-panel.open')) document.documentElement.classList.remove('nav-locked');
+    if (searchOpener && searchOpener.focus) searchOpener.focus();
+  }
+  UOR.openSearch = openSearch;
+  document.addEventListener('click', function (e) { if (e.target.closest('.search-btn')) openSearch(); });
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === 'k' || e.key === 'K')) {
+      if (!UOR.categories || !document.querySelector('.search-btn')) return;
+      e.preventDefault();
+      if (searchEl && searchEl.classList.contains('open')) closeSearch(); else openSearch();
+    } else if (e.key === 'Escape') closeSearch();
+  });
 
   function footer() {
     return '<div class="wrap"><div class="foot-grid">' +
@@ -118,7 +306,7 @@ window.UOR = window.UOR || {};
       '<div><h4>The shelf</h4><ul>' + UOR.categories.map(function (c) {
         return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
       }).join('') + '</ul></div>' +
-      '<div><h4>Visit</h4><ul><li><a href="index.html#collection">Every piece</a></li><li><a href="account.html">Your account</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">Your wishlist</button></li></ul></div>' +
+      '<div><h4>Visit</h4><ul><li><a href="index.html#collection">Every piece</a></li><li><a href="about.html">About</a></li><li><a href="resources.html">Care &amp; hanging guides</a></li><li><a href="blog.html">Journal</a></li><li><a href="contact.html">Contact</a></li><li><a href="account.html">Your account</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">Your wishlist</button></li></ul></div>' +
       '</div><div class="foot-note label"><span>© ' + new Date().getFullYear() + ' Under One Roof</span><span>Made by hand · Stitched in rust</span></div></div>';
   }
 
@@ -181,6 +369,7 @@ window.UOR = window.UOR || {};
   UOR.chrome = function (active) {
     var h = document.querySelector('.site-head');
     h.innerHTML = header(active);
+    initNav();
     var f = document.querySelector('.site-foot');
     if (f) f.innerHTML = footer();
     drawerShell();

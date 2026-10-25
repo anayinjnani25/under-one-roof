@@ -3,7 +3,7 @@ UOR.ready.then(function () {
   var reduced = UOR.reduced();
   var p = UOR.byId(UOR.query('id')) || UOR.products[0];
   var cat = UOR.cat(p.cat);
-  UOR.chrome(p.cat === 'torans' || p.cat === 'garlands' ? p.cat : (p.cat === 'oxidised' || p.cat === 'gold-silver') ? 'jewelry' : 'shop');
+  UOR.chrome('products');
 
   var $ = function (s) { return document.querySelector(s); };
   document.title = p.name + ' — Under One Roof';
