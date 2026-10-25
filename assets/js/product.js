@@ -20,6 +20,10 @@ UOR.ready.then(function () {
   $('.pd-mini').textContent = p.mini;
   $('.pd-desc').textContent = p.desc;
   $('.pd-care').textContent = UOR.care[p.cat];
+  var sold = UOR.soldOut(p);
+  if (p.stock && p.stock !== 'in_stock') {
+    $('.pd-mini').insertAdjacentHTML('afterend', '<p class="pd-stock">' + UOR.stockBadge(p) + ' ' + t(sold ? 'stock.soldNote' : 'stock.mtoNote') + '</p>');
+  }
 
   // prices aren't shown: shoppers ask for them on WhatsApp, with the piece and colour pre-filled
   var priceBtn = $('.wa-price');
@@ -48,6 +52,8 @@ UOR.ready.then(function () {
     document.querySelectorAll('.swatch').forEach(function (s) { s.setAttribute('aria-checked', s.dataset.k === current); s.tabIndex = s.dataset.k === current ? 0 : -1; });
     if (UOR.wa()) priceBtn.href = UOR.wa(priceAsk());
     customLink.href = 'contact.html?custom=' + encodeURIComponent(p.id) + '&colour=' + encodeURIComponent(current) + '#custom';
+    var alt = $('.pd-sold-alt a');
+    if (alt) alt.href = customLink.href;
   }
   $('.swatches').innerHTML = p.colors.map(function (k) {
     return '<button class="swatch" type="button" role="radio" data-k="' + k + '" aria-label="' + UOR.esc(UOR.palName(k)) + '" style="background:' + UOR.swatch(k) + '"></button>';
@@ -140,7 +146,16 @@ UOR.ready.then(function () {
     var again = qtyBox.querySelector('[data-step="' + which + '"]');
     (again && !again.disabled ? again : qtyBox.querySelector('.qty-btn:not([disabled])')).focus();
   });
+  if (sold) {
+    // sold out: no adding; point to a custom version instead
+    qtyBox.hidden = true;
+    var addBtn = $('.add-bag');
+    addBtn.disabled = true; addBtn.classList.add('is-sold');
+    addBtn.textContent = t('stock.sold');
+    $('.pd-actions').insertAdjacentHTML('afterend', '<p class="pd-sold-alt"><a href="' + customLink.getAttribute('href') + '">' + t('stock.custom') + '</a></p>');
+  }
   $('.add-bag').addEventListener('click', function () {
+    if (sold) return;
     var had = UOR.wish.has(p.id);
     UOR.wish.set(p.id, { qty: qty, colour: current });
     UOR.toast(t(had ? 'pd.updated' : 'pd.added', { n: qty, name: p.name }));

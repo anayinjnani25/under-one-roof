@@ -581,4 +581,20 @@ UOR.ready.then(function () {
       .then(function () { render(); measureLanes(); }, function () {});
   }
   window.addEventListener('load', measureLanes);
+
+  // ---- banner for the live collection (set "Show on homepage" on the admin page)
+  UOR.collections().then(function (list) {
+    var c = list.filter(function (x) { return x.banner; })[0];
+    var box = document.querySelector('.coll-banner');
+    if (!c || !box) return;
+    var cover = UOR.byId(c.cover);
+    box.innerHTML = '<a class="coll-banner-card" href="collection.html?c=' + encodeURIComponent(c.slug) + '" style="--bg:' + (cover ? cover.bg : 'var(--paper)') + '">' +
+      '<span class="coll-banner-art" aria-hidden="true">' + (cover ? UOR.art(cover) : '') + '</span>' +
+      '<span class="coll-banner-text"><span class="eyebrow">' + UOR.t('col.now') + '</span>' +
+      '<strong id="coll-banner-h">' + UOR.esc(c.title) + '</strong>' +
+      (c.blurb ? '<span class="coll-banner-blurb">' + UOR.esc(c.blurb) + '</span>' : '') +
+      '<span class="coll-banner-go">' + UOR.t('col.see', { n: c.ids.length }) + ' →</span></span></a>';
+    box.hidden = false;
+    measureLanes();
+  });
 });

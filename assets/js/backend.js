@@ -37,7 +37,8 @@
     if (!sb) return Promise.reject(new Error('Supabase client unavailable'));
     return timeout(Promise.all([
       sb.from('categories').select('slug,no,title,accent,blurb,care,feature_product_id,i18n').order('sort'),
-      sb.from('products').select('id,category_slug,name,mini,description,colors,art,bg,image_url,i18n').order('sort')
+      // admins can read hidden pieces too, so the shop asks for published ones explicitly
+      sb.from('products').select('id,category_slug,name,mini,description,colors,art,bg,image_url,i18n,stock_status').eq('published', true).order('sort')
     ]), 6000).then(function (r) {
       if (r[0].error || r[1].error) throw (r[0].error || r[1].error);
       if (!r[0].data.length || !r[1].data.length) throw new Error('catalog is empty');
@@ -58,7 +59,7 @@
           cat: p.category_slug, id: p.id, name: tr(p, 'name'), mini: tr(p, 'mini'), desc: tr(p, 'description'),
           en: { name: p.name, mini: p.mini, desc: p.description }, // WhatsApp messages to the shop use these
           art: p.art && p.art.type ? p.art : { type: 'pendant', style: 'coin' },
-          colors: colorsFor(p), bg: p.bg, image: imageUrl(p.image_url)
+          colors: colorsFor(p), bg: p.bg, image: imageUrl(p.image_url), stock: p.stock_status || 'in_stock'
         };
       });
       // a category's feature piece must exist; otherwise use its first product
@@ -74,6 +75,30 @@
       UOR.source = 'supabase';
     });
   }
+
+  UOR.imageUrl = imageUrl;
+
+  // ---- collections: the live ones (published and inside their dates), pieces in order
+  function live(c, now) {
+    return c.published && (!c.starts_at || new Date(c.starts_at) <= now) && (!c.ends_at || new Date(c.ends_at) > now);
+  }
+  UOR.collections = function () {
+    if (!sb) return Promise.resolve([]);
+    return timeout(sb.from('collections')
+      .select('slug,title,blurb,i18n,cover_product_id,published,show_banner,sort,starts_at,ends_at,collection_products(product_id,sort)')
+      .order('sort'), 6000).then(unwrap).then(function (r) {
+        var now = new Date();
+        return r.data.filter(function (c) { return live(c, now); }).map(function (c) {
+          var x = c.i18n && c.i18n[UOR.lang] || {};
+          var ids = (c.collection_products || []).slice().sort(function (a, b) { return a.sort - b.sort; })
+            .map(function (cp) { return cp.product_id; }).filter(function (id) { return UOR.byId(id); });
+          return {
+            slug: c.slug, title: x.title || c.title, blurb: x.blurb || c.blurb, banner: c.show_banner,
+            cover: UOR.byId(c.cover_product_id) ? c.cover_product_id : ids[0], ids: ids
+          };
+        }).filter(function (c) { return c.ids.length; });
+      }).catch(function (e) { log('Collections unavailable:', e); return []; });
+  };
 
   UOR.ready = loadCatalog().catch(function (e) {
     UOR.source = 'bundled';
@@ -245,7 +270,11 @@
       if (!sb) return Promise.resolve([]);
       return timeout(sb.from('reviews').select('name,rating,body,created_at,approved,user_id')
         .eq('product_id', productId).order('created_at', { ascending: false }).limit(50), 6000)
-        .then(unwrap).then(function (r) { return r.data; });
+        .then(unwrap).then(function (r) {
+          // admins can read every review; the shop shows approved ones plus the member's own
+          var me = member() && member().id;
+          return r.data.filter(function (x) { return x.approved || x.user_id === me; });
+        });
     },
     mine: function () {
       var u = member();

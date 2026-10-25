@@ -11,6 +11,8 @@ A storefront for a handcraft brand that sells torans, toran garlands, wall and d
 - `account.html`: Sign in, create an account, Google (once it's switched on), forgotten and reset password. Once signed in: your name, your notes with their approval status, and your synced wishlist.
 - `blog.html`: The journal. It has three **placeholder** posts, labelled as such on the page.
 - `about.html`: The brand story. The copy is general on purpose, so swap in your own details.
+- `collection.html?c=<slug>`: A curated collection (made on the admin page). Only live collections show: published, and inside their start and end dates. One can also appear as a banner on the homepage.
+- `admin.html`: The shop admin (see **Admin page** below). Not linked from the shop and hidden from search engines.
 - `contact.html`: A **custom piece request** form (base piece, colour, size, quantity, occasion, needed-by date and notes, sent to WhatsApp as a structured message; `contact.html?custom=<id>&colour=<key>` pre-fills it), followed by a WhatsApp chat starter.
 
 ## Languages: English, Telugu, Hindi
@@ -31,29 +33,41 @@ Prices aren't shown on the site. Each product's Price panel says "Price on reque
 
 Until it's set, the corner button stays hidden and the Contact page says chat is coming soon. The old `contact_messages` table in Supabase is no longer used by the site and is safe to drop.
 
+## Admin page (`admin.html`)
+Open `https://anayinjnani25.github.io/under-one-roof/admin.html` and sign in with the shop account (anayinjnani25@gmail.com, via Google). Anyone else who signs in sees "You don't have access" and nothing more. Admin rights are rows in the `admins` table; every change is checked by Supabase itself (`private.is_admin()` in the row-level security rules), not just by the page.
+- **Products:** search and filter by shelf, shown/hidden and stock. Add or edit a piece: English, Telugu and Hindi text, shelf, colours, background, drawing, sort order, published, and **stock** (In stock, Made to order, Sold out). Photos are resized to 1600px WebP in your browser (plus a 600px copy for phones) before upload. **Remove** hides a piece (nothing is lost); **Delete permanently** also removes it from wishlists and collections and deletes its reviews and photos, and tells you how many first.
+- **Stock in the shop:** "Sold out" and "Made to order" badges on cards and product pages. Sold-out pieces can't be added to a wishlist and are left out of the WhatsApp order message, with a note in the wishlist; the product page offers a custom version instead.
+- **Collections:** title (plus Telugu/Hindi), blurb, cover piece, pieces in order (drag, or use the arrows), published, optional start and end dates, and "show as homepage banner" (one at a time).
+- **Reviews:** approve, unapprove or reject with one click.
+- **Notifications:** the bell counts new reviews waiting for approval, live. Opening one or "Mark all read" clears it for good, in every tab.
+- **Customers:** a read-only list of members (name, email, joined, wishlist size). To switch it off, set `FEATURES.customers = false` at the top of `assets/js/admin.js`.
+- Orders aren't recorded anywhere: shoppers order by WhatsApp, so the WhatsApp chat is the order record.
+- Offline, the shop shows a small "You're offline" banner and keeps working; the admin page refuses to save until you're back online.
+
 ## Header
 Products (a dropdown of every shelf), Categories, Blog, About and Contact, followed by account, wishlist and Search (Ctrl K or ⌘K opens it). Below 1240px wide, the links move into a menu button.
 
 ## Backend (Supabase)
 | Piece | Where | Who can do what |
 |---|---|---|
-| Categories | `public.categories` | Anyone can read. You edit them in the dashboard. |
-| Products | `public.products` | Anyone can read rows where `published = true`. You edit them in the dashboard. |
+| Categories | `public.categories` | Anyone can read. You edit them in the Supabase dashboard. |
+| Products | `public.products` | Anyone can read rows where `published = true`. Admins edit them on `admin.html`. |
+| Collections | `public.collections`, `public.collection_products` | Anyone can read live ones. Admins edit them on `admin.html`. |
+| Admins | `public.admins` | Add a row (the person's user id from Authentication → Users) to make someone an admin. |
+| Notifications | `public.notifications` | Created automatically for each new review. Only admins can read them. |
 | Accounts | Supabase Auth + `public.profiles` | Shoppers sign up with email + password or Google. A profile row (display name) is created automatically. Each member can read and edit only their own. |
 | Reviews | `public.reviews` | Signed-in members only, one per piece. A review shows publicly once you set `approved = true`; until then only its author sees it, marked "awaiting approval". |
 | Wishlists | `public.wishlist_items` | Guests keep theirs in the browser. When they sign in it merges into their account and syncs across devices. Members can read and change only their own rows. |
-| Photos | Storage bucket `product-images` (public) | Anyone can view them. You upload them in the dashboard. |
+| Photos | Storage bucket `product-images` (public) | Anyone can view them. Only admins can upload, replace or delete. |
 
 The schema is in `supabase/migrations/`. `supabase/seed.sql` loads the starting catalog and is generated with `node supabase/export-seed.js > supabase/seed.sql`.
 
 The site only uses the **publishable** key (`assets/js/config.js`), which is safe to make public because row-level security (RLS) controls what it can read and write. Never put the secret / service_role key in this repo.
 
-### Everyday tasks in the Supabase dashboard
-- **Change a price or text:** Table Editor → `products` → edit the row. The site picks up the change on the next page load.
-- **Hide a product:** set `published` to false.
-- **Add a product:** insert a row in `products`. Give it a `category_slug`, some `colors` (palette keys from `assets/js/data.js`, such as `rust`, `ink`, `gold-pearl`) and an `art` value such as `{"type":"jhumka"}`, or simply set `image_url`.
-- **Add a product photo:** Storage → `product-images` → upload a transparent PNG/WebP. Then put its file name (for example `lotus-jhumka.png`) or its full URL in that product's `image_url`.
-- **Approve a review:** Table Editor → `reviews` → set `approved` to true. Delete the row to reject it.
+### Everyday tasks
+Products, photos, stock, collections and reviews are all handled on `admin.html`. The Supabase dashboard is only needed for shelves (`categories`), adding admins and the settings below.
+
+The security advisor's one remaining warning, "Leaked password protection", is a switch under Authentication → Sign In / Providers → Email (it may need a paid plan).
 
 ### Sign-in settings (Supabase dashboard → Authentication)
 - **URL Configuration:** set the Site URL to `https://anayinjnani25.github.io/under-one-roof/account.html`. Add `https://anayinjnani25.github.io/under-one-roof/**` and `http://localhost:8737/**` to Redirect URLs. Confirmation emails, password resets and Google all return to these addresses.
@@ -70,6 +84,3 @@ After editing anything in `assets/`, run `python tools/stamp-assets.py` before y
 
 ## Logo
 Replace `assets/logo/mark.svg`. The header, footer and favicon all point to this one file. The wordmark text is `WORDMARK` in `assets/js/common.js`.
-
-## Not built yet
-There is no checkout. "Add to bag" saves the piece to the wishlist and says checkout is coming soon.

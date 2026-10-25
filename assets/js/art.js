@@ -389,10 +389,16 @@ window.UOR = window.UOR || {};
   }
 
   var DRAW = { toran: toran, hanging: hanging, garland: garland, jhumka: jhumka, chandbali: chandbali, hoops: hoops, necklace: necklace, bangle: bangle, pendant: pendant };
+  UOR.ART_TYPES = Object.keys(DRAW); // the admin page offers these
 
   UOR.art = function (product, palKey, cls) {
     var key = palKey || product.colors[0];
-    if (product.image) return '<img class="art ' + (cls || '') + '" src="' + product.image + '" alt="" draggable="false">';
+    if (product.image) {
+      // photos uploaded from the admin page come as name@1600.webp plus a name@600.webp copy
+      var set = /@1600\.webp$/.test(product.image)
+        ? ' srcset="' + product.image.replace(/@1600\.webp$/, '@600.webp') + ' 600w, ' + product.image + ' 1600w" sizes="(max-width: 700px) 60vw, 480px"' : '';
+      return '<img class="art ' + (cls || '') + '" src="' + product.image + '"' + set + ' alt="" draggable="false" loading="lazy" decoding="async">';
+    }
     var pal = UOR.palettes[key], m = UOR.metals[pal.metal], g = 'g' + (++uid);
     var body = DRAW[product.art.type](product.art, pal, m, g, rng(product.id));
     return '<svg class="art ' + (cls || '') + '" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><defs>' + grad(g, m) + '</defs>' + body + '</svg>';

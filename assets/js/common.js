@@ -99,11 +99,21 @@ window.UOR = window.UOR || {};
     return '<button class="heart" type="button" data-id="' + p.id + '" data-name="' + esc(p.name) + '" aria-pressed="' + on + '" aria-label="' + esc(UOR.t(on ? 'heart.remove' : 'heart.add', { name: p.name })) + '">' + HEART + '</button>';
   };
 
+  // ---- stock: 'in_stock' | 'made_to_order' | 'sold_out' (set from the admin page)
+  UOR.soldOut = function (p) { return !!p && p.stock === 'sold_out'; };
+  UOR.stockBadge = function (p) {
+    if (!p || !p.stock || p.stock === 'in_stock') return '';
+    var sold = p.stock === 'sold_out';
+    return '<span class="stock-badge' + (sold ? ' is-sold' : '') + '">' + UOR.t(sold ? 'stock.sold' : 'stock.mto') + '</span>';
+  };
+
   // one delegated listener for every heart on the page (optimistic: UI first)
   document.addEventListener('click', function (e) {
     var b = e.target.closest('.heart[data-id]');
     if (!b) return;
     e.preventDefault(); e.stopPropagation();
+    // sold-out pieces can be taken off the wishlist but not added to it
+    if (!UOR.wish.has(b.dataset.id) && UOR.soldOut(UOR.byId(b.dataset.id))) { UOR.toast(UOR.t('stock.cantAdd')); return; }
     var on = UOR.wish.toggle(b.dataset.id, b.dataset.colour); // product page sets data-colour to the chosen colour
     if (on && !UOR.reduced()) {
       document.querySelectorAll('.heart[data-id="' + b.dataset.id + '"]').forEach(function (h) {
@@ -119,7 +129,7 @@ window.UOR = window.UOR || {};
     return '<article class="pcard" style="--bg:' + p.bg + '" data-id="' + p.id + '" id="p-' + p.id + '">' +
       '<div class="pcard-chrome" aria-hidden="true"><i></i><i></i><i></i><span class="label">' + UOR.t('card.no') + ' ' + String(num).padStart(2, '0') + '</span></div>' +
       '<div class="pcard-frame"><div class="pcard-art">' + UOR.art(p) + '</div></div>' +
-      '<div class="pcard-row">' + UOR.heartBtn(p) + '</div>' +
+      '<div class="pcard-row">' + UOR.stockBadge(p) + UOR.heartBtn(p) + '</div>' +
       '<h3 class="pcard-name"><a href="' + href + '">' + esc(p.name) + '</a></h3>' +
       '<p class="pcard-mini">' + esc(p.mini) + '</p>' +
       '</article>';
@@ -377,8 +387,9 @@ window.UOR = window.UOR || {};
 
   // ---- wishlist rows, shared by the drawer and the account page --------
   function wishEntries() {
-    return UOR.wish.items().map(function (e) { var p = UOR.byId(e.id); return p ? { p: p, qty: e.qty, colour: e.colour } : null; }).filter(Boolean);
+    return UOR.wish.items().map(function (e) { var p = UOR.byId(e.id); return p ? { p: p, qty: e.qty, colour: e.colour, sold: UOR.soldOut(p) } : null; }).filter(Boolean);
   }
+  function orderable(rows) { return rows.filter(function (r) { return !r.sold; }); }
   UOR.stepper = function (qty, label, id) {
     var data = id ? ' data-id="' + id + '"' : '';
     return '<div class="qty" role="group" aria-label="' + esc(UOR.t('wish.qtyOf', { name: label })) + '">' +
@@ -410,10 +421,11 @@ window.UOR = window.UOR || {};
     } else {
       list.innerHTML = rows.map(function (r) {
         var p = r.p;
-        return '<li class="drawer-item"><a class="drawer-thumb" href="' + UOR.productHref(p) + '" style="--bg:' + p.bg + '" tabindex="-1" aria-hidden="true">' + UOR.art(p, r.colour) + '</a>' +
+        return '<li class="drawer-item' + (r.sold ? ' is-sold' : '') + '"><a class="drawer-thumb" href="' + UOR.productHref(p) + '" style="--bg:' + p.bg + '" tabindex="-1" aria-hidden="true">' + UOR.art(p, r.colour) + '</a>' +
           '<div class="wish-info"><a class="wish-name" href="' + UOR.productHref(p) + '">' + esc(p.name) + '</a>' +
           '<small>' + esc(UOR.palName(r.colour)) + '</small>' +
-          '<div class="wish-controls">' + UOR.stepper(r.qty, p.name, p.id) +
+          (r.sold ? '<p class="sold-note">' + UOR.stockBadge(p) + ' ' + UOR.t('stock.leftOut') + '</p>' : '') +
+          '<div class="wish-controls">' + (r.sold ? '' : UOR.stepper(r.qty, p.name, p.id)) +
           '<button class="wish-remove" type="button" data-id="' + p.id + '" aria-label="' + esc(UOR.t('wish.removeAria', { name: p.name })) + '">' + UOR.t('wish.remove') + '</button></div></div></li>';
       }).join('');
     }
@@ -425,11 +437,12 @@ window.UOR = window.UOR || {};
     // order footer(s) next to this list
     var foot = list.parentElement.querySelector('.order-foot');
     if (foot) {
-      foot.querySelector('.order-sum').textContent = rows.length ? summary(rows) : UOR.t('wish.empty');
+      var ok = orderable(rows);
+      foot.querySelector('.order-sum').textContent = !rows.length ? UOR.t('wish.empty') : !ok.length ? UOR.t('stock.allSold') : summary(ok);
       var btn = foot.querySelector('.wa-order');
-      btn.classList.toggle('is-disabled', !rows.length);
-      btn.setAttribute('aria-disabled', !rows.length);
-      if (UOR.wa()) btn.href = UOR.wa(orderText(rows));
+      btn.classList.toggle('is-disabled', !ok.length);
+      btn.setAttribute('aria-disabled', !ok.length);
+      if (UOR.wa()) btn.href = UOR.wa(orderText(ok));
       else { btn.href = 'contact.html'; btn.removeAttribute('target'); }
     }
   };
@@ -454,7 +467,7 @@ window.UOR = window.UOR || {};
     for (var n = rows.length - 1; text.length > 1800 && n > 0; n--) text = build(false, n);
     return text;
   }
-  UOR.orderText = function () { return orderText(wishEntries()); };
+  UOR.orderText = function () { return orderText(orderable(wishEntries())); }; // sold-out pieces are left out
 
   function renderDrawer() { UOR.renderWishRows(document.querySelector('.drawer-list')); }
 
@@ -475,8 +488,14 @@ window.UOR = window.UOR || {};
     }
     var order = e.target.closest('.wa-order');
     if (order) {
-      if (order.classList.contains('is-disabled')) { e.preventDefault(); UOR.toast(UOR.t('wish.addFirst')); return; }
+      if (order.classList.contains('is-disabled')) {
+        e.preventDefault();
+        UOR.toast(UOR.t(wishEntries().length ? 'stock.allSold' : 'wish.addFirst'));
+        return;
+      }
       if (UOR.wa()) order.href = UOR.wa(UOR.orderText()); // latest quantities and name
+      var left = wishEntries().filter(function (r) { return r.sold; }).length;
+      if (left) UOR.toast(UOR.t('stock.someLeft', { n: left }));
     }
   });
 
@@ -577,7 +596,20 @@ window.UOR = window.UOR || {};
     if (sec) sec.remove();
   });
 
+  // ---- offline: a small banner; the shop keeps running on the bundled catalog
+  UOR.offlineBar = function (msgKey) {
+    var bar = document.createElement('div');
+    bar.className = 'offline-bar'; bar.setAttribute('role', 'status'); bar.hidden = navigator.onLine !== false;
+    bar.textContent = UOR.t(msgKey || 'off.msg');
+    document.body.appendChild(bar);
+    function paint() { bar.hidden = navigator.onLine !== false; document.body.classList.toggle('is-offline', !bar.hidden); }
+    window.addEventListener('online', paint);
+    window.addEventListener('offline', paint);
+    paint();
+  };
+
   UOR.chrome = function (active) {
+    UOR.offlineBar();
     var h = document.querySelector('.site-head');
     h.innerHTML = header(active);
     initNav();
