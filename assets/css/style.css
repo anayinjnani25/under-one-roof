@@ -382,7 +382,7 @@ html.reduced .intro { height: 100vh; height: 100svh; }
 .pcard-name { font-family: var(--f-display); font-size: 1.22rem; line-height: 1.15; margin: 0 0 4px; font-variation-settings: 'opsz' 30; }
 .pcard-name a { text-decoration: none; }
 .pcard-name a::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: 6px; }
-.pcard-mini { margin: 0; font-style: italic; color: var(--brown); font-size: 1.05rem; line-height: 1.3; }
+.pcard-mini { margin: 0; font-style: italic; color: #5A4430; /* a shade darker than --brown: readable on the deeper card backgrounds */ font-size: 1.05rem; line-height: 1.3; }
 .pcard.flash { animation: flash 1.6s var(--ease-out); }
 @keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px var(--rust), var(--shadow); } 100% { box-shadow: var(--shadow); } }
 
@@ -601,7 +601,7 @@ body.page-cat .stamp { box-shadow: inset 0 0 0 3px var(--paper-dark), inset 0 0 
 
 /* ---- product page -------------------------------------------------------- */
 .pd { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 72px); align-items: center; padding-top: calc(var(--head-h) + 32px); padding-bottom: 8vh; min-height: 100svh; }
-.crumbs { grid-column: 1 / -1; font-family: var(--f-type); font-size: var(--fs-label); letter-spacing: .14em; text-transform: uppercase; color: var(--brown); }
+.crumbs { grid-column: 1 / -1; min-height: 1.4em; /* filled by script; reserve the line so the stage doesn't jump */ font-family: var(--f-type); font-size: var(--fs-label); letter-spacing: .14em; text-transform: uppercase; color: var(--brown); }
 .crumbs a { text-decoration: none; }
 .crumbs a:hover { color: var(--rust); }
 .pd-stage { position: relative; aspect-ratio: 1; max-width: 640px; width: 100%; margin: 0 auto; touch-action: pan-y; user-select: none; cursor: grab; }

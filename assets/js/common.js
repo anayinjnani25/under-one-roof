@@ -186,7 +186,7 @@ window.UOR = window.UOR || {};
       '<button class="wish-btn" type="button" aria-haspopup="dialog" aria-controls="wishlist">' + HEART +
       '<span class="nav-opt">' + t('nav.wishlist') + '</span><span class="wish-count" data-n="' + wishCount() + '">' + wishCount() + '</span>' +
       '<span class="sr-only">' + t('nav.wishItems') + '</span></button>' +
-      '<button class="search-btn" type="button" aria-haspopup="dialog" aria-controls="search" aria-keyshortcuts="' + (IS_MAC ? 'Meta+K' : 'Control+K') + '">' + SEARCH +
+      '<button class="search-btn" type="button" aria-label="' + esc(t('nav.search')) + '" aria-haspopup="dialog" aria-controls="search" aria-keyshortcuts="' + (IS_MAC ? 'Meta+K' : 'Control+K') + '">' + SEARCH +
       '<span class="search-word">' + t('nav.search') + '</span><kbd>' + (IS_MAC ? '⌘K' : 'Ctrl K') + '</kbd></button>' +
       '<button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-panel" aria-label="' + esc(t('nav.menuOpen')) + '"><span></span><span></span><span></span></button>' +
       '</div></nav>';
