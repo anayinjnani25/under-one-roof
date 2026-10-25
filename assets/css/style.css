@@ -580,7 +580,9 @@ body.page-cat .stamp { box-shadow: inset 0 0 0 3px var(--paper-dark), inset 0 0 
 .cat-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .cat-tabs a { text-decoration: none; display: inline-grid; place-items: center; }
 .cat-tabs .chip { border-color: rgba(107, 83, 57, .4); }
-.swirl { position: relative; max-width: 1000px; margin: 0 auto; }
+/* the path runs the full width of the page, inside the usual side margin */
+.swirl-sec { padding: 0 var(--gutter); }
+.swirl { position: relative; }
 .swirl-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .swirl-node { position: absolute; width: 250px; transform: translate(-50%, -50%); }
 .swirl-stamp {

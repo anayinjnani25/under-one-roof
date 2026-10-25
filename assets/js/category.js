@@ -29,22 +29,41 @@ UOR.ready.then(function () {
   var pts = [], cum = [], maxY = [], nodeIdx = [], total = 0, revealShown = 0, revealTarget = 0, running = false;
   var needleG, maskPath;
 
-  // The thread runs down a spine; stamps (milestones) sit on it and the cards hang off
-  // to either side (desktop) or to the right of a left-hand spine (phones).
+  // Phones: the thread runs down a left-hand spine with the cards to its right.
+  // Wider screens: the thread swings across the whole page; cards sit left, middle-right,
+  // right, middle-left (repeating) with their stamp on the side facing the middle.
+  var ACROSS = [0, .64, 1, .36];
   function build() {
     var Wc = swirl.clientWidth, mobile = Wc < 640;
-    var spine = mobile ? 26 : Wc / 2, lane = mobile ? 0 : 56;
-    var cw = mobile ? Wc - 64 : Math.min(260, Wc / 2 - lane - 8);
+    var spine = mobile ? 26 : Wc / 2;
+    var cw = mobile ? Wc - 64 : clamp(Wc * .2, 240, 330);
     nodes.forEach(function (n) { n.style.width = cw + 'px'; });
-    var ch = nodes[0].querySelector('.pcard').offsetHeight;
+    // tallest card (long names wrap, more so in Telugu and Hindi)
+    var ch = nodes.reduce(function (h, n) { return Math.max(h, n.querySelector('.pcard').offsetHeight); }, 0);
     var lift = cw * .34; // pop-out art rises this far above each card
-    var gapY = mobile ? ch + lift + 34 : ch * .6 + lift * .5 + 30, top0 = 140 + lift + ch / 2;
+    var top0 = 140 + lift + ch / 2;
     var centers = [], marks = [];
-    items.forEach(function (p, i) {
-      var y = top0 + i * gapY, side = i % 2 ? 1 : -1;
-      centers.push(mobile ? [spine + 38 + cw / 2, y] : [spine + side * (lane + cw / 2), y]);
-      marks.push(mobile ? [spine + (i % 2 ? 6 : -6), y] : [spine + side * 18, y]);
-    });
+    if (mobile) {
+      items.forEach(function (p, i) {
+        var y = top0 + i * (ch + lift + 34);
+        centers.push([spine + 38 + cw / 2, y]);
+        marks.push([spine + (i % 2 ? 6 : -6), y]);
+      });
+    } else {
+      var art = cw * .62;                // the pop-out art is 24% wider than the card
+      var off = art + 30;                // stamp sits just past the art, on the side facing the middle
+      var m = art + 6, span = Wc - 2 * m;
+      var reach = 2 * (off + 24) + 16;   // closer than this side by side, two cards (plus stamps) would collide
+      var stack = ch + lift + 34;       // so the lower one has to clear the upper one completely
+      var step = ch * .42 + lift * .4 + 26; // otherwise each piece still sits a little below the last
+      items.forEach(function (p, i) {
+        var x = m + ACROSS[i % 4] * span, y = i ? centers[i - 1][1] + step : top0;
+        centers.forEach(function (c) { if (Math.abs(c[0] - x) < reach) y = Math.max(y, c[1] + stack); });
+        var dir = x < Wc / 2 ? 1 : -1;
+        centers.push([x, y]);
+        marks.push([x + dir * off, y + ch * .18]);
+      });
+    }
     nodes.forEach(function (n, i) { n.style.left = centers[i][0] + 'px'; n.style.top = centers[i][1] + 'px'; });
     stamps.forEach(function (s, i) { s.style.left = marks[i][0] + 'px'; s.style.top = marks[i][1] + 'px'; });
     var H = centers[centers.length - 1][1] + ch / 2 + 90;
