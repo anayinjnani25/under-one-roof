@@ -54,6 +54,9 @@ The site only uses the **publishable** key (`assets/js/config.js`), which is saf
 - If Supabase can't be reached, the site renders the catalog bundled in `assets/js/data.js`.
 - Guests' wishlists always work, stored in the browser.
 
+## Publishing changes
+After editing anything in `assets/`, run `python tools/stamp-assets.py` before you commit. It adds a fresh `?v=` version to every script and stylesheet link, so visitors' browsers load the new files together rather than mixing new and cached ones.
+
 ## Logo
 Replace `assets/logo/mark.svg`. The header, footer and favicon all point to this one file. The wordmark text is `WORDMARK` in `assets/js/common.js`.
 
