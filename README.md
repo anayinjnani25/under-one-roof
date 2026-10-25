@@ -5,11 +5,20 @@ A storefront for a handcraft brand that sells torans, toran garlands, wall and d
 ## Pages
 - `index.html`: The opening sequence (an interactive pixel field, then a spool and needle driven by scroll that reveals the brand name and tears away), the category shelf, the multi-lane worktable carousel and the full collection.
 - `category.html?c=<slug>`: The needle stitches a looping path down the page, and the pieces hang off it like milestones.
-- `product.html?id=<id>`: A product with no background that wobbles like jelly, a sliding panel for colour, story and price, approved reviews and a review form for signed-in members.
+- `product.html?id=<id>`: A product with no background that wobbles like jelly, a sliding panel for colour, story and price, approved reviews and a review form for signed-in members. It also has **Share on WhatsApp** (the phone's own share sheet on mobile, otherwise WhatsApp with no fixed number, so shoppers can send the piece to family), a **Request a custom version** link, and **You might also like** (pieces from shelves that go together: torans, garlands and hangings; oxidised with gold & silver-tone jewelry, same colours first).
+- **Recently viewed:** the last 8 pieces a shopper opened appear above the footer on every page. They're stored in that browser only.
+- `faq.html`: Delivery & FAQ, with sections you can link to (`faq.html#delivery`, `#making`, `#returns`, `#custom`, `#care`, `#payments`, `#whatsapp`). **Every answer marked "Fill in" is a placeholder.** Replace the example text in `faq.html` (English) and in `assets/js/i18n-strings.js` (`f.a1`… for Telugu and Hindi) with your real policies.
 - `account.html`: Sign in, create an account, Google (once it's switched on), forgotten and reset password. Once signed in: your name, your notes with their approval status, and your synced wishlist.
 - `blog.html`: The journal. It has three **placeholder** posts, labelled as such on the page.
 - `about.html`: The brand story. The copy is general on purpose, so swap in your own details.
-- `contact.html`: A WhatsApp chat starter. The shopper writes a message and WhatsApp opens with it ready to send.
+- `contact.html`: A **custom piece request** form (base piece, colour, size, quantity, occasion, needed-by date and notes, sent to WhatsApp as a structured message; `contact.html?custom=<id>&colour=<key>` pre-fills it), followed by a WhatsApp chat starter.
+
+## Languages: English, Telugu, Hindi
+- Shoppers switch language from the header (or the menu on phones). The choice is remembered, and `?lang=en|te|hi` in a link sets it too.
+- **Interface text** is in `assets/js/i18n-strings.js`. Static page text keeps its English in the HTML (`data-i18n="key"`), and only Telugu and Hindi live in that file.
+- **Catalog text** (names, descriptions, shelf titles, care notes) lives in each row's `i18n` column in Supabase. Edit `supabase/catalog-i18n.json`, run `python tools/load-catalog-i18n.py > supabase/catalog-i18n.sql`, then run that SQL in Supabase. A missing field falls back to English.
+- **⚠ All Telugu and Hindi text is machine-drafted.** Have a native speaker review both files before you launch.
+- WhatsApp messages sent to the shop are always in English, with English names, so the shop can read every order.
 
 ## WhatsApp
 Set the shop's number in `assets/js/config.js` → `UOR.WHATSAPP.number`, with the country code (for example `'+91 98765 43210'`). Once it's set:

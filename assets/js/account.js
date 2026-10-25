@@ -16,14 +16,14 @@ UOR.ready.then(function () {
 
   function friendly(e) {
     var m = (e && e.message) || '';
-    if (/invalid login credentials/i.test(m)) return 'That email and password don\'t match.';
-    if (/email not confirmed/i.test(m)) return 'Confirm your email first. The link is in your inbox.';
-    if (/already registered/i.test(m)) return 'There\'s already an account with that email. Sign in instead.';
-    if (/provider is not enabled|unsupported provider/i.test(m)) return 'Google sign-in isn\'t switched on yet. Use email for now.';
-    if (/rate limit|too many/i.test(m)) return 'Too many emails sent just now. Try again in a little while.';
-    if (/password should be|weak password|at least/i.test(m)) return 'Choose a password of 8 characters or more.';
-    if (/timeout|fetch|network/i.test(m)) return 'Couldn\'t reach the shop. Check your connection and try again.';
-    return m || 'Something went wrong. Please try again.';
+    if (/invalid login credentials/i.test(m)) return UOR.t('a.errCreds');
+    if (/email not confirmed/i.test(m)) return UOR.t('a.errConfirm');
+    if (/already registered/i.test(m)) return UOR.t('a.errExists');
+    if (/provider is not enabled|unsupported provider/i.test(m)) return UOR.t('a.errGoogle');
+    if (/rate limit|too many/i.test(m)) return UOR.t('a.errRate');
+    if (/password should be|weak password|at least/i.test(m)) return UOR.t('a.errPw');
+    if (/timeout|fetch|network/i.test(m)) return UOR.t('a.errNet');
+    return UOR.t('a.errAny');
   }
   function say(form, msg, kind) {
     var n = $('.form-note', form);
@@ -32,7 +32,7 @@ UOR.ready.then(function () {
   function busy(form, on, label) {
     var b = $('button[type="submit"]', form);
     if (!b) return;
-    if (on) { b.dataset.label = b.textContent; b.textContent = label || 'One moment…'; }
+    if (on) { b.dataset.label = b.textContent; b.textContent = label || UOR.t('a.moment'); }
     else if (b.dataset.label) b.textContent = b.dataset.label;
     b.disabled = on;
   }
@@ -68,9 +68,9 @@ UOR.ready.then(function () {
   signin.addEventListener('submit', function (e) {
     e.preventDefault();
     var email = signin.email.value.trim(), pw = signin.password.value;
-    if (!validEmail(email)) return say(signin, 'Enter your email address.', 'err');
-    if (!pw) return say(signin, 'Enter your password.', 'err');
-    busy(signin, true, 'Signing in…');
+    if (!validEmail(email)) return say(signin, UOR.t('a.needEmail'), 'err');
+    if (!pw) return say(signin, UOR.t('a.needPw'), 'err');
+    busy(signin, true, UOR.t('a.signingIn'));
     UOR.auth.signIn(email, pw).then(function () {
       say(signin, '');
       if (next) location.href = next;
@@ -82,12 +82,12 @@ UOR.ready.then(function () {
   signup.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = signup.elements.name.value.trim(), email = signup.email.value.trim(), pw = signup.password.value;
-    if (!name) return say(signup, 'Tell us your name.', 'err');
-    if (!validEmail(email)) return say(signup, 'Enter a valid email address.', 'err');
-    if (pw.length < 8) return say(signup, 'Choose a password of 8 characters or more.', 'err');
-    busy(signup, true, 'Creating…');
+    if (!name) return say(signup, UOR.t('a.needName'), 'err');
+    if (!validEmail(email)) return say(signup, UOR.t('a.validEmail'), 'err');
+    if (pw.length < 8) return say(signup, UOR.t('a.errPw'), 'err');
+    busy(signup, true, UOR.t('a.creating'));
     UOR.auth.signUp(email, pw, name, backTo).then(function (r) {
-      if (r.needsConfirm) { signup.reset(); say(signup, 'Nearly done. Click the link we\'ve sent to ' + email + ' to confirm your account.', 'ok'); }
+      if (r.needsConfirm) { signup.reset(); say(signup, UOR.t('a.nearly', { email: email }), 'ok'); }
       else if (next) location.href = next;
     }, function (err) { say(signup, friendly(err), 'err'); }).then(function () { busy(signup, false); });
   });
@@ -106,10 +106,10 @@ UOR.ready.then(function () {
   reset.addEventListener('submit', function (e) {
     e.preventDefault();
     var email = reset.email.value.trim();
-    if (!validEmail(email)) return say(reset, 'Enter your email address.', 'err');
-    busy(reset, true, 'Sending…');
+    if (!validEmail(email)) return say(reset, UOR.t('a.needEmail'), 'err');
+    busy(reset, true, UOR.t('a.sending'));
     UOR.auth.sendReset(email).then(function () {
-      say(reset, 'If there\'s an account for ' + email + ', a reset link is on its way.', 'ok');
+      say(reset, UOR.t('a.resetSent', { email: email }), 'ok');
     }, function (err) { say(reset, friendly(err), 'err'); }).then(function () { busy(reset, false); });
   });
 
@@ -117,9 +117,9 @@ UOR.ready.then(function () {
   newpass.addEventListener('submit', function (e) {
     e.preventDefault();
     var pw = newpass.password.value;
-    if (pw.length < 8) return say(newpass, 'Choose a password of 8 characters or more.', 'err');
-    busy(newpass, true, 'Saving…');
-    UOR.auth.setPassword(pw).then(function () { UOR.toast('Password saved'); render(); },
+    if (pw.length < 8) return say(newpass, UOR.t('a.errPw'), 'err');
+    busy(newpass, true, UOR.t('a.saving'));
+    UOR.auth.setPassword(pw).then(function () { UOR.toast(UOR.t('a.pwSaved')); render(); },
       function (err) { say(newpass, friendly(err), 'err'); }).then(function () { busy(newpass, false); });
   });
 
@@ -128,13 +128,13 @@ UOR.ready.then(function () {
   profileForm.addEventListener('submit', function (e) {
     e.preventDefault();
     var name = profileForm.elements.name.value.trim();
-    if (!name) return say(profileForm, 'Your name can\'t be empty.', 'err');
-    busy(profileForm, true, 'Saving…');
-    UOR.auth.setName(name).then(function () { say(profileForm, 'Saved.', 'ok'); },
+    if (!name) return say(profileForm, UOR.t('a.nameEmpty'), 'err');
+    busy(profileForm, true, UOR.t('a.saving'));
+    UOR.auth.setName(name).then(function () { say(profileForm, UOR.t('a.savedOk'), 'ok'); },
       function (err) { say(profileForm, friendly(err), 'err'); }).then(function () { busy(profileForm, false); });
   });
   $('[data-action=signout]').addEventListener('click', function () {
-    UOR.auth.signOut().then(function () { UOR.toast('Signed out'); }, function (err) { UOR.toast(friendly(err)); });
+    UOR.auth.signOut().then(function () { UOR.toast(UOR.t('a.signedOut')); }, function (err) { UOR.toast(friendly(err)); });
   });
 
   function stars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += i <= v ? '★' : '☆'; return s; }
@@ -147,7 +147,7 @@ UOR.ready.then(function () {
   }
   function paintNotes() {
     var list = $('.my-notes');
-    list.innerHTML = '<li class="empty-card slim"><p>Fetching your notes…</p></li>';
+    list.innerHTML = '<li class="empty-card slim"><p>' + UOR.t('a.fetchingNotes') + '</p></li>';
     UOR.reviews.mine().then(function (rows) {
       $('.stat-notes').textContent = rows.length;
       list.innerHTML = rows.length ? rows.map(function (r) {
@@ -155,11 +155,11 @@ UOR.ready.then(function () {
         return '<li class="my-note">' +
           (p ? '<a class="note-thumb" href="' + UOR.productHref(p) + '" style="--bg:' + p.bg + '" tabindex="-1" aria-hidden="true">' + UOR.art(p) + '</a>' : '<span class="note-thumb"></span>') +
           '<div class="note-body"><div class="note-top"><a class="note-name" href="' + (p ? UOR.productHref(p) : '#') + '">' + UOR.esc(p ? p.name : r.product_id) + '</a>' +
-          '<span class="pill ' + (r.approved ? 'pub' : 'wait') + '">' + (r.approved ? 'Published' : 'Awaiting approval') + '</span></div>' +
-          '<span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span>' +
+          '<span class="pill ' + (r.approved ? 'pub' : 'wait') + '">' + UOR.t(r.approved ? 'a.published' : 'a.awaiting') + '</span></div>' +
+          '<span class="stars" role="img" aria-label="' + UOR.esc(UOR.t('rev.outOf', { n: r.rating })) + '">' + stars(r.rating) + '</span>' +
           '<p>' + UOR.esc(r.body) + '</p></div></li>';
-      }).join('') : '<li class="empty-card slim"><p class="empty-title">No notes yet</p><p>Brought a piece home? Open it in the shop and leave a few words under <em>Reviews</em>.</p></li>';
-    }, function () { list.innerHTML = '<li class="empty-card slim"><p>Your notes couldn\'t load just now.</p></li>'; });
+      }).join('') : '<li class="empty-card slim"><p class="empty-title">' + UOR.t('a.noNotes') + '</p><p>' + UOR.t('a.noNotesText') + '</p></li>';
+    }, function () { list.innerHTML = '<li class="empty-card slim"><p>' + UOR.t('a.notesError') + '</p></li>'; });
   }
 
   function render() {
@@ -177,7 +177,7 @@ UOR.ready.then(function () {
     $('.avatar').textContent = (full.trim()[0] || '?').toUpperCase();
     $('.acct-email').textContent = u.email || '';
     $('.acct-email-input').value = u.email || '';
-    $('.stat-since').textContent = u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—';
+    $('.stat-since').textContent = u.created_at ? UOR.date(u.created_at, { month: 'short', year: 'numeric' }) : '—';
     profileForm.elements.name.value = (UOR.auth.profile() && UOR.auth.profile().display_name) || '';
     paintWish(); paintNotes();
   }

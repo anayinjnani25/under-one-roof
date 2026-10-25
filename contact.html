@@ -3,55 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Contact — Under One Roof</title>
+  <title data-i18n="ct.title">Contact — Under One Roof</title>
   <meta name="description" content="Chat with Under One Roof on WhatsApp about an order, a custom piece or wholesale.">
   <meta name="theme-color" content="#F6EFE2">
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=202610251425">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Serif+Telugu:wght@400;500;600&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=202610251535">
 </head>
 <body class="page-info" data-page="contact">
   <header class="site-head"></header>
 
   <main>
     <section class="page-hero wrap">
-      <span class="eyebrow">Contact</span>
-      <h1>Chat with <em>us</em></h1>
-      <p class="lede">A question about an order, an idea for a custom piece, or wholesale for your shop. Message us on WhatsApp and a real person will reply.</p>
+      <span class="eyebrow" data-i18n="ct.eyebrow">Contact</span>
+      <h1 data-i18n="ct.h1">Chat with <em>us</em></h1>
+      <p class="lede" data-i18n="ct.lede">A question about an order, an idea for a custom piece, or wholesale for your shop. Message us on WhatsApp and a real person will reply.</p>
+      <p class="faq-link"><a href="faq.html" data-i18n="ct.faq">Delivery, returns and other common questions →</a></p>
+    </section>
+
+    <section class="wrap page-section custom-sec" id="custom" aria-labelledby="custom-h">
+      <form class="panel-card custom-form" novalidate>
+        <span class="eyebrow" data-i18n="cu.eyebrow">Made for you</span>
+        <h2 class="card-title" id="custom-h" data-i18n="cu.title">Request a <em>custom piece</em></h2>
+        <p class="card-sub" data-i18n="cu.sub">Start from any piece, or something new. Sizes and dates are requests: we'll reply on WhatsApp to say what's possible.</p>
+        <div class="field-row">
+          <label class="field"><span class="label" data-i18n="cu.base">Base piece</span><select name="base" required></select></label>
+          <label class="field"><span class="label" data-i18n="cu.colour">Colour</span><select name="colour"></select></label>
+        </div>
+        <label class="field colour-other" hidden><span class="label" data-i18n="cu.colourDesc">Describe the colour</span><input name="colourOther" maxlength="120"></label>
+        <div class="field-row">
+          <label class="field"><span class="label" data-i18n="cu.size">Size</span><select name="size"></select></label>
+          <label class="field size-measure" hidden><span class="label" data-i18n="cu.measure">Measurement (cm or inches)</span><input name="measure" maxlength="60" data-i18n-ph="cu.measurePh" placeholder="e.g. about 5 ft wide"></label>
+        </div>
+        <div class="field"><span class="label" id="cu-qty-l" data-i18n="cu.qty">Quantity</span><div class="cu-qty"></div></div>
+        <div class="field-row">
+          <label class="field"><span class="label"><span data-i18n="cu.occasion">Occasion</span> <small data-i18n="cu.optional">(optional)</small></span><input name="occasion" maxlength="60" data-i18n-ph="cu.occasionPh" placeholder="e.g. Diwali, a wedding"></label>
+          <label class="field"><span class="label"><span data-i18n="cu.needBy">Needed by</span> <small data-i18n="cu.optional">(optional)</small></span><input name="needBy" type="date"></label>
+        </div>
+        <label class="field"><span class="label" data-i18n="cu.notes">Notes</span><textarea name="notes" rows="4" maxlength="1000" data-i18n-ph="cu.notesPh" placeholder="Anything else: patterns, materials, where it will hang…"></textarea></label>
+        <div class="form-row">
+          <button class="btn wa-go" type="submit"><span class="wa-ico"></span><span data-i18n="cu.send">Send request on WhatsApp</span></button>
+          <p class="form-note" role="status"></p>
+        </div>
+      </form>
     </section>
 
     <section class="wrap page-section contact-grid">
       <form class="panel-card wa-form" novalidate>
-        <h2 class="card-title">Start a <em>WhatsApp</em> chat</h2>
-        <p class="card-sub">Write your message here and WhatsApp will open with it ready to send.</p>
-        <label class="field"><span class="label">Your name <small>(optional)</small></span><input name="name" maxlength="80" autocomplete="given-name"></label>
-        <label class="field"><span class="label">What's it about?</span>
+        <h2 class="card-title" data-i18n="ct.chatTitle">Start a <em>WhatsApp</em> chat</h2>
+        <p class="card-sub" data-i18n="ct.chatSub">Write your message here and WhatsApp will open with it ready to send.</p>
+        <label class="field"><span class="label"><span data-i18n="ct.yourName">Your name</span> <small data-i18n="cu.optional">(optional)</small></span><input name="name" maxlength="80" autocomplete="given-name"></label>
+        <label class="field"><span class="label" data-i18n="ct.about">What's it about?</span>
           <select name="topic">
-            <option value="">Just saying hello</option>
-            <option value="a question about an order">A question about an order</option>
-            <option value="a custom piece">A custom piece</option>
-            <option value="wholesale">Wholesale or stocking us</option>
-            <option value="something else">Something else</option>
+            <option value="" data-i18n="ct.t0">Just saying hello</option>
+            <option value="a question about an order" data-i18n="ct.t1">A question about an order</option>
+            <option value="a custom piece" data-i18n="ct.t2">A custom piece</option>
+            <option value="wholesale" data-i18n="ct.t3">Wholesale or stocking us</option>
+            <option value="something else" data-i18n="ct.t4">Something else</option>
           </select>
         </label>
-        <label class="field"><span class="label">Message</span><textarea name="message" rows="5" maxlength="1000"></textarea></label>
+        <label class="field"><span class="label" data-i18n="ct.message">Message</span><textarea name="message" rows="5" maxlength="1000"></textarea></label>
         <div class="form-row">
-          <button class="btn wa-go" type="submit"><span class="wa-ico"></span>Continue on WhatsApp</button>
+          <button class="btn wa-go" type="submit"><span class="wa-ico"></span><span data-i18n="ct.continue">Continue on WhatsApp</span></button>
           <p class="form-note" role="status"></p>
         </div>
       </form>
 
       <aside class="contact-aside">
-        <h2 class="card-title">How it <em>works</em></h2>
+        <h2 class="card-title" data-i18n="ct.how">How it <em>works</em></h2>
         <ol class="wa-steps">
-          <li>Write your message here, or tap the WhatsApp button in the corner of any page.</li>
-          <li>WhatsApp opens on your phone or computer with the message filled in.</li>
-          <li>Press send. We'll reply right there in the chat.</li>
+          <li data-i18n="ct.step1">Write your message here, or tap the WhatsApp button in the corner of any page.</li>
+          <li data-i18n="ct.step2">WhatsApp opens on your phone or computer with the message filled in.</li>
+          <li data-i18n="ct.step3">Press send. We'll reply right there in the chat.</li>
         </ol>
         <p class="card-sub wa-who" hidden></p>
-        <p class="card-sub">Asking about a particular piece? Use the WhatsApp button on that piece's page and we'll know which one you mean.</p>
+        <p class="card-sub" data-i18n="ct.piece">Asking about a particular piece? Use the WhatsApp button on that piece's page and we'll know which one you mean.</p>
       </aside>
     </section>
   </main>
@@ -59,11 +87,13 @@
   <footer class="site-foot"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/js/config.js?v=202610251425"></script>
-  <script src="assets/js/data.js?v=202610251425"></script>
-  <script src="assets/js/art.js?v=202610251425"></script>
-  <script src="assets/js/common.js?v=202610251425"></script>
-  <script src="assets/js/backend.js?v=202610251425"></script>
-  <script src="assets/js/pages.js?v=202610251425"></script>
+  <script src="assets/js/config.js?v=202610251535"></script>
+  <script src="assets/js/i18n-strings.js?v=202610251535"></script>
+  <script src="assets/js/i18n.js?v=202610251535"></script>
+  <script src="assets/js/data.js?v=202610251535"></script>
+  <script src="assets/js/art.js?v=202610251535"></script>
+  <script src="assets/js/common.js?v=202610251535"></script>
+  <script src="assets/js/backend.js?v=202610251535"></script>
+  <script src="assets/js/pages.js?v=202610251535"></script>
 </body>
 </html>

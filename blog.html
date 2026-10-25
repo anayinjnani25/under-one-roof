@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Journal — Under One Roof</title>
+  <title data-i18n="bl.title">Journal — Under One Roof</title>
   <meta name="description" content="Notes from the Under One Roof worktable.">
   <meta name="theme-color" content="#F6EFE2">
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=202610251425">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Serif+Telugu:wght@400;500;600&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=202610251535">
 </head>
 <body class="page-info" data-page="blog">
   <header class="site-head"></header>
 
   <main>
     <section class="page-hero wrap">
-      <span class="eyebrow">Blog</span>
-      <h1>The <em>journal</em></h1>
-      <p class="lede">Notes from the worktable: how pieces are made, where the patterns come from, and how to live with them.</p>
-      <p class="placeholder-note"><span class="pill wait">Placeholder</span> These are sample entries. The first real posts are being written.</p>
+      <span class="eyebrow" data-i18n="bl.eyebrow">Blog</span>
+      <h1 data-i18n="bl.h1">The <em>journal</em></h1>
+      <p class="lede" data-i18n="bl.lede">Notes from the worktable: how pieces are made, where the patterns come from, and how to live with them.</p>
+      <p class="placeholder-note"><span class="pill wait" data-i18n="bl.ph">Placeholder</span> <span data-i18n="bl.sample">These are sample entries. The first real posts are being written.</span></p>
     </section>
 
     <section class="wrap page-section" aria-label="Posts">
@@ -29,10 +29,10 @@
           <article class="post-card">
             <div class="post-art" style="--bg:#EFE2C9" data-art="haveli-toran"></div>
             <div class="post-body">
-              <p class="post-meta"><span class="label">Entry 01 · Making</span><span class="pill wait">Placeholder</span></p>
-              <h2>How a toran is stitched, start to finish</h2>
-              <p>From cutting the band to setting the last mirror: a walk through the days it takes to make one doorway piece.</p>
-              <span class="soon label">Coming soon</span>
+              <p class="post-meta"><span class="label" data-i18n="bl.e1">Entry 01 · Making</span><span class="pill wait" data-i18n="bl.ph">Placeholder</span></p>
+              <h2 data-i18n="bl.t1">How a toran is stitched, start to finish</h2>
+              <p data-i18n="bl.d1">From cutting the band to setting the last mirror: a walk through the days it takes to make one doorway piece.</p>
+              <span class="soon label" data-i18n="bl.soon">Coming soon</span>
             </div>
           </article>
         </li>
@@ -40,10 +40,10 @@
           <article class="post-card">
             <div class="post-art" style="--bg:#E6D5B4" data-art="pompom-swag"></div>
             <div class="post-body">
-              <p class="post-meta"><span class="label">Entry 02 · At home</span><span class="pill wait">Placeholder</span></p>
-              <h2>Dressing a doorway for the festive season</h2>
-              <p>Pairing a toran with a garland, choosing colours that suit your door, and keeping it all up past the festival weeks.</p>
-              <span class="soon label">Coming soon</span>
+              <p class="post-meta"><span class="label" data-i18n="bl.e2">Entry 02 · At home</span><span class="pill wait" data-i18n="bl.ph">Placeholder</span></p>
+              <h2 data-i18n="bl.t2">Dressing a doorway for the festive season</h2>
+              <p data-i18n="bl.d2">Pairing a toran with a garland, choosing colours that suit your door, and keeping it all up past the festival weeks.</p>
+              <span class="soon label" data-i18n="bl.soon">Coming soon</span>
             </div>
           </article>
         </li>
@@ -51,10 +51,10 @@
           <article class="post-card">
             <div class="post-art" style="--bg:#EBD3C3" data-art="temple-jhumka"></div>
             <div class="post-body">
-              <p class="post-meta"><span class="label">Entry 03 · Care</span><span class="pill wait">Placeholder</span></p>
-              <h2>Why oxidised jewelry darkens, and how to keep it that way</h2>
-              <p>What oxidising does to the metal, why the dark finish shows off chased detail, and the small habits that protect it.</p>
-              <span class="soon label">Coming soon</span>
+              <p class="post-meta"><span class="label" data-i18n="bl.e3">Entry 03 · Care</span><span class="pill wait" data-i18n="bl.ph">Placeholder</span></p>
+              <h2 data-i18n="bl.t3">Why oxidised jewelry darkens, and how to keep it that way</h2>
+              <p data-i18n="bl.d3">What oxidising does to the metal, why the dark finish shows off chased detail, and the small habits that protect it.</p>
+              <span class="soon label" data-i18n="bl.soon">Coming soon</span>
             </div>
           </article>
         </li>
@@ -65,11 +65,13 @@
   <footer class="site-foot"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/js/config.js?v=202610251425"></script>
-  <script src="assets/js/data.js?v=202610251425"></script>
-  <script src="assets/js/art.js?v=202610251425"></script>
-  <script src="assets/js/common.js?v=202610251425"></script>
-  <script src="assets/js/backend.js?v=202610251425"></script>
-  <script src="assets/js/pages.js?v=202610251425"></script>
+  <script src="assets/js/config.js?v=202610251535"></script>
+  <script src="assets/js/i18n-strings.js?v=202610251535"></script>
+  <script src="assets/js/i18n.js?v=202610251535"></script>
+  <script src="assets/js/data.js?v=202610251535"></script>
+  <script src="assets/js/art.js?v=202610251535"></script>
+  <script src="assets/js/common.js?v=202610251535"></script>
+  <script src="assets/js/backend.js?v=202610251535"></script>
+  <script src="assets/js/pages.js?v=202610251535"></script>
 </body>
 </html>

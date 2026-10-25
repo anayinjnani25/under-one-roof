@@ -7,10 +7,10 @@ UOR.ready.then(function () {
   var cat = UOR.cat(UOR.query('c')) || UOR.categories[0];
   var items = UOR.inCat(cat.slug);
   UOR.chrome('products');
-  UOR.waContext = 'Hi Under One Roof! I have a question about your ' + cat.title + ' ' + cat.accent + '.';
+  UOR.waContext = 'Hi Under One Roof! I have a question about your ' + UOR.en(cat, 'title') + ' ' + UOR.en(cat, 'accent') + '.';
 
   document.title = cat.title + ' ' + cat.accent + ' — Under One Roof';
-  document.querySelector('.cat-no').textContent = 'Entry No. ' + cat.no + ' — ' + items.length + ' pieces';
+  document.querySelector('.cat-no').textContent = UOR.t('cat.entry', { no: cat.no, n: items.length });
   document.querySelector('.cat-title').innerHTML = cat.title + ' <em>' + cat.accent + '</em>';
   document.querySelector('.cat-blurb').textContent = cat.blurb;
   document.querySelector('.cat-tabs').innerHTML = UOR.categories.map(function (c) {

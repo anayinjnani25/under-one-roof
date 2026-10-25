@@ -223,8 +223,14 @@ UOR.ready.then(function () {
     c.strokeStyle = C.rust; c.lineWidth = w || G.tw; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke();
   }
 
-  var EYEBROW = 'No. 01 — A journal of handmade things';
-  var SUB = 'Torans, garlands & jewelry — stitched by hand, kept under one roof.';
+  var LATIN = UOR.lang === 'en';
+  var EYEBROW = UOR.t('home.introEyebrow');
+  var SUB = UOR.t('home.introSub');
+  // split into user-perceived characters so typing never cuts a Telugu/Hindi syllable in half
+  var EYEBROW_G = (function () {
+    if (window.Intl && Intl.Segmenter) return Array.from(new Intl.Segmenter(UOR.locale, { granularity: 'grapheme' }).segment(EYEBROW), function (x) { return x.segment; });
+    return LATIN ? EYEBROW.split('') : EYEBROW.split(/(\s+)/).filter(Boolean); // older browsers: type word by word
+  })();
 
   function drawBrand(c, p) {
     var fs = G.fs, cx = W / 2, cy = G.cy;
@@ -245,27 +251,37 @@ UOR.ready.then(function () {
     }
     var e = seg(p, PH.eyebrow[0], PH.eyebrow[1]);
     if (e > 0) {
-      var efs = Math.max(11, fs * .13), n = Math.ceil(EYEBROW.length * e);
-      c.font = efs + 'px "Special Elite", "Courier New", monospace';
+      var efs = Math.max(11, fs * .13) * (LATIN ? 1 : 1.15), n = Math.ceil(EYEBROW_G.length * e);
+      c.font = efs + 'px "Special Elite", "Noto Serif Telugu", "Noto Serif Devanagari", "Courier New", monospace';
       c.fillStyle = C.brown; c.textBaseline = 'alphabetic';
-      var txt = EYEBROW.toUpperCase();
-      // measure full width so typing grows left-to-right from a fixed start
-      var track = efs * .22, total = 0;
-      for (var i = 0; i < txt.length; i++) total += c.measureText(txt[i]).width + track;
-      var sx = cx - total / 2, yy = cy - fs * .95;
-      for (var k = 0; k < n; k++) { c.fillText(txt[k], sx, yy); sx += c.measureText(txt[k]).width + track; }
+      var sx, yy = cy - fs * .95;
+      if (LATIN) {
+        var txt = EYEBROW_G.join('').toUpperCase();
+        // measure full width so typing grows left-to-right from a fixed start
+        var track = efs * .22, total = 0;
+        for (var i = 0; i < txt.length; i++) total += c.measureText(txt[i]).width + track;
+        sx = cx - total / 2;
+        for (var k = 0; k < n; k++) { c.fillText(txt[k], sx, yy); sx += c.measureText(txt[k]).width + track; }
+      } else {
+        // Telugu/Hindi: type whole syllables (grapheme clusters) and draw as one run so letters join
+        var part = EYEBROW_G.slice(0, n).join('');
+        sx = cx - c.measureText(EYEBROW_G.join('')).width / 2;
+        c.fillText(part, sx, yy);
+        sx += c.measureText(part).width;
+      }
       if (e < 1 || (performance.now() / 500 | 0) % 2) c.fillRect(sx + 2, yy - efs * .8, efs * .5, efs * .95);
     }
     var s = seg(p, PH.sub[0], PH.sub[1]);
     if (s > 0) {
-      var sfs = Math.max(17, fs * .24);
-      c.font = 'italic 400 ' + sfs + 'px "Cormorant Garamond", Georgia, serif';
+      var sfs = Math.max(17, fs * .24) * (LATIN ? 1 : .9);
+      c.font = 'italic 400 ' + sfs + 'px "Cormorant Garamond", "Noto Serif Telugu", "Noto Serif Devanagari", Georgia, serif';
       c.fillStyle = C.brown; c.textAlign = 'center'; c.globalAlpha = easeOut(s);
       var y0 = G.ny + sfs * 1.9 + (1 - easeOut(s)) * 10;
       if (c.measureText(SUB).width > W * .86) {
         var cut = SUB.indexOf('—');
+        if (cut < 0) { cut = SUB.lastIndexOf(' ', Math.floor(SUB.length / 2)); if (cut < 0) cut = Math.floor(SUB.length / 2); }
         c.fillText(SUB.slice(0, cut).trim(), cx, y0);
-        c.fillText(SUB.slice(cut).trim(), cx, y0 + sfs * 1.25);
+        c.fillText(SUB.slice(cut).trim(), cx, y0 + sfs * 1.35);
       } else c.fillText(SUB, cx, y0);
       c.textAlign = 'left'; c.globalAlpha = 1;
     }
@@ -411,10 +427,10 @@ UOR.ready.then(function () {
   catGrid.innerHTML = UOR.categories.map(function (c) {
     var n = UOR.inCat(c.slug).length, f = UOR.byId(c.feature);
     return '<li><a class="cat-card" href="category.html?c=' + c.slug + '">' +
-      '<span class="label"><span>No. ' + c.no + '</span><span>' + n + ' pieces</span></span>' +
+      '<span class="label"><span>' + UOR.t('card.no') + ' ' + c.no + '</span><span>' + UOR.t('search.pieces', { n: n }) + '</span></span>' +
       '<div class="cat-art">' + UOR.art(f) + '</div>' +
       '<h3>' + c.title + ' <em>' + c.accent + '</em></h3><p>' + c.blurb + '</p>' +
-      '<span class="open">Open entry →</span></a></li>';
+      '<span class="open">' + UOR.t('home.open') + '</span></a></li>';
   }).join('');
 
   var grid = document.querySelector('.pgrid');
@@ -422,8 +438,8 @@ UOR.ready.then(function () {
     return '<li data-cat="' + p.cat + '">' + UOR.card(p, UOR.catHref(p), i + 1) + '</li>';
   }).join('');
   var chips = document.querySelector('.chips');
-  chips.innerHTML = '<button class="chip" type="button" data-f="all" aria-pressed="true">All</button>' +
-    UOR.categories.map(function (c) { return '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + c.accent + (c.slug === 'oxidised' ? ' · Oxidised' : c.slug === 'gold-silver' ? ' · Gold & Silver' : '') + '</button>'; }).join('');
+  chips.innerHTML = '<button class="chip" type="button" data-f="all" aria-pressed="true">' + UOR.t('home.all') + '</button>' +
+    UOR.categories.map(function (c) { return '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + UOR.t('chip.' + c.slug) + '</button>'; }).join('');
   chips.addEventListener('click', function (e) {
     var b = e.target.closest('.chip'); if (!b) return;
     chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
@@ -445,7 +461,7 @@ UOR.ready.then(function () {
     }).join('');
     var lane = document.createElement('div');
     lane.className = 'lane';
-    lane.setAttribute('aria-label', 'Product lane ' + (li + 1));
+    lane.setAttribute('aria-label', UOR.t('home.lane', { n: li + 1 }));
     lane.innerHTML = '<div class="lane-track">' + html + '<div aria-hidden="true">' + html + '</div></div>';
     lane.querySelectorAll('[aria-hidden] a').forEach(function (a) { a.tabIndex = -1; });
     lanesEl.appendChild(lane);
@@ -561,7 +577,8 @@ UOR.ready.then(function () {
     Promise.all([
       document.fonts.load('400 40px Fraunces'), document.fonts.load('italic 300 40px Fraunces'),
       document.fonts.load('20px "Special Elite"'), document.fonts.load('italic 20px "Cormorant Garamond"')
-    ]).then(function () { render(); measureLanes(); }, function () {});
+    ].concat(LATIN ? [] : [document.fonts.load('20px "Noto Serif ' + (UOR.lang === 'te' ? 'Telugu' : 'Devanagari') + '"', SUB)]))
+      .then(function () { render(); measureLanes(); }, function () {});
   }
   window.addEventListener('load', measureLanes);
 });

@@ -1,46 +1,56 @@
-/* Under One Roof — product detail: jello-spring object, sliding info panel, reviews. */
+/* Under One Roof — product detail: jello-spring object, sliding info panel, sharing,
+   suggestions, reviews. Text on screen follows the chosen language; WhatsApp messages
+   to the shop stay in English (UOR.en / UOR.palNameEn). */
 UOR.ready.then(function () {
+  var t = UOR.t;
   var reduced = UOR.reduced();
   var p = UOR.byId(UOR.query('id')) || UOR.products[0];
   var cat = UOR.cat(p.cat);
   UOR.chrome('products');
-  UOR.waContext = 'Hi Under One Roof! I have a question about the ' + p.name + ': ' + location.href.split('#')[0];
+  var pageUrl = location.href.split('#')[0].replace(/[?&]lang=\w+/, '');
+  UOR.waContext = 'Hi Under One Roof! I have a question about the ' + UOR.en(p, 'name') + ': ' + pageUrl;
+  UOR.recent.add(p.id);
+  UOR.renderRecent(p.id);
 
-  var $ = function (s) { return document.querySelector(s); };
+  var $ = function (s, el) { return (el || document).querySelector(s); };
   document.title = p.name + ' — Under One Roof';
-  $('.crumbs').innerHTML = '<a href="index.html#shelf">Shelf</a> / <a href="category.html?c=' + cat.slug + '">' + cat.title + ' ' + cat.accent + '</a> / <span aria-current="page">' + UOR.esc(p.name) + '</span>';
-  $('.pd-cat').textContent = 'Entry No. ' + cat.no + ' — ' + cat.title + ' ' + cat.accent;
+  $('.crumbs').innerHTML = '<a href="index.html#shelf">' + t('pd.shelf') + '</a> / <a href="category.html?c=' + cat.slug + '">' + cat.title + ' ' + cat.accent + '</a> / <span aria-current="page">' + UOR.esc(p.name) + '</span>';
+  $('.pd-cat').textContent = t('pd.entry', { no: cat.no, cat: cat.title + ' ' + cat.accent });
   $('.pd-name').textContent = p.name;
   $('.pd-mini').textContent = p.mini;
   $('.pd-desc').textContent = p.desc;
   $('.pd-care').textContent = UOR.care[p.cat];
+
   // prices aren't shown: shoppers ask for them on WhatsApp, with the piece and colour pre-filled
   var priceBtn = $('.wa-price');
   $('.wa-ico', priceBtn).innerHTML = UOR.WA_ICON;
   function priceAsk() {
-    return 'Hi Under One Roof! Could you tell me the price of the ' + p.name +
-      (current ? ' in ' + UOR.palettes[current].name : '') + '? ' + location.href.split('#')[0];
+    return 'Hi Under One Roof! Could you tell me the price of the ' + UOR.en(p, 'name') +
+      (current ? ' in ' + UOR.palNameEn(current) : '') + '? ' + pageUrl;
   }
   if (UOR.wa()) {
-    priceBtn.href = UOR.wa(priceAsk());
     priceBtn.addEventListener('click', function () { priceBtn.href = UOR.wa(priceAsk()); }); // picks up the latest colour
   } else {
     priceBtn.removeAttribute('target'); priceBtn.removeAttribute('rel'); // no number set: fall back to the Contact page
   }
-  $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p));
+  $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p) +
+    '<button class="share-btn" type="button">' + UOR.WA_ICON + '<span>' + t('pd.share') + '</span></button>');
 
   // ---- colour options (start on the colour already saved in the wishlist, if any)
   var saved = UOR.wish.get(p.id);
   var jelly = $('.jelly'), current = saved ? saved.colour : p.colors[0];
+  var customLink = $('.custom-link');
   function paint() {
     jelly.innerHTML = UOR.art(p, current);
-    $('.swatch-name').textContent = UOR.palettes[current].name;
+    $('.swatch-name').textContent = UOR.palName(current);
     var heart = $('.pd-actions .heart');
     if (heart) heart.dataset.colour = current; // the heart saves the colour on screen
     document.querySelectorAll('.swatch').forEach(function (s) { s.setAttribute('aria-checked', s.dataset.k === current); s.tabIndex = s.dataset.k === current ? 0 : -1; });
+    if (UOR.wa()) priceBtn.href = UOR.wa(priceAsk());
+    customLink.href = 'contact.html?custom=' + encodeURIComponent(p.id) + '&colour=' + encodeURIComponent(current) + '#custom';
   }
   $('.swatches').innerHTML = p.colors.map(function (k) {
-    return '<button class="swatch" type="button" role="radio" data-k="' + k + '" aria-label="' + UOR.palettes[k].name + '" style="background:' + UOR.swatch(k) + '"></button>';
+    return '<button class="swatch" type="button" role="radio" data-k="' + k + '" aria-label="' + UOR.esc(UOR.palName(k)) + '" style="background:' + UOR.swatch(k) + '"></button>';
   }).join('');
   $('.swatches').addEventListener('click', function (e) {
     var b = e.target.closest('.swatch'); if (!b) return;
@@ -54,6 +64,18 @@ UOR.ready.then(function () {
     $('.swatch[data-k="' + current + '"]').focus();
   });
   paint();
+
+  // ---- share with family: native share sheet on phones, otherwise WhatsApp with no fixed number
+  $('.share-btn').addEventListener('click', function () {
+    var text = t('pd.shareText', { name: p.name, mini: p.mini, colour: UOR.palName(current) });
+    var phone = window.matchMedia('(pointer: coarse)').matches;
+    function viaWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + pageUrl), '_blank', 'noopener'); }
+    if (phone && navigator.share) {
+      navigator.share({ title: p.name, text: text, url: pageUrl }).catch(function (err) {
+        if (!err || err.name !== 'AbortError') viaWhatsApp(); // cancelled share sheets stay cancelled
+      });
+    } else viaWhatsApp();
+  });
 
   // ---- jello spring on the object
   var S = { r: 0, vr: 0, k: 0, vk: 0, s: 0, vs: 0 }, running = false, last = null;
@@ -93,10 +115,10 @@ UOR.ready.then(function () {
   function active() { return Math.round(panels.scrollLeft / Math.max(1, panels.clientWidth)); }
   function syncTabs() {
     var a = active();
-    tabs.forEach(function (t, i) { t.setAttribute('aria-selected', i === a); t.tabIndex = i === a ? 0 : -1; });
+    tabs.forEach(function (tb, i) { tb.setAttribute('aria-selected', i === a); tb.tabIndex = i === a ? 0 : -1; });
     prev.disabled = a === 0; next.disabled = a === tabs.length - 1;
   }
-  tabs.forEach(function (t, i) { t.addEventListener('click', function () { goPanel(i); }); });
+  tabs.forEach(function (tb, i) { tb.addEventListener('click', function () { goPanel(i); }); });
   $('.tabs').addEventListener('keydown', function (e) {
     var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
     var i = clamp(active() + d, 0, tabs.length - 1); goPanel(i); tabs[i].focus();
@@ -121,7 +143,7 @@ UOR.ready.then(function () {
   $('.add-bag').addEventListener('click', function () {
     var had = UOR.wish.has(p.id);
     UOR.wish.set(p.id, { qty: qty, colour: current });
-    UOR.toast((had ? 'Updated: ' : 'Added ') + qty + ' × ' + p.name + (had ? ' in your wishlist' : ''));
+    UOR.toast(t(had ? 'pd.updated' : 'pd.added', { n: qty, name: p.name }));
   });
   // keep the stepper in step with changes made from the wishlist drawer
   document.addEventListener('uor:wish', function () {
@@ -143,28 +165,28 @@ UOR.ready.then(function () {
       revs = [mine].concat(revs);
     }
     if (!revs.length) {
-      $('.rev-summary').innerHTML = '<span class="label">No notes yet</span>';
-      $('.review-list').innerHTML = '<li class="review review-empty"><p>Nobody has written about this piece yet. If it\'s found a home with you, be the first.</p></li>';
+      $('.rev-summary').innerHTML = '<span class="label">' + t('rev.none') + '</span>';
+      $('.review-list').innerHTML = '<li class="review review-empty"><p>' + t('rev.noneText') + '</p></li>';
       return;
     }
     var pub = revs.filter(function (r) { return r.approved; });
     if (pub.length) {
       var avg = pub.reduce(function (a, r) { return a + r.rating; }, 0) / pub.length;
-      $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' + avg.toFixed(1) + ' / 5 · ' + pub.length + (pub.length === 1 ? ' note' : ' notes') + '</span>';
-    } else $('.rev-summary').innerHTML = '<span class="label">No published notes yet</span>';
+      $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' +
+        t(pub.length === 1 ? 'rev.summary1' : 'rev.summary', { avg: avg.toFixed(1), n: pub.length }) + '</span>';
+    } else $('.rev-summary').innerHTML = '<span class="label">' + t('rev.noPub') + '</span>';
     $('.review-list').innerHTML = revs.map(function (r) {
-      var d = new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-      return '<li class="review' + (r.approved ? '' : ' pending') + '"><span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + d +
-        (r.approved ? '' : ' · <span class="pending-tag">Your note, awaiting approval</span>') + '</span></li>';
+      return '<li class="review' + (r.approved ? '' : ' pending') + '"><span class="stars" role="img" aria-label="' + UOR.esc(t('rev.outOf', { n: r.rating })) + '">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + UOR.date(r.created_at) +
+        (r.approved ? '' : ' · <span class="pending-tag">' + t('rev.awaiting') + '</span>') + '</span></li>';
     }).join('');
   }
   function loadReviews() {
     UOR.reviews.list(p.id).then(renderReviews, function () {
       $('.rev-summary').innerHTML = '';
-      $('.review-list').innerHTML = '<li class="review review-empty"><p>Reviews couldn\'t load just now. Please try again in a moment.</p></li>';
+      $('.review-list').innerHTML = '<li class="review review-empty"><p>' + t('rev.error') + '</p></li>';
     });
   }
-  $('.review-list').innerHTML = '<li class="review review-empty"><p>Fetching notes…</p></li>';
+  $('.review-list').innerHTML = '<li class="review review-empty"><p>' + t('rev.fetching') + '</p></li>';
 
   // the form is for signed-in members, once per piece
   var form = $('.review-form'), note = form.querySelector('.form-note');
@@ -181,25 +203,37 @@ UOR.ready.then(function () {
     e.preventDefault();
     var fd = new FormData(form), name = String(fd.get('name') || '').trim(), body = String(fd.get('body') || '').trim(), rating = +fd.get('rating');
     note.className = 'form-note';
-    if (fd.get('website')) { form.reset(); note.textContent = 'Thank you. Your note will appear once it\'s approved.'; return; } // bot trap
-    if (!rating) { note.textContent = 'Choose a rating from one to five stars.'; note.classList.add('err'); return; }
-    if (!name) { note.textContent = 'Add your name.'; note.classList.add('err'); form.elements.name.focus(); return; }
-    if (body.length < 3) { note.textContent = 'Write a few words about the piece.'; note.classList.add('err'); form.elements.body.focus(); return; }
+    if (fd.get('website')) { form.reset(); note.textContent = t('rev.thanks'); return; } // bot trap
+    if (!rating) { note.textContent = t('rev.chooseRating'); note.classList.add('err'); return; }
+    if (!name) { note.textContent = t('rev.addName'); note.classList.add('err'); form.elements.name.focus(); return; }
+    if (body.length < 3) { note.textContent = t('rev.fewWords'); note.classList.add('err'); form.elements.body.focus(); return; }
     var btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = 'Sending…';
+    btn.disabled = true; btn.textContent = t('rev.sending');
     UOR.reviews.submit(p.id, { name: name, rating: rating, body: body }).then(function () {
       form.reset();
-      UOR.toast('Thank you. Your note will appear once it\'s approved.');
+      UOR.toast(t('rev.thanks'));
       loadReviews();
     }, function (err) {
-      var m = err && err.message;
-      note.textContent = /already|sign in/i.test(m || '') ? m : 'That didn\'t send. Check your connection and try again.';
+      var known = err && (err.code === 'dup' || err.message === t('rev.signin'));
+      note.textContent = known ? err.message : t('rev.failed');
       note.classList.add('err');
-    }).then(function () { btn.disabled = false; btn.textContent = 'Send note'; });
+    }).then(function () { btn.disabled = false; btn.textContent = t('rev.send'); });
   });
 
-  // ---- related
-  $('.rel-title').innerHTML = 'More <em>' + cat.accent.toLowerCase() + '</em>';
+  // ---- "You might also like": other shelves that go together, same colours first.
+  // Deterministic per piece, so it doesn't reshuffle on reload.
+  var PAIRS = { torans: ['garlands', 'hangings'], garlands: ['torans', 'hangings'], hangings: ['torans', 'garlands'], oxidised: ['gold-silver'], 'gold-silver': ['oxidised'] };
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  var paired = PAIRS[p.cat] || [];
+  var also = UOR.products.filter(function (q) { return q.cat !== p.cat; }).map(function (q) {
+    var shared = q.colors.filter(function (k) { return p.colors.indexOf(k) > -1; }).length;
+    var score = (paired.indexOf(q.cat) > -1 ? 100 : 0) + (shared ? 10 + shared : 0);
+    return { q: q, score: score, tie: hash(p.id + '|' + q.id) };
+  }).sort(function (a, b) { return b.score - a.score || a.tie - b.tie; }).slice(0, 4);
+  $('.also-grid').innerHTML = also.map(function (x) { return '<li>' + UOR.card(x.q, UOR.productHref(x.q)) + '</li>'; }).join('');
+
+  // ---- same shelf
+  $('.rel-title').innerHTML = t('pd.more', { x: UOR.lang === 'en' ? cat.accent.toLowerCase() : cat.accent });
   $('.rel-grid').innerHTML = UOR.inCat(p.cat).filter(function (q) { return q !== p; }).slice(0, 4).map(function (q) {
     return '<li>' + UOR.card(q, UOR.productHref(q)) + '</li>';
   }).join('');

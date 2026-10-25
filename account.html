@@ -3,58 +3,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Your account — Under One Roof</title>
+  <title data-i18n="a.title">Your account — Under One Roof</title>
   <meta name="description" content="Sign in to Under One Roof to keep your wishlist and leave notes on pieces.">
   <meta name="theme-color" content="#F6EFE2">
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=202610251425">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Serif+Telugu:wght@400;500;600&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=202610251535">
 </head>
 <body class="page-account">
   <header class="site-head"></header>
 
   <main class="acct wrap">
-    <p class="acct-loading label" aria-live="polite">Opening your entry…</p>
+    <p class="acct-loading label" aria-live="polite" data-i18n="a.loading">Opening your entry…</p>
 
     <!-- Guests: sign in / create account -->
     <section class="acct-view" data-view="guest" hidden>
       <div class="acct-intro">
-        <span class="eyebrow">Entry No. 00 — Your shelf</span>
-        <h1>Come <em>in</em>.</h1>
-        <p class="lede">Sign in to keep your wishlist on every device and leave notes on the pieces you've brought home.</p>
+        <span class="eyebrow" data-i18n="a.eyebrow">Entry No. 00 — Your shelf</span>
+        <h1 data-i18n="a.comeIn">Come <em>in</em>.</h1>
+        <p class="lede" data-i18n="a.lede">Sign in to keep your wishlist on every device and leave notes on the pieces you've brought home.</p>
       </div>
 
       <div class="auth-card">
-        <div class="tabs" role="tablist" aria-label="Account">
-          <button class="tab" role="tab" type="button" id="tab-in" aria-controls="pane-in" aria-selected="true">Sign in</button>
-          <button class="tab" role="tab" type="button" id="tab-up" aria-controls="pane-up" aria-selected="false" tabindex="-1">Create account</button>
+        <div class="tabs" role="tablist" aria-label="Account" data-i18n-aria="a.tabsAria">
+          <button class="tab" role="tab" type="button" id="tab-in" aria-controls="pane-in" aria-selected="true" data-i18n="a.signin">Sign in</button>
+          <button class="tab" role="tab" type="button" id="tab-up" aria-controls="pane-up" aria-selected="false" tabindex="-1" data-i18n="a.create">Create account</button>
         </div>
 
         <form class="auth-pane" id="pane-in" role="tabpanel" aria-labelledby="tab-in" data-form="signin" novalidate>
-          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
-          <label class="field"><span class="label">Password</span><input name="password" type="password" autocomplete="current-password" required></label>
+          <label class="field"><span class="label" data-i18n="a.email">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span class="label" data-i18n="a.password">Password</span><input name="password" type="password" autocomplete="current-password" required></label>
           <div class="form-row">
-            <button class="btn" type="submit">Sign in</button>
-            <button class="link-btn" type="button" data-go="reset">Forgot password?</button>
+            <button class="btn" type="submit" data-i18n="a.signin">Sign in</button>
+            <button class="link-btn" type="button" data-go="reset" data-i18n="a.forgot">Forgot password?</button>
           </div>
           <p class="form-note" role="status"></p>
         </form>
 
         <form class="auth-pane" id="pane-up" role="tabpanel" aria-labelledby="tab-up" data-form="signup" novalidate hidden>
-          <label class="field"><span class="label">Your name</span><input name="name" autocomplete="name" maxlength="60" required></label>
-          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
-          <label class="field"><span class="label">Password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
-          <button class="btn" type="submit">Create account</button>
+          <label class="field"><span class="label" data-i18n="a.yourName">Your name</span><input name="name" autocomplete="name" maxlength="60" required></label>
+          <label class="field"><span class="label" data-i18n="a.email">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span class="label" data-i18n="a.newPw">Password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button class="btn" type="submit" data-i18n="a.create">Create account</button>
           <p class="form-note" role="status"></p>
         </form>
 
-        <div class="or"><span>or</span></div>
+        <div class="or"><span data-i18n="a.or">or</span></div>
         <button class="btn btn-ghost wide google" type="button" data-action="google">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>
-          Continue with Google
+          <span data-i18n="a.google">Continue with Google</span>
         </button>
         <p class="form-note google-note" role="status"></p>
       </div>
@@ -63,14 +63,14 @@
     <!-- Forgot password -->
     <section class="acct-view" data-view="reset" hidden>
       <div class="auth-card narrow">
-        <span class="eyebrow">Forgot password</span>
-        <h1 class="h2">A new <em>key</em>.</h1>
-        <p>Enter your email and we'll send a link to choose a new password.</p>
+        <span class="eyebrow" data-i18n="a.forgotEyebrow">Forgot password</span>
+        <h1 class="h2" data-i18n="a.newKey">A new <em>key</em>.</h1>
+        <p data-i18n="a.resetText">Enter your email and we'll send a link to choose a new password.</p>
         <form data-form="reset" novalidate>
-          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span class="label" data-i18n="a.email">Email</span><input name="email" type="email" autocomplete="email" required></label>
           <div class="form-row">
-            <button class="btn" type="submit">Send reset link</button>
-            <button class="link-btn" type="button" data-go="guest">Back to sign in</button>
+            <button class="btn" type="submit" data-i18n="a.sendReset">Send reset link</button>
+            <button class="link-btn" type="button" data-go="guest" data-i18n="a.backSignin">Back to sign in</button>
           </div>
           <p class="form-note" role="status"></p>
         </form>
@@ -80,11 +80,11 @@
     <!-- Arrived from a password-reset email -->
     <section class="acct-view" data-view="recover" hidden>
       <div class="auth-card narrow">
-        <span class="eyebrow">Choose a new password</span>
-        <h1 class="h2">Almost <em>there</em>.</h1>
+        <span class="eyebrow" data-i18n="a.chooseNew">Choose a new password</span>
+        <h1 class="h2" data-i18n="a.almost">Almost <em>there</em>.</h1>
         <form data-form="newpass" novalidate>
-          <label class="field"><span class="label">New password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
-          <button class="btn" type="submit">Save password</button>
+          <label class="field"><span class="label" data-i18n="a.newPassword">New password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button class="btn" type="submit" data-i18n="a.savePw">Save password</button>
           <p class="form-note" role="status"></p>
         </form>
       </div>
@@ -96,33 +96,33 @@
         <div class="member-id">
           <span class="avatar" aria-hidden="true"></span>
           <div>
-            <span class="eyebrow">Your shelf</span>
-            <h1>Hello, <em class="hello-name"></em></h1>
-            <p class="member-meta"><span class="acct-email"></span><span class="dot" aria-hidden="true">·</span><button class="link-btn" type="button" data-action="signout">Sign out</button></p>
+            <span class="eyebrow" data-i18n="a.yourShelf">Your shelf</span>
+            <h1><span data-i18n="a.hello">Hello,</span> <em class="hello-name"></em></h1>
+            <p class="member-meta"><span class="acct-email"></span><span class="dot" aria-hidden="true">·</span><button class="link-btn" type="button" data-action="signout" data-i18n="a.signout">Sign out</button></p>
           </div>
         </div>
-        <ul class="stats" aria-label="Your account at a glance">
-          <li><strong class="stat-wish">0</strong><span>Saved pieces</span></li>
-          <li><strong class="stat-notes">0</strong><span>Notes written</span></li>
-          <li><strong class="stat-since">—</strong><span>Member since</span></li>
+        <ul class="stats" aria-label="Your account at a glance" data-i18n-aria="a.statsAria">
+          <li><strong class="stat-wish">0</strong><span data-i18n="a.saved">Saved pieces</span></li>
+          <li><strong class="stat-notes">0</strong><span data-i18n="a.notes">Notes written</span></li>
+          <li><strong class="stat-since">—</strong><span data-i18n="a.since">Member since</span></li>
         </ul>
       </header>
 
       <div class="acct-grid">
         <form class="panel-card" data-form="profile" novalidate>
-          <h2 class="card-title">Your <em>details</em></h2>
-          <p class="card-sub">Your name appears on the notes you leave about pieces.</p>
-          <label class="field"><span class="label">Display name</span><input name="name" maxlength="60" autocomplete="name" required></label>
-          <label class="field"><span class="label">Email</span><input class="acct-email-input" type="email" readonly tabindex="-1" aria-readonly="true"></label>
+          <h2 class="card-title" data-i18n="a.details">Your <em>details</em></h2>
+          <p class="card-sub" data-i18n="a.detailsSub">Your name appears on the notes you leave about pieces.</p>
+          <label class="field"><span class="label" data-i18n="a.display">Display name</span><input name="name" maxlength="60" autocomplete="name" required></label>
+          <label class="field"><span class="label" data-i18n="a.email">Email</span><input class="acct-email-input" type="email" readonly tabindex="-1" aria-readonly="true"></label>
           <div class="form-row">
-            <button class="btn" type="submit">Save changes</button>
+            <button class="btn" type="submit" data-i18n="a.saveChanges">Save changes</button>
             <p class="form-note" role="status"></p>
           </div>
         </form>
 
         <div class="panel-card">
-          <h2 class="card-title">Your <em>notes</em></h2>
-          <p class="card-sub">Reviews you've written. Each one appears in the shop once it's approved.</p>
+          <h2 class="card-title" data-i18n="a.yourNotes">Your <em>notes</em></h2>
+          <p class="card-sub" data-i18n="a.notesSub">Reviews you've written. Each one appears in the shop once it's approved.</p>
           <ul class="my-notes"></ul>
         </div>
       </div>
@@ -130,10 +130,10 @@
       <section class="acct-wish" aria-labelledby="wish-h">
         <div class="section-head">
           <div>
-            <span class="eyebrow">Saved to your account</span>
-            <h2 id="wish-h">Your <em>wishlist</em></h2>
+            <span class="eyebrow" data-i18n="a.savedTo">Saved to your account</span>
+            <h2 id="wish-h" data-i18n="a.yourWish">Your <em>wishlist</em></h2>
           </div>
-          <a class="btn btn-ghost" href="index.html#collection">Browse the shop</a>
+          <a class="btn btn-ghost" href="index.html#collection" data-i18n="a.browse">Browse the shop</a>
         </div>
         <div class="panel-card acct-wishlist">
           <ul class="drawer-list wish-rows my-wish"></ul>
@@ -145,11 +145,13 @@
   <footer class="site-foot"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/js/config.js?v=202610251425"></script>
-  <script src="assets/js/data.js?v=202610251425"></script>
-  <script src="assets/js/art.js?v=202610251425"></script>
-  <script src="assets/js/common.js?v=202610251425"></script>
-  <script src="assets/js/backend.js?v=202610251425"></script>
-  <script src="assets/js/account.js?v=202610251425"></script>
+  <script src="assets/js/config.js?v=202610251535"></script>
+  <script src="assets/js/i18n-strings.js?v=202610251535"></script>
+  <script src="assets/js/i18n.js?v=202610251535"></script>
+  <script src="assets/js/data.js?v=202610251535"></script>
+  <script src="assets/js/art.js?v=202610251535"></script>
+  <script src="assets/js/common.js?v=202610251535"></script>
+  <script src="assets/js/backend.js?v=202610251535"></script>
+  <script src="assets/js/account.js?v=202610251535"></script>
 </body>
 </html>

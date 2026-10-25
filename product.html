@@ -9,97 +9,104 @@
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=202610251425">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Serif+Telugu:wght@400;500;600&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=202610251535">
 </head>
 <body class="page-product">
   <header class="site-head"></header>
 
   <main>
     <section class="pd wrap">
-      <nav class="crumbs" aria-label="Breadcrumb"></nav>
-      <div class="pd-stage" aria-label="Product image. Move over it or tap to nudge it.">
+      <nav class="crumbs" aria-label="Breadcrumb" data-i18n-aria="p.crumbs"></nav>
+      <div class="pd-stage" aria-label="Product image. Move over it or tap to nudge it." data-i18n-aria="p.stage">
         <div class="jelly"></div>
-        <span class="label pd-hint" aria-hidden="true">Nudge it ↔</span>
+        <span class="label pd-hint" aria-hidden="true" data-i18n="p.nudge">Nudge it ↔</span>
       </div>
       <div class="pd-info">
         <span class="eyebrow pd-cat"></span>
         <h1 class="pd-name"></h1>
         <p class="mini pd-mini"></p>
 
-        <div class="tabs" role="tablist" aria-label="About this piece">
-          <button class="tab" role="tab" type="button" aria-selected="true" aria-controls="panel-0" id="tab-0">01 Colour</button>
-          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-1" id="tab-1">02 The piece</button>
-          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-2" id="tab-2">03 Price</button>
+        <div class="tabs" role="tablist" aria-label="About this piece" data-i18n-aria="p.tabs">
+          <button class="tab" role="tab" type="button" aria-selected="true" aria-controls="panel-0" id="tab-0" data-i18n="p.tab0">01 Colour</button>
+          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-1" id="tab-1" data-i18n="p.tab1">02 The piece</button>
+          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-2" id="tab-2" data-i18n="p.tab2">03 Price</button>
         </div>
         <div class="panels">
           <div class="panel" role="tabpanel" id="panel-0" aria-labelledby="tab-0">
-            <span class="label">Choose a colour</span>
-            <div class="swatches" role="radiogroup" aria-label="Colour"></div>
+            <span class="label" data-i18n="p.choose">Choose a colour</span>
+            <div class="swatches" role="radiogroup" aria-label="Colour" data-i18n-aria="p.colour"></div>
             <p class="swatch-name"></p>
+            <a class="custom-link" href="contact.html#custom" data-i18n="p.custom">Want it in another size or colour? Request a custom version →</a>
           </div>
           <div class="panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1">
             <p class="pd-desc"></p>
             <p class="care pd-care"></p>
           </div>
           <div class="panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2">
-            <div class="price pd-price">Price on request</div>
-            <p class="price-note">Message us on WhatsApp and we'll share the price for this piece in the colour you've chosen.</p>
-            <a class="btn wa-price" href="contact.html" target="_blank" rel="noopener"><span class="wa-ico" aria-hidden="true"></span>Ask the price on WhatsApp</a>
-            <p class="care">Made by hand in small batches, so yours may differ a little from the picture.</p>
+            <div class="price pd-price" data-i18n="p.priceReq">Price on request</div>
+            <p class="price-note" data-i18n="p.priceNote">Message us on WhatsApp and we'll share the price for this piece in the colour you've chosen.</p>
+            <a class="btn wa-price" href="contact.html" target="_blank" rel="noopener"><span class="wa-ico" aria-hidden="true"></span><span data-i18n="p.askPrice">Ask the price on WhatsApp</span></a>
+            <p class="care"><span data-i18n="p.madeNote">Made by hand in small batches, so yours may differ a little from the picture.</span> <a href="faq.html#delivery" data-i18n="p.delivery">Delivery &amp; returns</a></p>
           </div>
         </div>
         <div class="panel-nav">
-          <button type="button" class="prev" aria-label="Previous panel">←</button>
-          <button type="button" class="next" aria-label="Next panel">→</button>
+          <button type="button" class="prev" aria-label="Previous panel" data-i18n-aria="p.prev">←</button>
+          <button type="button" class="next" aria-label="Next panel" data-i18n-aria="p.next">→</button>
         </div>
         <div class="pd-actions">
           <div class="pd-qty"></div>
-          <button class="btn add-bag" type="button">Add to wishlist</button>
+          <button class="btn add-bag" type="button" data-i18n="p.add">Add to wishlist</button>
         </div>
       </div>
+    </section>
+
+    <section class="also wrap" aria-labelledby="also-title">
+      <span class="eyebrow" data-i18n="p.alsoEyebrow">Goes well with</span>
+      <h2 id="also-title" data-i18n="p.alsoTitle">You might <em>also like</em></h2>
+      <ul class="pgrid also-grid"></ul>
     </section>
 
     <section class="reviews wrap" id="reviews" aria-labelledby="rev-title">
       <div class="reviews-head">
         <div>
-          <span class="eyebrow">Notes from homes</span>
-          <h2 id="rev-title">Reviews</h2>
+          <span class="eyebrow" data-i18n="p.revEyebrow">Notes from homes</span>
+          <h2 id="rev-title" data-i18n="p.revTitle">Reviews</h2>
         </div>
         <div class="rev-summary"></div>
       </div>
       <ul class="review-list" aria-live="polite"></ul>
 
       <div class="review-gate" hidden>
-        <p>Brought this piece home? <em>Sign in to leave a note.</em></p>
-        <a class="btn btn-ghost gate-link" href="account.html">Sign in</a>
+        <p data-i18n="p.gate">Brought this piece home? <em>Sign in to leave a note.</em></p>
+        <a class="btn btn-ghost gate-link" href="account.html" data-i18n="p.signin">Sign in</a>
       </div>
 
       <form class="review-form" novalidate hidden>
-        <h3>Leave a <em>note</em></h3>
+        <h3 data-i18n="p.leave">Leave a <em>note</em></h3>
         <fieldset class="rate">
-          <legend class="label">Your rating</legend>
+          <legend class="label" data-i18n="p.rating">Your rating</legend>
           <div class="rate-stars">
-            <input type="radio" id="r5" name="rating" value="5"><label for="r5" title="5 stars">★<span class="sr-only">5 stars</span></label>
-            <input type="radio" id="r4" name="rating" value="4"><label for="r4" title="4 stars">★<span class="sr-only">4 stars</span></label>
-            <input type="radio" id="r3" name="rating" value="3"><label for="r3" title="3 stars">★<span class="sr-only">3 stars</span></label>
-            <input type="radio" id="r2" name="rating" value="2"><label for="r2" title="2 stars">★<span class="sr-only">2 stars</span></label>
-            <input type="radio" id="r1" name="rating" value="1"><label for="r1" title="1 star">★<span class="sr-only">1 star</span></label>
+            <input type="radio" id="r5" name="rating" value="5"><label for="r5" title="5">★<span class="sr-only">5 / 5</span></label>
+            <input type="radio" id="r4" name="rating" value="4"><label for="r4" title="4">★<span class="sr-only">4 / 5</span></label>
+            <input type="radio" id="r3" name="rating" value="3"><label for="r3" title="3">★<span class="sr-only">3 / 5</span></label>
+            <input type="radio" id="r2" name="rating" value="2"><label for="r2" title="2">★<span class="sr-only">2 / 5</span></label>
+            <input type="radio" id="r1" name="rating" value="1"><label for="r1" title="1">★<span class="sr-only">1 / 5</span></label>
           </div>
         </fieldset>
-        <label class="field"><span class="label">Your name</span><input name="name" maxlength="60" autocomplete="given-name" required></label>
-        <label class="field"><span class="label">Your note</span><textarea name="body" rows="4" maxlength="1000" required></textarea></label>
+        <label class="field"><span class="label" data-i18n="p.yourName">Your name</span><input name="name" maxlength="60" autocomplete="given-name" required></label>
+        <label class="field"><span class="label" data-i18n="p.yourNote">Your note</span><textarea name="body" rows="4" maxlength="1000" required></textarea></label>
         <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="form-row">
-          <button class="btn" type="submit">Send note</button>
+          <button class="btn" type="submit" data-i18n="p.send">Send note</button>
           <p class="form-note" role="status"></p>
         </div>
-        <p class="care">Notes are read by a person before they appear. One note per piece.</p>
+        <p class="care" data-i18n="p.revCare">Notes are read by a person before they appear. One note per piece.</p>
       </form>
     </section>
 
     <section class="related wrap" aria-labelledby="rel-title">
-      <span class="eyebrow">From the same shelf</span>
+      <span class="eyebrow" data-i18n="p.sameShelf">From the same shelf</span>
       <h2 id="rel-title" class="rel-title"></h2>
       <ul class="pgrid rel-grid"></ul>
     </section>
@@ -108,11 +115,13 @@
   <footer class="site-foot"></footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="assets/js/config.js?v=202610251425"></script>
-  <script src="assets/js/data.js?v=202610251425"></script>
-  <script src="assets/js/art.js?v=202610251425"></script>
-  <script src="assets/js/common.js?v=202610251425"></script>
-  <script src="assets/js/backend.js?v=202610251425"></script>
-  <script src="assets/js/product.js?v=202610251425"></script>
+  <script src="assets/js/config.js?v=202610251535"></script>
+  <script src="assets/js/i18n-strings.js?v=202610251535"></script>
+  <script src="assets/js/i18n.js?v=202610251535"></script>
+  <script src="assets/js/data.js?v=202610251535"></script>
+  <script src="assets/js/art.js?v=202610251535"></script>
+  <script src="assets/js/common.js?v=202610251535"></script>
+  <script src="assets/js/backend.js?v=202610251535"></script>
+  <script src="assets/js/product.js?v=202610251535"></script>
 </body>
 </html>

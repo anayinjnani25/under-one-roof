@@ -36,21 +36,27 @@
   function loadCatalog() {
     if (!sb) return Promise.reject(new Error('Supabase client unavailable'));
     return timeout(Promise.all([
-      sb.from('categories').select('slug,no,title,accent,blurb,care,feature_product_id').order('sort'),
-      sb.from('products').select('id,category_slug,name,mini,description,colors,art,bg,image_url').order('sort')
+      sb.from('categories').select('slug,no,title,accent,blurb,care,feature_product_id,i18n').order('sort'),
+      sb.from('products').select('id,category_slug,name,mini,description,colors,art,bg,image_url,i18n').order('sort')
     ]), 6000).then(function (r) {
       if (r[0].error || r[1].error) throw (r[0].error || r[1].error);
       if (!r[0].data.length || !r[1].data.length) throw new Error('catalog is empty');
       var care = {};
+      // pick a field in the chosen language, falling back to the English column
+      function tr(row, field) { var x = row.i18n && row.i18n[UOR.lang]; return x && x[field] ? x[field] : row[field]; }
       var cats = r[0].data.map(function (c) {
-        care[c.slug] = c.care;
-        return { slug: c.slug, no: c.no, title: c.title, accent: c.accent, blurb: c.blurb, feature: c.feature_product_id };
+        care[c.slug] = tr(c, 'care');
+        return {
+          slug: c.slug, no: c.no, title: tr(c, 'title'), accent: tr(c, 'accent'), blurb: tr(c, 'blurb'), feature: c.feature_product_id,
+          en: { title: c.title, accent: c.accent, blurb: c.blurb }
+        };
       });
       var slugs = {};
       cats.forEach(function (c) { slugs[c.slug] = 1; });
       var prods = r[1].data.filter(function (p) { return slugs[p.category_slug]; }).map(function (p) {
         return {
-          cat: p.category_slug, id: p.id, name: p.name, mini: p.mini, desc: p.description,
+          cat: p.category_slug, id: p.id, name: tr(p, 'name'), mini: tr(p, 'mini'), desc: tr(p, 'description'),
+          en: { name: p.name, mini: p.mini, desc: p.description }, // WhatsApp messages to the shop use these
           art: p.art && p.art.type ? p.art : { type: 'pendant', style: 'coin' },
           colors: colorsFor(p), bg: p.bg, image: imageUrl(p.image_url)
         };
@@ -99,15 +105,15 @@
   function displayName() {
     var u = member();
     if (!u) return null;
-    return (profile && profile.display_name) || (u.email ? u.email.split('@')[0] : 'Account');
+    return (profile && profile.display_name) || (u.email ? u.email.split('@')[0] : UOR.t('nav.account'));
   }
 
   function paintHeader() {
     var u = member();
     document.querySelectorAll('.acct-link').forEach(function (a) {
       var label = a.querySelector('.acct-label');
-      if (label) label.textContent = u ? displayName().split(/\s+/)[0] : 'Sign in'; // first name keeps the nav short
-      a.setAttribute('aria-label', u ? 'Your account (' + displayName() + ')' : 'Sign in or create an account');
+      if (label) label.textContent = u ? displayName().split(/\s+/)[0] : UOR.t('nav.signin'); // first name keeps the nav short
+      a.setAttribute('aria-label', u ? UOR.t('nav.accountAria', { name: displayName() }) : UOR.t('nav.signinAria'));
       a.classList.toggle('in', !!u);
     });
   }
@@ -248,10 +254,10 @@
         .eq('user_id', u.id).order('created_at', { ascending: false }).then(unwrap).then(function (r) { return r.data; });
     },
     submit: function (productId, review) {
-      if (!member()) return Promise.reject(new Error('Sign in to leave a note.'));
+      if (!member()) return Promise.reject(new Error(UOR.t('rev.signin')));
       return timeout(sb.from('reviews').insert({ product_id: productId, name: review.name, rating: review.rating, body: review.body }), 8000)
         .then(function (r) {
-          if (r.error && r.error.code === '23505') throw new Error('You\'ve already left a note for this piece.');
+          if (r.error && r.error.code === '23505') { var dup = new Error(UOR.t('rev.already')); dup.code = 'dup'; throw dup; }
           unwrap(r);
         });
     }
