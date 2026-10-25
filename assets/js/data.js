@@ -1,7 +1,8 @@
-/* Under One Roof — catalog data.
-   Placeholder catalog: 5 categories x 6 pieces. Swap names, copy and prices
-   for the real catalog; `art` drives the illustrated product renderer in art.js
-   and can be replaced by `image: 'path/to/cutout.png'` once photography exists. */
+/* Under One Roof — design palettes plus the BUNDLED catalog.
+   The live catalog is the `categories` / `products` tables in Supabase (backend.js
+   loads them and replaces UOR.categories / UOR.products). This copy is only the
+   offline fallback and the source for supabase/seed.sql. `art` drives the
+   illustrated renderer in art.js; a product's `image_url` in Supabase overrides it. */
 window.UOR = window.UOR || {};
 
 UOR.palettes = {
@@ -157,19 +158,6 @@ UOR.categories = [
     oxidised: 'Oxidised alloy, nickel-free. Keep dry and store in the cloth pouch it arrives in.',
     'gold-silver': 'Plated alloy, nickel-free. Avoid perfume and water to keep the finish bright.'
   };
-
-  // Sample reviews: placeholders until real customer reviews are collected.
-  UOR.reviewPool = [
-    { name: 'Meera S.', rating: 5, text: 'Even nicer in person. You can see the stitches, which is exactly what I wanted.' },
-    { name: 'Aarav K.', rating: 5, text: 'Arrived well wrapped with a handwritten note. Hung it the same evening.' },
-    { name: 'Nandini R.', rating: 4, text: 'Lovely work. The colour is a little deeper than the picture, which I prefer.' },
-    { name: 'Ishita P.', rating: 5, text: 'Bought one for my mother and then went back for another for myself.' },
-    { name: 'Kabir M.', rating: 4, text: 'Took a few days to arrive but worth the wait. Very well made.' },
-    { name: 'Zoya F.', rating: 5, text: 'Light, comfortable and gets compliments every time.' },
-    { name: 'Rohan D.', rating: 5, text: 'Our doorway finally looks like ours. The bells are a nice touch.' },
-    { name: 'Tara V.', rating: 4, text: 'Beautiful and clearly handmade. Small variations make it feel special.' },
-    { name: 'Anika J.', rating: 5, text: 'Exactly as described. I keep finding new little details in it.' }
-  ];
 
   UOR.byId = function (id) {
     for (var i = 0; i < UOR.products.length; i++) if (UOR.products[i].id === id) return UOR.products[i];

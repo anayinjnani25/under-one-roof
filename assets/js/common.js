@@ -16,10 +16,10 @@ window.UOR = window.UOR || {};
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   UOR.esc = esc;
 
-  // ---- wishlist store (browser-local; survives reloads when storage allows)
+  // ---- wishlist store: local first (instant, optimistic), synced to Supabase by backend.js
   var KEY = 'uor-wishlist';
   var wish = [];
-  try { wish = JSON.parse(localStorage.getItem(KEY) || '[]').filter(UOR.byId); } catch (e) { wish = []; }
+  try { wish = JSON.parse(localStorage.getItem(KEY) || '[]').filter(function (id) { return typeof id === 'string'; }); } catch (e) { wish = []; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(wish)); } catch (e) { /* storage blocked: keep in memory */ } }
   UOR.wish = {
     has: function (id) { return wish.indexOf(id) > -1; },
@@ -27,13 +27,21 @@ window.UOR = window.UOR || {};
     toggle: function (id) {
       var on = !this.has(id);
       if (on) wish.unshift(id); else wish.splice(wish.indexOf(id), 1);
-      save(); sync(id); return on;
+      save(); sync(id);
+      if (this.onToggle) this.onToggle(id, on);
+      return on;
     },
-    add: function (id) { if (!this.has(id)) this.toggle(id); }
+    add: function (id) { if (!this.has(id)) this.toggle(id); },
+    replace: function (ids) {
+      wish = ids.filter(function (id, i) { return ids.indexOf(id) === i; });
+      save(); sync();
+    },
+    onToggle: null
   };
 
-  function sync(changedId) {
-    var n = wish.length;
+  function wishCount() { return wish.filter(UOR.byId).length; }
+  function sync() {
+    var n = wishCount();
     document.querySelectorAll('.wish-count').forEach(function (el) {
       el.textContent = n; el.dataset.n = n;
       el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
@@ -96,7 +104,7 @@ window.UOR = window.UOR || {};
         return '<a class="' + (i ? 'nav-opt' : '') + '" href="' + l[0] + '"' + (active === l[2] ? ' aria-current="page"' : '') + '>' + l[1] + '</a>';
       }).join('') +
       '<button class="wish-btn" type="button" aria-haspopup="dialog" aria-controls="wishlist">' + HEART +
-      '<span class="nav-opt">Wishlist</span><span class="wish-count" data-n="' + wish.length + '">' + wish.length + '</span>' +
+      '<span class="nav-opt">Wishlist</span><span class="wish-count" data-n="' + wishCount() + '">' + wishCount() + '</span>' +
       '<span class="sr-only"> items in wishlist</span></button></nav>';
   }
 
@@ -123,12 +131,12 @@ window.UOR = window.UOR || {};
   function renderDrawer() {
     var list = document.querySelector('.drawer-list');
     if (!list) return;
-    if (!wish.length) {
+    var items = wish.map(UOR.byId).filter(Boolean); // skip pieces no longer in the catalog
+    if (!items.length) {
       list.innerHTML = '<li class="drawer-empty"><span class="stamp">Nothing<br>saved<br>yet</span>Tap the heart on any piece to keep it here.</li>';
       return;
     }
-    list.innerHTML = wish.map(function (id) {
-      var p = UOR.byId(id);
+    list.innerHTML = items.map(function (p) {
       return '<li class="drawer-item"><div class="drawer-thumb" style="--bg:' + p.bg + '">' + UOR.art(p) + '</div>' +
         '<div><a href="' + UOR.productHref(p) + '">' + esc(p.name) + '</a><small>' + esc(p.mini) + '</small></div>' + UOR.heartBtn(p) + '</li>';
     }).join('');

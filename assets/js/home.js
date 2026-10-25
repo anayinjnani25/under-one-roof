@@ -1,5 +1,5 @@
 /* Under One Roof — homepage: pixel field, spool-and-needle sequence, shelf, lanes. */
-(function () {
+UOR.ready.then(function () {
   var C = { cream: '#F6EFE2', paper: '#EFE2C9', beige: '#C9B18C', brown: '#6B5339', ink: '#2C2217', rust: '#A3341F' };
   var reduced = UOR.reduced();
 
@@ -563,4 +563,4 @@
     ]).then(function () { render(); measureLanes(); }, function () {});
   }
   window.addEventListener('load', measureLanes);
-})();
+});

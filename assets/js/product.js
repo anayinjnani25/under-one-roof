@@ -1,5 +1,5 @@
 /* Under One Roof — product detail: jello-spring object, sliding info panel, reviews. */
-(function () {
+UOR.ready.then(function () {
   var reduced = UOR.reduced();
   var p = UOR.byId(UOR.query('id')) || UOR.products[0];
   var cat = UOR.cat(p.cat);
@@ -95,14 +95,47 @@
     UOR.toast('Checkout opens soon — saved to your wishlist for now');
   });
 
-  // ---- reviews (static sample set until real reviews exist)
-  var n = UOR.products.indexOf(p), pool = UOR.reviewPool, revs = [0, 1, 2].map(function (k) { return pool[(n * 2 + k * 3) % pool.length]; });
-  var avg = revs.reduce(function (a, r) { return a + r.rating; }, 0) / revs.length;
+  // ---- reviews (Supabase; only approved ones are readable)
   function stars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += i <= Math.round(v) ? '★' : '☆'; return s; }
-  $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' + avg.toFixed(1) + ' / 5 · ' + revs.length + ' notes</span>';
-  $('.review-list').innerHTML = revs.map(function (r) {
-    return '<li class="review"><span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span><p>' + UOR.esc(r.text) + '</p><span class="label">— ' + UOR.esc(r.name) + '</span></li>';
-  }).join('');
+  function renderReviews(revs) {
+    if (!revs.length) {
+      $('.rev-summary').innerHTML = '<span class="label">No notes yet</span>';
+      $('.review-list').innerHTML = '<li class="review review-empty"><p>Nobody has written about this piece yet. If it\'s found a home with you, be the first.</p></li>';
+      return;
+    }
+    var avg = revs.reduce(function (a, r) { return a + r.rating; }, 0) / revs.length;
+    $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' + avg.toFixed(1) + ' / 5 · ' + revs.length + (revs.length === 1 ? ' note' : ' notes') + '</span>';
+    $('.review-list').innerHTML = revs.map(function (r) {
+      var d = new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      return '<li class="review"><span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + d + '</span></li>';
+    }).join('');
+  }
+  $('.review-list').innerHTML = '<li class="review review-empty"><p>Fetching notes…</p></li>';
+  UOR.reviews.list(p.id).then(renderReviews, function () {
+    $('.rev-summary').innerHTML = '';
+    $('.review-list').innerHTML = '<li class="review review-empty"><p>Reviews couldn\'t load just now. Please try again in a moment.</p></li>';
+  });
+
+  var form = $('.review-form'), note = form.querySelector('.form-note');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var fd = new FormData(form), name = String(fd.get('name') || '').trim(), body = String(fd.get('body') || '').trim(), rating = +fd.get('rating');
+    note.className = 'form-note';
+    if (fd.get('website')) { form.reset(); note.textContent = 'Thank you. Your note will appear once it\'s approved.'; return; } // bot trap
+    if (!rating) { note.textContent = 'Choose a rating from one to five stars.'; note.classList.add('err'); return; }
+    if (!name) { note.textContent = 'Add your name.'; note.classList.add('err'); form.elements.name.focus(); return; }
+    if (body.length < 3) { note.textContent = 'Write a few words about the piece.'; note.classList.add('err'); form.elements.body.focus(); return; }
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    UOR.reviews.submit(p.id, { name: name, rating: rating, body: body }).then(function () {
+      form.reset();
+      note.textContent = 'Thank you. Your note will appear once it\'s approved.';
+      note.classList.add('ok');
+    }, function () {
+      note.textContent = 'That didn\'t send. Check your connection and try again.';
+      note.classList.add('err');
+    }).then(function () { btn.disabled = false; btn.textContent = 'Send note'; });
+  });
 
   // ---- related
   $('.rel-title').innerHTML = 'More <em>' + cat.accent.toLowerCase() + '</em>';
@@ -116,4 +149,4 @@
     requestAnimationFrame(function () { queued = false; UOR.headSolid(scrollY > 10); });
   }, { passive: true });
   UOR.headSolid(scrollY > 10);
-})();
+});

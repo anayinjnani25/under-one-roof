@@ -1,5 +1,5 @@
 /* Under One Roof — category page: the needle swirls down a stitched milestone path. */
-(function () {
+UOR.ready.then(function () {
   var reduced = UOR.reduced();
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
@@ -169,4 +169,4 @@
       }, 200);
     }
   }
-})();
+});

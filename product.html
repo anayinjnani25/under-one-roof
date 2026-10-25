@@ -65,8 +65,29 @@
         </div>
         <div class="rev-summary"></div>
       </div>
-      <ul class="review-list"></ul>
-      <p class="sample-note">Sample reviews shown while we gather real ones from customers.</p>
+      <ul class="review-list" aria-live="polite"></ul>
+
+      <form class="review-form" novalidate>
+        <h3>Leave a <em>note</em></h3>
+        <fieldset class="rate">
+          <legend class="label">Your rating</legend>
+          <div class="rate-stars">
+            <input type="radio" id="r5" name="rating" value="5"><label for="r5" title="5 stars">★<span class="sr-only">5 stars</span></label>
+            <input type="radio" id="r4" name="rating" value="4"><label for="r4" title="4 stars">★<span class="sr-only">4 stars</span></label>
+            <input type="radio" id="r3" name="rating" value="3"><label for="r3" title="3 stars">★<span class="sr-only">3 stars</span></label>
+            <input type="radio" id="r2" name="rating" value="2"><label for="r2" title="2 stars">★<span class="sr-only">2 stars</span></label>
+            <input type="radio" id="r1" name="rating" value="1"><label for="r1" title="1 star">★<span class="sr-only">1 star</span></label>
+          </div>
+        </fieldset>
+        <label class="field"><span class="label">Your name</span><input name="name" maxlength="60" autocomplete="given-name" required></label>
+        <label class="field"><span class="label">Your note</span><textarea name="body" rows="4" maxlength="1000" required></textarea></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="form-row">
+          <button class="btn" type="submit">Send note</button>
+          <p class="form-note" role="status"></p>
+        </div>
+        <p class="care">Notes are read by a person before they appear.</p>
+      </form>
     </section>
 
     <section class="related wrap" aria-labelledby="rel-title">
@@ -78,9 +99,12 @@
 
   <footer class="site-foot"></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="assets/js/config.js"></script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/art.js"></script>
   <script src="assets/js/common.js"></script>
+  <script src="assets/js/backend.js"></script>
   <script src="assets/js/product.js"></script>
 </body>
 </html>
