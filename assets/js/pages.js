@@ -19,6 +19,12 @@ UOR.ready.then(function () {
   if (page === 'contact') {
     var form = $('.wa-form'), note = $('.form-note', form), btn = $('.wa-go', form);
     $('.wa-ico', btn).innerHTML = UOR.WA_ICON;
+    // tell shoppers whose name they'll see in WhatsApp, so the chat doesn't look unfamiliar
+    var cfg = UOR.WHATSAPP || {};
+    if (UOR.wa() && cfg.chatName) {
+      $('.wa-who').innerHTML = 'In WhatsApp you\'ll be chatting with <strong>' + UOR.esc(cfg.chatName) + '</strong> (' + UOR.esc(cfg.number) + ').';
+      $('.wa-who').hidden = false;
+    }
     if (!UOR.wa()) {
       // no number configured yet: say so instead of offering a dead button
       btn.disabled = true;
