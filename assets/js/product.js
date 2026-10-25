@@ -97,26 +97,52 @@ UOR.ready.then(function () {
 
   // ---- reviews (Supabase; only approved ones are readable)
   function stars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += i <= Math.round(v) ? '★' : '☆'; return s; }
-  function renderReviews(revs) {
+  var mineDone = false;
+  function renderReviews(all) {
+    var me = UOR.auth.user();
+    var mine = me ? all.filter(function (r) { return r.user_id === me.id; })[0] : null;
+    var revs = all.filter(function (r) { return r.approved; });
+    mineDone = !!mine;
+    gate();
+    if (mine && !mine.approved) {
+      // the member's own note, visible only to them until it's approved
+      revs = [mine].concat(revs);
+    }
     if (!revs.length) {
       $('.rev-summary').innerHTML = '<span class="label">No notes yet</span>';
       $('.review-list').innerHTML = '<li class="review review-empty"><p>Nobody has written about this piece yet. If it\'s found a home with you, be the first.</p></li>';
       return;
     }
-    var avg = revs.reduce(function (a, r) { return a + r.rating; }, 0) / revs.length;
-    $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' + avg.toFixed(1) + ' / 5 · ' + revs.length + (revs.length === 1 ? ' note' : ' notes') + '</span>';
+    var pub = revs.filter(function (r) { return r.approved; });
+    if (pub.length) {
+      var avg = pub.reduce(function (a, r) { return a + r.rating; }, 0) / pub.length;
+      $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' + avg.toFixed(1) + ' / 5 · ' + pub.length + (pub.length === 1 ? ' note' : ' notes') + '</span>';
+    } else $('.rev-summary').innerHTML = '<span class="label">No published notes yet</span>';
     $('.review-list').innerHTML = revs.map(function (r) {
       var d = new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-      return '<li class="review"><span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + d + '</span></li>';
+      return '<li class="review' + (r.approved ? '' : ' pending') + '"><span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + d +
+        (r.approved ? '' : ' · <span class="pending-tag">Your note, awaiting approval</span>') + '</span></li>';
     }).join('');
   }
+  function loadReviews() {
+    UOR.reviews.list(p.id).then(renderReviews, function () {
+      $('.rev-summary').innerHTML = '';
+      $('.review-list').innerHTML = '<li class="review review-empty"><p>Reviews couldn\'t load just now. Please try again in a moment.</p></li>';
+    });
+  }
   $('.review-list').innerHTML = '<li class="review review-empty"><p>Fetching notes…</p></li>';
-  UOR.reviews.list(p.id).then(renderReviews, function () {
-    $('.rev-summary').innerHTML = '';
-    $('.review-list').innerHTML = '<li class="review review-empty"><p>Reviews couldn\'t load just now. Please try again in a moment.</p></li>';
-  });
 
+  // the form is for signed-in members, once per piece
   var form = $('.review-form'), note = form.querySelector('.form-note');
+  $('.gate-link').href = 'account.html?next=' + encodeURIComponent('product.html?id=' + p.id + '#reviews');
+  function gate() {
+    var me = UOR.auth.user();
+    $('.review-gate').hidden = !!me;
+    form.hidden = !me || mineDone;
+    if (me && !form.elements.name.value) form.elements.name.value = UOR.auth.name() || '';
+  }
+  UOR.auth.ready.then(function () { gate(); loadReviews(); });
+  UOR.auth.onChange(function () { mineDone = false; gate(); loadReviews(); });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var fd = new FormData(form), name = String(fd.get('name') || '').trim(), body = String(fd.get('body') || '').trim(), rating = +fd.get('rating');
@@ -129,10 +155,11 @@ UOR.ready.then(function () {
     btn.disabled = true; btn.textContent = 'Sending…';
     UOR.reviews.submit(p.id, { name: name, rating: rating, body: body }).then(function () {
       form.reset();
-      note.textContent = 'Thank you. Your note will appear once it\'s approved.';
-      note.classList.add('ok');
-    }, function () {
-      note.textContent = 'That didn\'t send. Check your connection and try again.';
+      UOR.toast('Thank you. Your note will appear once it\'s approved.');
+      loadReviews();
+    }, function (err) {
+      var m = err && err.message;
+      note.textContent = /already|sign in/i.test(m || '') ? m : 'That didn\'t send. Check your connection and try again.';
       note.classList.add('err');
     }).then(function () { btn.disabled = false; btn.textContent = 'Send note'; });
   });

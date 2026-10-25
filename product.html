@@ -57,7 +57,7 @@
       </div>
     </section>
 
-    <section class="reviews wrap" aria-labelledby="rev-title">
+    <section class="reviews wrap" id="reviews" aria-labelledby="rev-title">
       <div class="reviews-head">
         <div>
           <span class="eyebrow">Notes from homes</span>
@@ -67,7 +67,12 @@
       </div>
       <ul class="review-list" aria-live="polite"></ul>
 
-      <form class="review-form" novalidate>
+      <div class="review-gate" hidden>
+        <p>Brought this piece home? <em>Sign in to leave a note.</em></p>
+        <a class="btn btn-ghost gate-link" href="account.html">Sign in</a>
+      </div>
+
+      <form class="review-form" novalidate hidden>
         <h3>Leave a <em>note</em></h3>
         <fieldset class="rate">
           <legend class="label">Your rating</legend>
@@ -86,7 +91,7 @@
           <button class="btn" type="submit">Send note</button>
           <p class="form-note" role="status"></p>
         </div>
-        <p class="care">Notes are read by a person before they appear.</p>
+        <p class="care">Notes are read by a person before they appear. One note per piece.</p>
       </form>
     </section>
 

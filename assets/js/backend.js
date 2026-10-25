@@ -1,16 +1,22 @@
-/* Under One Roof — Supabase backend: catalog, wishlist sync, reviews.
+/* Under One Roof — Supabase backend: catalog, shopper accounts, wishlist sync, reviews.
    Everything degrades gracefully: if Supabase is unreachable the site runs on the
-   bundled catalog in data.js and keeps the wishlist in the browser. */
+   bundled catalog in data.js, and guests always keep their wishlist in the browser. */
 (function () {
   var cfg = UOR.SUPABASE, sb = null;
   try {
-    if (window.supabase && cfg) sb = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: true, autoRefreshToken: true } });
+    if (window.supabase && cfg) {
+      sb = window.supabase.createClient(cfg.url, cfg.key, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      });
+    }
   } catch (e) { sb = null; }
   UOR.sb = sb;
 
+  function log(msg, e) { if (window.console) console.info('[Under One Roof] ' + msg, e && e.message ? e.message : e || ''); }
   function timeout(p, ms) {
     return Promise.race([p, new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, ms); })]);
   }
+  function unwrap(r) { if (r && r.error) throw r.error; return r; }
 
   // image_url may be a full URL or just a file name inside the storage bucket
   function imageUrl(v) {
@@ -68,85 +74,161 @@
     if (window.console) console.warn('[Under One Roof] Using the bundled catalog:', e && e.message);
   });
 
-  // ---- wishlist sync (anonymous Supabase user per browser) ------------
-  var userP = null, anonOff = false;
-  function currentUser() {
-    if (!sb) return Promise.resolve(null);
-    return sb.auth.getSession().then(function (r) { return r.data.session ? r.data.session.user : null; });
+  // ---- accounts -------------------------------------------------------
+  var session = null, profile = null, listeners = [], recovering = false, resolveAuth;
+  var authReady = new Promise(function (r) { resolveAuth = r; });
+
+  function member() { return session && session.user && !session.user.is_anonymous ? session.user : null; }
+  // where auth emails / Google send people back to (works on localhost and on GitHub Pages)
+  function back(rel) { return new URL(rel || 'account.html', location.href).href; }
+
+  function emit() {
+    paintHeader();
+    listeners.forEach(function (cb) { try { cb(member(), profile); } catch (e) { log('auth listener failed', e); } });
   }
-  function ensureUser() {
-    if (!sb) return Promise.reject(new Error('offline'));
-    if (anonOff) return Promise.reject(new Error('Anonymous sign-ins are disabled'));
-    if (!userP) {
-      userP = currentUser().then(function (u) {
-        if (u) return u;
-        return sb.auth.signInAnonymously().then(function (r) {
-          if (r.error) {
-            if (/anonymous sign-ins are disabled/i.test(r.error.message)) anonOff = true; // don't retry on every heart
-            throw r.error;
-          }
-          return r.data.user;
-        });
+
+  function loadProfile() {
+    var u = member();
+    if (!u) { profile = null; return Promise.resolve(null); }
+    return sb.from('profiles').select('display_name').eq('id', u.id).maybeSingle().then(function (r) {
+      profile = (r.data) || { display_name: null };
+      return profile;
+    }, function () { profile = { display_name: null }; return profile; });
+  }
+
+  function displayName() {
+    var u = member();
+    if (!u) return null;
+    return (profile && profile.display_name) || (u.email ? u.email.split('@')[0] : 'Account');
+  }
+
+  function paintHeader() {
+    var u = member();
+    document.querySelectorAll('.acct-link').forEach(function (a) {
+      var label = a.querySelector('.acct-label');
+      if (label) label.textContent = u ? displayName() : 'Sign in';
+      a.setAttribute('aria-label', u ? 'Your account (' + displayName() + ')' : 'Sign in or create an account');
+      a.classList.toggle('in', !!u);
+    });
+  }
+  UOR.paintAccount = paintHeader;
+
+  UOR.auth = {
+    ready: authReady,
+    user: member,
+    profile: function () { return profile; },
+    name: displayName,
+    recovering: function () { return recovering; },
+    onChange: function (cb) { listeners.push(cb); },
+    signIn: function (email, password) {
+      return sb.auth.signInWithPassword({ email: email, password: password }).then(unwrap);
+    },
+    signUp: function (email, password, name, next) {
+      return sb.auth.signUp({
+        email: email, password: password,
+        options: { data: { display_name: name }, emailRedirectTo: back(next) }
+      }).then(unwrap).then(function (r) {
+        // with email confirmation on, an existing address comes back as a user with no identities
+        var u = r.data.user;
+        if (u && u.identities && u.identities.length === 0) throw new Error('User already registered');
+        return { needsConfirm: !r.data.session };
       });
-      userP.catch(function () { userP = null; });
+    },
+    magicLink: function (email, next) {
+      return sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: back(next) } }).then(unwrap);
+    },
+    google: function (next) {
+      return sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: back(next) } }).then(unwrap);
+    },
+    sendReset: function (email) {
+      return sb.auth.resetPasswordForEmail(email, { redirectTo: back('account.html') }).then(unwrap);
+    },
+    setPassword: function (password) {
+      return sb.auth.updateUser({ password: password }).then(unwrap).then(function () { recovering = false; emit(); });
+    },
+    setName: function (name) {
+      var u = member();
+      return sb.from('profiles').update({ display_name: name }).eq('id', u.id).then(unwrap)
+        .then(function () { profile = { display_name: name }; emit(); });
+    },
+    signOut: function () { return sb.auth.signOut().then(unwrap); },
+    // which sign-in providers are switched on in the Supabase dashboard
+    providers: function () {
+      if (!sb) return Promise.resolve({});
+      return timeout(fetch(cfg.url + '/auth/v1/settings', { headers: { apikey: cfg.key } }).then(function (r) { return r.json(); }), 5000)
+        .then(function (s) { return s.external || {}; }, function () { return {}; });
     }
-    return userP;
+  };
+
+  if (sb) {
+    var first = true;
+    sb.auth.onAuthStateChange(function (event, s) {
+      var was = member() && member().id;
+      session = s;
+      if (event === 'PASSWORD_RECOVERY') recovering = true;
+      // never await Supabase calls inside this callback; hop out of it first
+      setTimeout(function () {
+        var now = member() && member().id;
+        if (event === 'SIGNED_OUT' && was) UOR.wish.replace([]); // shared devices: don't leave a member's list behind
+        loadProfile().then(function () {
+          if (now && (now !== was || first)) pullWishlist();
+          first = false;
+          emit();
+          resolveAuth();
+        });
+      }, 0);
+    });
+  } else {
+    resolveAuth();
   }
 
-  function pushLocal(user, ids) {
-    if (!ids.length) return Promise.resolve();
-    return sb.from('wishlist_items').upsert(ids.map(function (id) { return { user_id: user.id, product_id: id }; }),
-      { onConflict: 'user_id,product_id', ignoreDuplicates: true });
+  // ---- wishlist sync (members only; guests keep it in the browser) ------
+  function pushIds(ids) {
+    var u = member();
+    if (!u || !ids.length) return Promise.resolve();
+    return sb.from('wishlist_items').upsert(ids.map(function (id) { return { user_id: u.id, product_id: id }; }),
+      { onConflict: 'user_id,product_id', ignoreDuplicates: true }).then(unwrap);
   }
 
-  // pull the saved list on load (only if this browser already has a visitor id)
+  // merge: anything hearted as a guest is added to the account, then the account list wins
   function pullWishlist() {
-    return currentUser().then(function (u) {
-      if (!u) return;
-      return sb.from('wishlist_items').select('product_id').order('created_at', { ascending: false }).then(function (r) {
-        if (r.error) throw r.error;
-        var remote = r.data.map(function (x) { return x.product_id; }).filter(UOR.byId);
-        var local = UOR.wish.all();
-        var localOnly = local.filter(function (id) { return remote.indexOf(id) < 0; });
-        UOR.wish.replace(localOnly.concat(remote));
-        return pushLocal(u, localOnly.filter(UOR.byId));
-      });
-    }).catch(function (e) { if (window.console) console.info('[Under One Roof] Wishlist sync paused:', e && e.message); });
+    return sb.from('wishlist_items').select('product_id').order('created_at', { ascending: false }).then(unwrap).then(function (r) {
+      var remote = r.data.map(function (x) { return x.product_id; }).filter(UOR.byId);
+      var localOnly = UOR.wish.all().filter(function (id) { return remote.indexOf(id) < 0 && UOR.byId(id); });
+      UOR.wish.replace(localOnly.concat(remote));
+      return pushIds(localOnly);
+    }).catch(function (e) { log('Wishlist sync paused:', e); });
   }
 
   UOR.wish.onToggle = function (id, on) {
-    if (!sb) return;
-    ensureUser().then(function (u) {
-      if (on) return pushLocal(u, [id]);
-      return sb.from('wishlist_items').delete().eq('user_id', u.id).eq('product_id', id);
-    }).then(function (r) {
-      if (r && r.error) throw r.error;
-    }).catch(function (e) {
-      // anonymous sign-ins switched off, or offline: the wishlist stays in this browser
-      if (window.console) console.info('[Under One Roof] Wishlist saved in this browser only:', e && e.message);
-    });
+    var u = member();
+    if (!u) return;
+    (on ? pushIds([id]) : sb.from('wishlist_items').delete().eq('user_id', u.id).eq('product_id', id).then(unwrap))
+      .catch(function (e) { log('Wishlist change not saved to your account:', e); });
   };
-
-  if (sb) UOR.ready.then(function () {
-    // first save from this browser: upload anything hearted before sync existed
-    currentUser().then(function (u) {
-      if (u) return pullWishlist();
-      if (UOR.wish.all().length) return ensureUser().then(function (nu) { return pushLocal(nu, UOR.wish.all().filter(UOR.byId)); });
-    }).catch(function () {});
-  });
 
   // ---- reviews -------------------------------------------------------
   UOR.reviews = {
+    // approved reviews, plus the signed-in member's own pending one (RLS decides)
     list: function (productId) {
       if (!sb) return Promise.resolve([]);
-      return timeout(sb.from('reviews').select('name,rating,body,created_at')
+      return timeout(sb.from('reviews').select('name,rating,body,created_at,approved,user_id')
         .eq('product_id', productId).order('created_at', { ascending: false }).limit(50), 6000)
-        .then(function (r) { if (r.error) throw r.error; return r.data; });
+        .then(unwrap).then(function (r) { return r.data; });
+    },
+    mine: function () {
+      var u = member();
+      if (!u) return Promise.resolve([]);
+      return sb.from('reviews').select('product_id,rating,body,approved,created_at')
+        .eq('user_id', u.id).order('created_at', { ascending: false }).then(unwrap).then(function (r) { return r.data; });
     },
     submit: function (productId, review) {
-      if (!sb) return Promise.reject(new Error('Reviews are offline right now.'));
+      if (!member()) return Promise.reject(new Error('Sign in to leave a note.'));
       return timeout(sb.from('reviews').insert({ product_id: productId, name: review.name, rating: review.rating, body: review.body }), 8000)
-        .then(function (r) { if (r.error) throw r.error; });
+        .then(function (r) {
+          if (r.error && r.error.code === '23505') throw new Error('You\'ve already left a note for this piece.');
+          unwrap(r);
+        });
     }
   };
 })();

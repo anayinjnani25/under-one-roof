@@ -12,6 +12,7 @@ window.UOR = window.UOR || {};
 
   var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.8 4.2 7.2 4.2c2 0 3.6 1.1 4.8 2.9 1.2-1.8 2.8-2.9 4.8-2.9 3.4 0 5.6 3.4 4.4 6.9-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg>';
   UOR.HEART = HEART;
+  var PERSON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.8 3.9-5.8 7.5-5.8s6.6 2 7.5 5.8" stroke-linecap="round"/></svg>';
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   UOR.esc = esc;
@@ -103,6 +104,8 @@ window.UOR = window.UOR || {};
       links.map(function (l, i) {
         return '<a class="' + (i ? 'nav-opt' : '') + '" href="' + l[0] + '"' + (active === l[2] ? ' aria-current="page"' : '') + '>' + l[1] + '</a>';
       }).join('') +
+      '<a class="acct-link" href="account.html"' + (active === 'account' ? ' aria-current="page"' : '') + ' aria-label="Sign in or create an account">' + PERSON +
+      '<span class="acct-label">Sign in</span></a>' +
       '<button class="wish-btn" type="button" aria-haspopup="dialog" aria-controls="wishlist">' + HEART +
       '<span class="nav-opt">Wishlist</span><span class="wish-count" data-n="' + wishCount() + '">' + wishCount() + '</span>' +
       '<span class="sr-only"> items in wishlist</span></button></nav>';
@@ -115,7 +118,7 @@ window.UOR = window.UOR || {};
       '<div><h4>The shelf</h4><ul>' + UOR.categories.map(function (c) {
         return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
       }).join('') + '</ul></div>' +
-      '<div><h4>Visit</h4><ul><li><a href="index.html#collection">Every piece</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">Your wishlist</button></li></ul></div>' +
+      '<div><h4>Visit</h4><ul><li><a href="index.html#collection">Every piece</a></li><li><a href="account.html">Your account</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">Your wishlist</button></li></ul></div>' +
       '</div><div class="foot-note label"><span>© ' + new Date().getFullYear() + ' Under One Roof</span><span>Made by hand · Stitched in rust</span></div></div>';
   }
 
@@ -182,6 +185,7 @@ window.UOR = window.UOR || {};
     if (f) f.innerHTML = footer();
     drawerShell();
     renderDrawer();
+    if (UOR.paintAccount) UOR.paintAccount();
   };
 
   // header turns solid once the page has moved; called from each page's single scroll handler

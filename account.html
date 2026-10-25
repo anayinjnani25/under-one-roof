@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Your account — Under One Roof</title>
+  <meta name="description" content="Sign in to Under One Roof to keep your wishlist and leave notes on pieces.">
+  <meta name="theme-color" content="#F6EFE2">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="page-account">
+  <header class="site-head"></header>
+
+  <main class="acct wrap">
+    <p class="acct-loading label" aria-live="polite">Opening your entry…</p>
+
+    <!-- Guests: sign in / create account -->
+    <section class="acct-view" data-view="guest" hidden>
+      <div class="acct-intro">
+        <span class="eyebrow">Entry No. 00 — Your shelf</span>
+        <h1>Come <em>in</em>.</h1>
+        <p class="lede">Sign in to keep your wishlist on every device and leave notes on the pieces you've brought home.</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="tabs" role="tablist" aria-label="Account">
+          <button class="tab" role="tab" type="button" id="tab-in" aria-controls="pane-in" aria-selected="true">Sign in</button>
+          <button class="tab" role="tab" type="button" id="tab-up" aria-controls="pane-up" aria-selected="false" tabindex="-1">Create account</button>
+        </div>
+
+        <form class="auth-pane" id="pane-in" role="tabpanel" aria-labelledby="tab-in" data-form="signin" novalidate>
+          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span class="label">Password</span><input name="password" type="password" autocomplete="current-password" required></label>
+          <div class="form-row">
+            <button class="btn" type="submit">Sign in</button>
+            <button class="link-btn" type="button" data-go="reset">Forgot password?</button>
+          </div>
+          <p class="form-note" role="status"></p>
+          <div class="or"><span>or</span></div>
+          <button class="btn btn-ghost wide" type="button" data-action="magic">Email me a sign-in link</button>
+        </form>
+
+        <form class="auth-pane" id="pane-up" role="tabpanel" aria-labelledby="tab-up" data-form="signup" novalidate hidden>
+          <label class="field"><span class="label">Your name</span><input name="name" autocomplete="name" maxlength="60" required></label>
+          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="field"><span class="label">Password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button class="btn" type="submit">Create account</button>
+          <p class="form-note" role="status"></p>
+        </form>
+
+        <div class="or"><span>or</span></div>
+        <button class="btn btn-ghost wide google" type="button" data-action="google">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>
+          Continue with Google
+        </button>
+        <p class="form-note google-note" role="status"></p>
+      </div>
+    </section>
+
+    <!-- Forgot password -->
+    <section class="acct-view" data-view="reset" hidden>
+      <div class="auth-card narrow">
+        <span class="eyebrow">Forgot password</span>
+        <h1 class="h2">A new <em>key</em>.</h1>
+        <p>Enter your email and we'll send a link to choose a new password.</p>
+        <form data-form="reset" novalidate>
+          <label class="field"><span class="label">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <div class="form-row">
+            <button class="btn" type="submit">Send reset link</button>
+            <button class="link-btn" type="button" data-go="guest">Back to sign in</button>
+          </div>
+          <p class="form-note" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Arrived from a password-reset email -->
+    <section class="acct-view" data-view="recover" hidden>
+      <div class="auth-card narrow">
+        <span class="eyebrow">Choose a new password</span>
+        <h1 class="h2">Almost <em>there</em>.</h1>
+        <form data-form="newpass" novalidate>
+          <label class="field"><span class="label">New password <small>(8 characters or more)</small></span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button class="btn" type="submit">Save password</button>
+          <p class="form-note" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Signed in -->
+    <section class="acct-view" data-view="member" hidden>
+      <div class="acct-intro member-head">
+        <div>
+          <span class="eyebrow">Entry No. 00 — Your shelf</span>
+          <h1>Hello, <em class="hello-name"></em>.</h1>
+          <p class="lede acct-email"></p>
+        </div>
+        <button class="btn btn-ghost" type="button" data-action="signout">Sign out</button>
+      </div>
+
+      <div class="acct-grid">
+        <form class="auth-card" data-form="profile" novalidate>
+          <h2 class="h3">Your <em>details</em></h2>
+          <label class="field"><span class="label">Name shown on your notes</span><input name="name" maxlength="60" autocomplete="name" required></label>
+          <button class="btn" type="submit">Save</button>
+          <p class="form-note" role="status"></p>
+        </form>
+
+        <div class="auth-card">
+          <h2 class="h3">Your <em>notes</em></h2>
+          <ul class="my-notes"></ul>
+        </div>
+      </div>
+
+      <section class="acct-wish">
+        <span class="eyebrow">Saved to your account</span>
+        <h2>Your <em>wishlist</em></h2>
+        <ul class="pgrid my-wish"></ul>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-foot"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/art.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/backend.js"></script>
+  <script src="assets/js/account.js"></script>
+</body>
+</html>
