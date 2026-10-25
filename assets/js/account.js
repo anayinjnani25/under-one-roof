@@ -1,4 +1,4 @@
-/* Under One Roof — account page: sign in / up, magic link, Google, reset, profile. */
+/* Under One Roof — account page: sign in / up, Google, reset, profile. */
 UOR.ready.then(function () {
   UOR.chrome('account');
   var $ = function (s, el) { return (el || document).querySelector(s); };
@@ -75,15 +75,6 @@ UOR.ready.then(function () {
       say(signin, '');
       if (next) location.href = next;
     }, function (err) { say(signin, friendly(err), 'err'); }).then(function () { busy(signin, false); });
-  });
-
-  $('[data-action=magic]').addEventListener('click', function () {
-    var email = signin.email.value.trim();
-    if (!validEmail(email)) { say(signin, 'Type your email above, then ask for a link.', 'err'); signin.email.focus(); return; }
-    var b = this; b.disabled = true;
-    UOR.auth.magicLink(email, backTo).then(function () {
-      say(signin, 'Check your inbox. We\'ve sent a sign-in link to ' + email + '.', 'ok');
-    }, function (err) { say(signin, friendly(err), 'err'); }).then(function () { b.disabled = false; });
   });
 
   // ---- create account
@@ -174,7 +165,7 @@ UOR.ready.then(function () {
       if (!cur || cur.dataset.view === 'member' || cur.dataset.view === 'recover') show('guest');
       return;
     }
-    if (next && !UOR.auth.recovering()) { location.href = next; return; } // e.g. back from Google or a magic link
+    if (next && !UOR.auth.recovering()) { location.href = next; return; } // e.g. back from Google or an email link
     show('member');
     $('.hello-name').textContent = UOR.auth.name();
     $('.acct-email').textContent = 'Signed in as ' + u.email;

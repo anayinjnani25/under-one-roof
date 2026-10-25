@@ -134,9 +134,6 @@
         return { needsConfirm: !r.data.session };
       });
     },
-    magicLink: function (email, next) {
-      return sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: back(next) } }).then(unwrap);
-    },
     google: function (next) {
       return sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: back(next) } }).then(unwrap);
     },
