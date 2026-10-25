@@ -37,7 +37,7 @@
     if (!sb) return Promise.reject(new Error('Supabase client unavailable'));
     return timeout(Promise.all([
       sb.from('categories').select('slug,no,title,accent,blurb,care,feature_product_id').order('sort'),
-      sb.from('products').select('id,category_slug,name,mini,description,price,colors,art,bg,image_url').order('sort')
+      sb.from('products').select('id,category_slug,name,mini,description,colors,art,bg,image_url').order('sort')
     ]), 6000).then(function (r) {
       if (r[0].error || r[1].error) throw (r[0].error || r[1].error);
       if (!r[0].data.length || !r[1].data.length) throw new Error('catalog is empty');
@@ -50,7 +50,7 @@
       cats.forEach(function (c) { slugs[c.slug] = 1; });
       var prods = r[1].data.filter(function (p) { return slugs[p.category_slug]; }).map(function (p) {
         return {
-          cat: p.category_slug, id: p.id, name: p.name, mini: p.mini, desc: p.description, price: p.price,
+          cat: p.category_slug, id: p.id, name: p.name, mini: p.mini, desc: p.description,
           art: p.art && p.art.type ? p.art : { type: 'pendant', style: 'coin' },
           colors: colorsFor(p), bg: p.bg, image: imageUrl(p.image_url)
         };

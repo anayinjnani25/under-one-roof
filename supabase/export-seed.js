@@ -18,9 +18,9 @@ out += UOR.categories.map((c, i) =>
   `  (${q(c.slug)}, ${q(c.no)}, ${q(c.title)}, ${q(c.accent)}, ${q(c.blurb)}, ${q(UOR.care[c.slug])}, ${q(c.feature)}, ${i})`
 ).join(',\n') + '\non conflict (slug) do update set no = excluded.no, title = excluded.title, accent = excluded.accent, blurb = excluded.blurb, care = excluded.care, feature_product_id = excluded.feature_product_id, sort = excluded.sort;\n\n';
 
-out += 'insert into public.products (id, category_slug, name, mini, description, price, colors, art, bg, sort) values\n';
+out += 'insert into public.products (id, category_slug, name, mini, description, colors, art, bg, sort) values\n';
 out += UOR.products.map((p, i) =>
-  `  (${q(p.id)}, ${q(p.cat)}, ${q(p.name)}, ${q(p.mini)}, ${q(p.desc)}, ${p.price}, ${arr(p.colors)}, ${q(JSON.stringify(p.art))}::jsonb, ${q(p.bg)}, ${i})`
-).join(',\n') + '\non conflict (id) do update set category_slug = excluded.category_slug, name = excluded.name, mini = excluded.mini, description = excluded.description, price = excluded.price, colors = excluded.colors, art = excluded.art, bg = excluded.bg, sort = excluded.sort, updated_at = now();\n';
+  `  (${q(p.id)}, ${q(p.cat)}, ${q(p.name)}, ${q(p.mini)}, ${q(p.desc)}, ${arr(p.colors)}, ${q(JSON.stringify(p.art))}::jsonb, ${q(p.bg)}, ${i})`
+).join(',\n') + '\non conflict (id) do update set category_slug = excluded.category_slug, name = excluded.name, mini = excluded.mini, description = excluded.description, colors = excluded.colors, art = excluded.art, bg = excluded.bg, sort = excluded.sort, updated_at = now();\n';
 
 process.stdout.write(out);

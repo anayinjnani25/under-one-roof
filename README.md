@@ -16,7 +16,7 @@ Set the shop's number in `assets/js/config.js` → `UOR.WHATSAPP.number`, with t
 - a WhatsApp button appears in the corner of every page. On a product page it pre-fills the piece's name and link; on a shelf page, the shelf's name.
 - the Contact page form opens WhatsApp with the shopper's message.
 
-Prices aren't shown on the site. Each product's Price panel says "Price on request" and has an **Ask the price on WhatsApp** button that pre-fills the piece, the chosen colour and a link to the piece. The `price` column in Supabase is kept but not displayed.
+Prices aren't shown on the site. Each product's Price panel says "Price on request" and has an **Ask the price on WhatsApp** button that pre-fills the piece, the chosen colour and a link to the piece. Prices aren't stored anywhere: the `products` table has no price column and the bundled catalog has no prices.
 
 Until it's set, the corner button stays hidden and the Contact page says chat is coming soon. The old `contact_messages` table in Supabase is no longer used by the site and is safe to drop.
 
