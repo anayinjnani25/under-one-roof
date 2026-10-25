@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Piece — Under One Roof</title>
+  <meta name="description" content="A handmade piece from Under One Roof.">
+  <meta name="theme-color" content="#F6EFE2">
+  <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Special+Elite&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="page-product">
+  <header class="site-head"></header>
+
+  <main>
+    <section class="pd wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"></nav>
+      <div class="pd-stage" aria-label="Product image. Move over it or tap to nudge it.">
+        <div class="jelly"></div>
+        <span class="label pd-hint" aria-hidden="true">Nudge it ↔</span>
+      </div>
+      <div class="pd-info">
+        <span class="eyebrow pd-cat"></span>
+        <h1 class="pd-name"></h1>
+        <p class="mini pd-mini"></p>
+
+        <div class="tabs" role="tablist" aria-label="About this piece">
+          <button class="tab" role="tab" type="button" aria-selected="true" aria-controls="panel-0" id="tab-0">01 Colour</button>
+          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-1" id="tab-1">02 The piece</button>
+          <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="panel-2" id="tab-2">03 Price</button>
+        </div>
+        <div class="panels">
+          <div class="panel" role="tabpanel" id="panel-0" aria-labelledby="tab-0">
+            <span class="label">Choose a colour</span>
+            <div class="swatches" role="radiogroup" aria-label="Colour"></div>
+            <p class="swatch-name"></p>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1">
+            <p class="pd-desc"></p>
+            <p class="care pd-care"></p>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2">
+            <div class="price pd-price"></div>
+            <p class="care">Made by hand in small batches, so yours may differ a little from the picture.</p>
+          </div>
+        </div>
+        <div class="panel-nav">
+          <button type="button" class="prev" aria-label="Previous panel">←</button>
+          <button type="button" class="next" aria-label="Next panel">→</button>
+        </div>
+        <div class="pd-actions">
+          <button class="btn add-bag" type="button">Add to bag</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews wrap" aria-labelledby="rev-title">
+      <div class="reviews-head">
+        <div>
+          <span class="eyebrow">Notes from homes</span>
+          <h2 id="rev-title">Reviews</h2>
+        </div>
+        <div class="rev-summary"></div>
+      </div>
+      <ul class="review-list"></ul>
+      <p class="sample-note">Sample reviews shown while we gather real ones from customers.</p>
+    </section>
+
+    <section class="related wrap" aria-labelledby="rel-title">
+      <span class="eyebrow">From the same shelf</span>
+      <h2 id="rel-title" class="rel-title"></h2>
+      <ul class="pgrid rel-grid"></ul>
+    </section>
+  </main>
+
+  <footer class="site-foot"></footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/art.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/product.js"></script>
+</body>
+</html>

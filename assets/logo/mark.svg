@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- TEMPORARY placeholder mark: a stitched circle with a roof. Replace this file with the real logo. -->
+  <circle cx="32" cy="32" r="30" fill="#F6EFE2"/>
+  <circle cx="32" cy="32" r="27" fill="none" stroke="#A3341F" stroke-width="2.4" stroke-dasharray="5 3.4" stroke-linecap="round"/>
+  <path d="M17 35 L32 21 L47 35" fill="none" stroke="#2C2217" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22 33 V44 H42 V33" fill="none" stroke="#2C2217" stroke-width="2.4" stroke-linejoin="round"/>
+  <circle cx="32" cy="38.5" r="2.6" fill="#A3341F"/>
+</svg>
