@@ -7,13 +7,19 @@ A storefront for a handcraft brand that sells torans, toran garlands, wall and d
 - `category.html?c=<slug>`: The needle stitches a looping path down the page, and the pieces hang off it like milestones.
 - `product.html?id=<id>`: A product with no background that wobbles like jelly, a sliding panel for colour, story and price, approved reviews and a review form for signed-in members.
 - `account.html`: Sign in, create an account, Google (once it's switched on), forgotten and reset password. Once signed in: your name, your notes with their approval status, and your synced wishlist.
-- `resources.html`: Care guides (text comes from each category's `care` column in Supabase) and a hanging & sizing guide.
 - `blog.html`: The journal. It has three **placeholder** posts, labelled as such on the page.
 - `about.html`: The brand story. The copy is general on purpose, so swap in your own details.
-- `contact.html`: A contact form saved to `public.contact_messages`. The site can only add messages, so read and answer them in the dashboard and tick `handled` once you've replied. The email and Instagram lines are **placeholders**.
+- `contact.html`: A WhatsApp chat starter. The shopper writes a message and WhatsApp opens with it ready to send.
+
+## WhatsApp
+Set the shop's number in `assets/js/config.js` → `UOR.WHATSAPP.number`, with the country code (for example `'+91 98765 43210'`). Once it's set:
+- a WhatsApp button appears in the corner of every page. On a product page it pre-fills the piece's name and link; on a shelf page, the shelf's name.
+- the Contact page form opens WhatsApp with the shopper's message.
+
+Until it's set, the corner button stays hidden and the Contact page says chat is coming soon. The old `contact_messages` table in Supabase is no longer used by the site and is safe to drop.
 
 ## Header
-Products (a dropdown of every shelf), Categories, Resources, Blog, About and Contact, followed by account, wishlist and Search (Ctrl K or ⌘K opens it). Below 1240px wide, the links move into a menu button.
+Products (a dropdown of every shelf), Categories, Blog, About and Contact, followed by account, wishlist and Search (Ctrl K or ⌘K opens it). Below 1240px wide, the links move into a menu button.
 
 ## Backend (Supabase)
 | Piece | Where | Who can do what |

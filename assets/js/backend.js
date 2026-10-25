@@ -204,15 +204,6 @@
       .catch(function (e) { log('Wishlist change not saved to your account:', e); });
   };
 
-  // ---- contact form (write-only table; read messages in the dashboard) --
-  UOR.contact = {
-    send: function (msg) {
-      if (!sb) return Promise.reject(new Error('offline'));
-      return timeout(sb.from('contact_messages').insert({ name: msg.name, email: msg.email, topic: msg.topic, message: msg.message }), 8000)
-        .then(unwrap);
-    }
-  };
-
   // ---- reviews -------------------------------------------------------
   UOR.reviews = {
     // approved reviews, plus the signed-in member's own pending one (RLS decides)

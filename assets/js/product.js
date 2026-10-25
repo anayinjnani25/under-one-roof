@@ -4,6 +4,7 @@ UOR.ready.then(function () {
   var p = UOR.byId(UOR.query('id')) || UOR.products[0];
   var cat = UOR.cat(p.cat);
   UOR.chrome('products');
+  UOR.waContext = 'Hi Under One Roof! I have a question about the ' + p.name + ': ' + location.href.split('#')[0];
 
   var $ = function (s) { return document.querySelector(s); };
   document.title = p.name + ' — Under One Roof';

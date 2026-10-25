@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Contact — Under One Roof</title>
-  <meta name="description" content="Write to Under One Roof about an order, a custom piece or wholesale.">
+  <meta name="description" content="Chat with Under One Roof on WhatsApp about an order, a custom piece or wholesale.">
   <meta name="theme-color" content="#F6EFE2">
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,40 +18,39 @@
   <main>
     <section class="page-hero wrap">
       <span class="eyebrow">Contact</span>
-      <h1>Write to <em>us</em></h1>
-      <p class="lede">A question about an order, an idea for a custom piece, or wholesale for your shop. Every message is read by a person.</p>
+      <h1>Chat with <em>us</em></h1>
+      <p class="lede">A question about an order, an idea for a custom piece, or wholesale for your shop. Message us on WhatsApp and a real person will reply.</p>
     </section>
 
     <section class="wrap page-section contact-grid">
-      <form class="panel-card contact-form" novalidate>
-        <div class="field-row">
-          <label class="field"><span class="label">Your name</span><input name="name" maxlength="80" autocomplete="name" required></label>
-          <label class="field"><span class="label">Email</span><input name="email" type="email" maxlength="200" autocomplete="email" required></label>
-        </div>
+      <form class="panel-card wa-form" novalidate>
+        <h2 class="card-title">Start a <em>WhatsApp</em> chat</h2>
+        <p class="card-sub">Write your message here and WhatsApp will open with it ready to send.</p>
+        <label class="field"><span class="label">Your name <small>(optional)</small></span><input name="name" maxlength="80" autocomplete="given-name"></label>
         <label class="field"><span class="label">What's it about?</span>
           <select name="topic">
-            <option value="general">Just saying hello</option>
-            <option value="order">A question about an order</option>
-            <option value="custom">A custom piece</option>
+            <option value="">Just saying hello</option>
+            <option value="a question about an order">A question about an order</option>
+            <option value="a custom piece">A custom piece</option>
             <option value="wholesale">Wholesale or stocking us</option>
-            <option value="other">Something else</option>
+            <option value="something else">Something else</option>
           </select>
         </label>
-        <label class="field"><span class="label">Message</span><textarea name="message" rows="6" maxlength="4000" required></textarea></label>
-        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="field"><span class="label">Message</span><textarea name="message" rows="5" maxlength="1000"></textarea></label>
         <div class="form-row">
-          <button class="btn" type="submit">Send message</button>
+          <button class="btn wa-go" type="submit"><span class="wa-ico"></span>Continue on WhatsApp</button>
           <p class="form-note" role="status"></p>
         </div>
       </form>
 
       <aside class="contact-aside">
-        <h2 class="card-title">Other ways to <em>reach us</em></h2>
-        <ul class="reach">
-          <li><span class="label">Email</span><span>hello@example.com <span class="pill wait">Placeholder</span></span></li>
-          <li><span class="label">Instagram</span><span>@your-handle <span class="pill wait">Placeholder</span></span></li>
-        </ul>
-        <p class="card-sub">We reply by email. For care questions, the <a href="resources.html">care &amp; hanging guides</a> may already have your answer.</p>
+        <h2 class="card-title">How it <em>works</em></h2>
+        <ol class="wa-steps">
+          <li>Write your message here, or tap the WhatsApp button in the corner of any page.</li>
+          <li>WhatsApp opens on your phone or computer with the message filled in.</li>
+          <li>Press send. We'll reply right there in the chat.</li>
+        </ol>
+        <p class="card-sub">Asking about a particular piece? Use the WhatsApp button on that piece's page and we'll know which one you mean.</p>
       </aside>
     </section>
   </main>

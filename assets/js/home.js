@@ -531,6 +531,7 @@ UOR.ready.then(function () {
     pTarget = reduced || range <= 0 ? (reduced ? .74 : 1) : clamp(-r.top / range, 0, 1);
     hint.classList.toggle('gone', pTarget > .01 || reduced);
     UOR.headSolid(reduced ? scrollY > 10 : pTarget > .97);
+    document.body.classList.toggle('intro-live', !reduced && pTarget < .97);
     if (!reduced) kick();
 
     var vh = innerHeight;

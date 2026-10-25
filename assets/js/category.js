@@ -7,6 +7,7 @@ UOR.ready.then(function () {
   var cat = UOR.cat(UOR.query('c')) || UOR.categories[0];
   var items = UOR.inCat(cat.slug);
   UOR.chrome('products');
+  UOR.waContext = 'Hi Under One Roof! I have a question about your ' + cat.title + ' ' + cat.accent + '.';
 
   document.title = cat.title + ' ' + cat.accent + ' — Under One Roof';
   document.querySelector('.cat-no').textContent = 'Entry No. ' + cat.no + ' — ' + items.length + ' pieces';

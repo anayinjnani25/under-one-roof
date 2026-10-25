@@ -1,4 +1,4 @@
-/* Under One Roof — simple content pages: resources, blog, about, contact.
+/* Under One Roof — simple content pages: blog, about, contact.
    Each page sets <body data-page="…">; this file draws the shared chrome and
    whatever that page needs from the catalog or Supabase. */
 UOR.ready.then(function () {
@@ -15,58 +15,32 @@ UOR.ready.then(function () {
     if (p) el.innerHTML = UOR.art(p);
   });
 
-  // ---- resources: care text comes from the catalog (UOR.care, editable in Supabase)
-  if (page === 'resources') {
-    var groups = [
-      { slugs: ['torans'], title: 'Torans' },
-      { slugs: ['hangings'], title: 'Wall & door hangings' },
-      { slugs: ['garlands'], title: 'Toran garlands' },
-      { slugs: ['oxidised', 'gold-silver'], title: 'Jewelry' }
-    ];
-    $('.care-grid').innerHTML = groups.map(function (g) {
-      var cats = g.slugs.map(UOR.cat).filter(Boolean);
-      if (!cats.length) return '';
-      var f = UOR.byId(cats[0].feature);
-      return '<article class="care-card">' +
-        (f ? '<div class="care-thumb" style="--bg:' + f.bg + '">' + UOR.art(f) + '</div>' : '') +
-        '<div><h3>' + g.title + '</h3>' +
-        cats.map(function (c) {
-          return (cats.length > 1 ? '<p class="care-sub">' + c.title + '</p>' : '') + '<p>' + UOR.esc(UOR.care[c.slug] || '') + '</p>';
-        }).join('') +
-        '<a class="care-link" href="category.html?c=' + cats[0].slug + '">See the shelf →</a></div></article>';
-    }).join('');
-  }
-
-  // ---- contact form
+  // ---- contact: compose a message, then hand it to WhatsApp
   if (page === 'contact') {
-    var form = $('.contact-form'), note = $('.form-note', form), btn = $('button[type="submit"]', form);
-    // signed-in members get their name and email filled in
-    function prefill() {
-      var me = UOR.auth.user();
-      if (!me) return;
-      if (!form.elements.email.value) form.elements.email.value = me.email || '';
-      if (!form.elements.name.value) form.elements.name.value = UOR.auth.name() || '';
+    var form = $('.wa-form'), note = $('.form-note', form), btn = $('.wa-go', form);
+    $('.wa-ico', btn).innerHTML = UOR.WA_ICON;
+    if (!UOR.wa()) {
+      // no number configured yet: say so instead of offering a dead button
+      btn.disabled = true;
+      note.textContent = 'WhatsApp chat is being set up. Please check back soon.';
+      form.querySelectorAll('input, select, textarea').forEach(function (el) { el.disabled = true; });
     }
-    UOR.auth.ready.then(prefill);
+    UOR.auth.ready.then(function () {
+      if (UOR.auth.user() && !form.elements.name.value) form.elements.name.value = (UOR.auth.name() || '').split(/\s+/)[0];
+    });
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var f = form.elements;
-      var msg = { name: f.name.value.trim(), email: f.email.value.trim(), topic: f.topic.value, message: f.message.value.trim() };
+      var f = form.elements, name = f.name.value.trim(), topic = f.topic.value, msg = f.message.value.trim();
       note.className = 'form-note';
-      if (f.website.value) { form.reset(); note.textContent = 'Thank you. We\'ll write back soon.'; note.classList.add('ok'); return; } // bot trap
-      if (!msg.name) { note.textContent = 'Tell us your name.'; note.classList.add('err'); f.name.focus(); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(msg.email)) { note.textContent = 'Add an email so we can reply.'; note.classList.add('err'); f.email.focus(); return; }
-      if (msg.message.length < 5) { note.textContent = 'Write a few words about what you need.'; note.classList.add('err'); f.message.focus(); return; }
-      btn.disabled = true; btn.textContent = 'Sending…';
-      UOR.contact.send(msg).then(function () {
-        form.reset();
-        prefill();
-        note.textContent = 'Thank you, ' + msg.name.split(/\s+/)[0] + '. Your note is with us and we\'ll reply by email.';
-        note.classList.add('ok');
-      }, function () {
-        note.textContent = 'That didn\'t send. Check your connection and try again.';
-        note.classList.add('err');
-      }).then(function () { btn.disabled = false; btn.textContent = 'Send message'; });
+      if (!msg) { note.textContent = 'Write a few words first.'; note.classList.add('err'); f.message.focus(); return; }
+      var text = 'Hi Under One Roof!' + (name ? ' I\'m ' + name + '.' : '') + (topic ? ' This is about ' + topic + '.' : '') + '\n\n' + msg;
+      var url = UOR.wa(text);
+      if (!url) return;
+      var win = window.open(url, '_blank');
+      if (win) win.opener = null;
+      else location.href = url; // pop-up blocked: open in this tab instead
+      note.textContent = 'WhatsApp is opening. Press send there to reach us.';
+      note.classList.add('ok');
     });
   }
 });
