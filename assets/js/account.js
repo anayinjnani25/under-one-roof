@@ -140,21 +140,27 @@ UOR.ready.then(function () {
   function stars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += i <= v ? '★' : '☆'; return s; }
   function paintWish() {
     var items = UOR.wish.all().map(UOR.byId).filter(Boolean);
+    $('.stat-wish').textContent = items.length;
+    $('.my-wish').classList.toggle('is-empty', !items.length);
     $('.my-wish').innerHTML = items.length
       ? items.map(function (p) { return '<li>' + UOR.card(p, UOR.productHref(p)) + '</li>'; }).join('')
-      : '<li class="empty-note">Nothing saved yet. Tap the heart on any piece and it will wait for you here, on every device.</li>';
+      : '<li class="empty-card"><p class="empty-title">Nothing saved yet</p><p>Tap the heart on any piece and it will wait for you here, on every device you sign in on.</p></li>';
   }
   function paintNotes() {
     var list = $('.my-notes');
-    list.innerHTML = '<li class="empty-note">Fetching your notes…</li>';
+    list.innerHTML = '<li class="empty-card slim"><p>Fetching your notes…</p></li>';
     UOR.reviews.mine().then(function (rows) {
+      $('.stat-notes').textContent = rows.length;
       list.innerHTML = rows.length ? rows.map(function (r) {
         var p = UOR.byId(r.product_id);
-        return '<li class="my-note"><a href="' + (p ? UOR.productHref(p) : '#') + '">' + UOR.esc(p ? p.name : r.product_id) + '</a>' +
+        return '<li class="my-note">' +
+          (p ? '<a class="note-thumb" href="' + UOR.productHref(p) + '" style="--bg:' + p.bg + '" tabindex="-1" aria-hidden="true">' + UOR.art(p) + '</a>' : '<span class="note-thumb"></span>') +
+          '<div class="note-body"><div class="note-top"><a class="note-name" href="' + (p ? UOR.productHref(p) : '#') + '">' + UOR.esc(p ? p.name : r.product_id) + '</a>' +
+          '<span class="pill ' + (r.approved ? 'pub' : 'wait') + '">' + (r.approved ? 'Published' : 'Awaiting approval') + '</span></div>' +
           '<span class="stars" role="img" aria-label="' + r.rating + ' out of 5">' + stars(r.rating) + '</span>' +
-          '<p>' + UOR.esc(r.body) + '</p><span class="label status ' + (r.approved ? 'pub' : 'wait') + '">' + (r.approved ? 'Published' : 'Awaiting approval') + '</span></li>';
-      }).join('') : '<li class="empty-note">You haven\'t left any notes yet.</li>';
-    }, function () { list.innerHTML = '<li class="empty-note">Your notes couldn\'t load just now.</li>'; });
+          '<p>' + UOR.esc(r.body) + '</p></div></li>';
+      }).join('') : '<li class="empty-card slim"><p class="empty-title">No notes yet</p><p>Brought a piece home? Open it in the shop and leave a few words under <em>Reviews</em>.</p></li>';
+    }, function () { list.innerHTML = '<li class="empty-card slim"><p>Your notes couldn\'t load just now.</p></li>'; });
   }
 
   function render() {
@@ -167,8 +173,12 @@ UOR.ready.then(function () {
     }
     if (next && !UOR.auth.recovering()) { location.href = next; return; } // e.g. back from Google or an email link
     show('member');
-    $('.hello-name').textContent = UOR.auth.name();
-    $('.acct-email').textContent = 'Signed in as ' + u.email;
+    var full = UOR.auth.name() || '';
+    $('.hello-name').textContent = full.split(/\s+/)[0] || full;
+    $('.avatar').textContent = (full.trim()[0] || '?').toUpperCase();
+    $('.acct-email').textContent = u.email || '';
+    $('.acct-email-input').value = u.email || '';
+    $('.stat-since').textContent = u.created_at ? new Date(u.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—';
     profileForm.elements.name.value = (UOR.auth.profile() && UOR.auth.profile().display_name) || '';
     paintWish(); paintNotes();
   }

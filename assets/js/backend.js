@@ -106,7 +106,7 @@
     var u = member();
     document.querySelectorAll('.acct-link').forEach(function (a) {
       var label = a.querySelector('.acct-label');
-      if (label) label.textContent = u ? displayName() : 'Sign in';
+      if (label) label.textContent = u ? displayName().split(/\s+/)[0] : 'Sign in'; // first name keeps the nav short
       a.setAttribute('aria-label', u ? 'Your account (' + displayName() + ')' : 'Sign in or create an account');
       a.classList.toggle('in', !!u);
     });

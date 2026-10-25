@@ -92,32 +92,49 @@
 
     <!-- Signed in -->
     <section class="acct-view" data-view="member" hidden>
-      <div class="acct-intro member-head">
-        <div>
-          <span class="eyebrow">Entry No. 00 — Your shelf</span>
-          <h1>Hello, <em class="hello-name"></em>.</h1>
-          <p class="lede acct-email"></p>
+      <header class="member-head">
+        <div class="member-id">
+          <span class="avatar" aria-hidden="true"></span>
+          <div>
+            <span class="eyebrow">Your shelf</span>
+            <h1>Hello, <em class="hello-name"></em></h1>
+            <p class="member-meta"><span class="acct-email"></span><span class="dot" aria-hidden="true">·</span><button class="link-btn" type="button" data-action="signout">Sign out</button></p>
+          </div>
         </div>
-        <button class="btn btn-ghost" type="button" data-action="signout">Sign out</button>
-      </div>
+        <ul class="stats" aria-label="Your account at a glance">
+          <li><strong class="stat-wish">0</strong><span>Saved pieces</span></li>
+          <li><strong class="stat-notes">0</strong><span>Notes written</span></li>
+          <li><strong class="stat-since">—</strong><span>Member since</span></li>
+        </ul>
+      </header>
 
       <div class="acct-grid">
-        <form class="auth-card" data-form="profile" novalidate>
-          <h2 class="h3">Your <em>details</em></h2>
-          <label class="field"><span class="label">Name shown on your notes</span><input name="name" maxlength="60" autocomplete="name" required></label>
-          <button class="btn" type="submit">Save</button>
-          <p class="form-note" role="status"></p>
+        <form class="panel-card" data-form="profile" novalidate>
+          <h2 class="card-title">Your <em>details</em></h2>
+          <p class="card-sub">Your name appears on the notes you leave about pieces.</p>
+          <label class="field"><span class="label">Display name</span><input name="name" maxlength="60" autocomplete="name" required></label>
+          <label class="field"><span class="label">Email</span><input class="acct-email-input" type="email" readonly tabindex="-1" aria-readonly="true"></label>
+          <div class="form-row">
+            <button class="btn" type="submit">Save changes</button>
+            <p class="form-note" role="status"></p>
+          </div>
         </form>
 
-        <div class="auth-card">
-          <h2 class="h3">Your <em>notes</em></h2>
+        <div class="panel-card">
+          <h2 class="card-title">Your <em>notes</em></h2>
+          <p class="card-sub">Reviews you've written. Each one appears in the shop once it's approved.</p>
           <ul class="my-notes"></ul>
         </div>
       </div>
 
-      <section class="acct-wish">
-        <span class="eyebrow">Saved to your account</span>
-        <h2>Your <em>wishlist</em></h2>
+      <section class="acct-wish" aria-labelledby="wish-h">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Saved to your account</span>
+            <h2 id="wish-h">Your <em>wishlist</em></h2>
+          </div>
+          <a class="btn btn-ghost" href="index.html#collection">Browse the shop</a>
+        </div>
         <ul class="pgrid my-wish"></ul>
       </section>
     </section>
