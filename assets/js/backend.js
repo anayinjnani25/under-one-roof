@@ -180,28 +180,56 @@
   }
 
   // ---- wishlist sync (members only; guests keep it in the browser) ------
-  function pushIds(ids) {
+  // new rows only; existing rows are changed with updateItem (members may update qty/colour, nothing else)
+  function insertItems(items) {
     var u = member();
-    if (!u || !ids.length) return Promise.resolve();
-    return sb.from('wishlist_items').upsert(ids.map(function (id) { return { user_id: u.id, product_id: id }; }),
-      { onConflict: 'user_id,product_id', ignoreDuplicates: true }).then(unwrap);
+    if (!u || !items.length) return Promise.resolve();
+    return sb.from('wishlist_items').upsert(items.map(function (e) {
+      return { user_id: u.id, product_id: e.id, qty: e.qty, colour: e.colour };
+    }), { onConflict: 'user_id,product_id', ignoreDuplicates: true }).then(unwrap);
+  }
+  function updateItem(e) {
+    var u = member();
+    if (!u) return Promise.resolve();
+    return sb.from('wishlist_items').update({ qty: e.qty, colour: e.colour }).eq('user_id', u.id).eq('product_id', e.id).then(unwrap);
   }
 
-  // merge: anything hearted as a guest is added to the account, then the account list wins
+  // merge on sign-in: guest pieces join the account; where both have a piece, the higher quantity wins
   function pullWishlist() {
-    return sb.from('wishlist_items').select('product_id').order('created_at', { ascending: false }).then(unwrap).then(function (r) {
-      var remote = r.data.map(function (x) { return x.product_id; }).filter(UOR.byId);
-      var localOnly = UOR.wish.all().filter(function (id) { return remote.indexOf(id) < 0 && UOR.byId(id); });
+    return sb.from('wishlist_items').select('product_id,qty,colour').order('created_at', { ascending: false }).then(unwrap).then(function (r) {
+      var remote = r.data.filter(function (x) { return UOR.byId(x.product_id); })
+        .map(function (x) { return { id: x.product_id, qty: x.qty, colour: x.colour }; });
+      var byId = {};
+      remote.forEach(function (e) { byId[e.id] = e; });
+      var localOnly = [], raise = [];
+      UOR.wish.items().forEach(function (l) {
+        if (!UOR.byId(l.id)) return;
+        var m = byId[l.id];
+        if (!m) localOnly.push(l);
+        else if (l.qty > m.qty) { m.qty = l.qty; m.colour = l.colour || m.colour; raise.push(m); } // the guest's choice is the more recent one
+      });
       UOR.wish.replace(localOnly.concat(remote));
-      return pushIds(localOnly);
+      return Promise.all([insertItems(localOnly)].concat(raise.map(updateItem)));
     }).catch(function (e) { log('Wishlist sync paused:', e); });
   }
 
-  UOR.wish.onToggle = function (id, on) {
+  UOR.wish.onToggle = function (id, on, entry) {
     var u = member();
     if (!u) return;
-    (on ? pushIds([id]) : sb.from('wishlist_items').delete().eq('user_id', u.id).eq('product_id', id).then(unwrap))
+    (on ? insertItems([entry || UOR.wish.get(id)]) : sb.from('wishlist_items').delete().eq('user_id', u.id).eq('product_id', id).then(unwrap))
       .catch(function (e) { log('Wishlist change not saved to your account:', e); });
+  };
+
+  // quantity steppers fire quickly: send one update per piece once clicking settles
+  var pending = {};
+  UOR.wish.onUpdate = function (entry) {
+    if (!member()) return;
+    clearTimeout(pending[entry.id]);
+    pending[entry.id] = setTimeout(function () {
+      delete pending[entry.id];
+      var latest = UOR.wish.get(entry.id);
+      if (latest) updateItem(latest).catch(function (e) { log('Quantity not saved to your account:', e); });
+    }, 350);
   };
 
   // ---- reviews -------------------------------------------------------

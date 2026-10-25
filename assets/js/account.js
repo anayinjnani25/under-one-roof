@@ -138,13 +138,12 @@ UOR.ready.then(function () {
   });
 
   function stars(v) { var s = ''; for (var i = 1; i <= 5; i++) s += i <= v ? '★' : '☆'; return s; }
+  // same rows, steppers and WhatsApp order button as the wishlist drawer
+  var wishBox = $('.acct-wishlist');
+  wishBox.insertAdjacentHTML('beforeend', UOR.orderFoot());
   function paintWish() {
-    var items = UOR.wish.all().map(UOR.byId).filter(Boolean);
-    $('.stat-wish').textContent = items.length;
-    $('.my-wish').classList.toggle('is-empty', !items.length);
-    $('.my-wish').innerHTML = items.length
-      ? items.map(function (p) { return '<li>' + UOR.card(p, UOR.productHref(p)) + '</li>'; }).join('')
-      : '<li class="empty-card"><p class="empty-title">Nothing saved yet</p><p>Tap the heart on any piece and it will wait for you here, on every device you sign in on.</p></li>';
+    $('.stat-wish').textContent = UOR.wish.all().filter(UOR.byId).length;
+    UOR.renderWishRows($('.my-wish'));
   }
   function paintNotes() {
     var list = $('.my-notes');
@@ -183,9 +182,8 @@ UOR.ready.then(function () {
     paintWish(); paintNotes();
   }
 
-  // keep the wishlist panel in step with hearts toggled here or merged on sign-in
-  new MutationObserver(function () { if (!$('[data-view=member]').hidden) paintWish(); })
-    .observe(document.querySelector('.wish-count') || document.body, { childList: true, characterData: true, subtree: true });
+  // keep the wishlist panel in step with changes made here, in the drawer, or merged on sign-in
+  document.addEventListener('uor:wish', function () { if (!$('[data-view=member]').hidden) paintWish(); });
 
   UOR.auth.onChange(render);
   UOR.auth.ready.then(render);

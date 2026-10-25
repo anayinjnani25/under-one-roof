@@ -29,11 +29,14 @@ UOR.ready.then(function () {
   }
   $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p));
 
-  // ---- colour options
-  var jelly = $('.jelly'), current = p.colors[0];
+  // ---- colour options (start on the colour already saved in the wishlist, if any)
+  var saved = UOR.wish.get(p.id);
+  var jelly = $('.jelly'), current = saved ? saved.colour : p.colors[0];
   function paint() {
     jelly.innerHTML = UOR.art(p, current);
     $('.swatch-name').textContent = UOR.palettes[current].name;
+    var heart = $('.pd-actions .heart');
+    if (heart) heart.dataset.colour = current; // the heart saves the colour on screen
     document.querySelectorAll('.swatch').forEach(function (s) { s.setAttribute('aria-checked', s.dataset.k === current); s.tabIndex = s.dataset.k === current ? 0 : -1; });
   }
   $('.swatches').innerHTML = p.colors.map(function (k) {
@@ -103,9 +106,27 @@ UOR.ready.then(function () {
   var pt; panels.addEventListener('scroll', function () { cancelAnimationFrame(pt); pt = requestAnimationFrame(syncTabs); }, { passive: true });
   syncTabs();
 
+  // ---- quantity + Add to wishlist
+  var qty = saved ? saved.qty : 1, qtyBox = $('.pd-qty');
+  function paintQty() { qtyBox.innerHTML = UOR.stepper(qty, p.name); }
+  paintQty();
+  qtyBox.addEventListener('click', function (e) {
+    var b = e.target.closest('.qty-btn'); if (!b) return;
+    qty = Math.min(UOR.QTY_MAX, Math.max(1, qty + (+b.dataset.step)));
+    var which = b.dataset.step;
+    paintQty();
+    var again = qtyBox.querySelector('[data-step="' + which + '"]');
+    (again && !again.disabled ? again : qtyBox.querySelector('.qty-btn:not([disabled])')).focus();
+  });
   $('.add-bag').addEventListener('click', function () {
-    UOR.wish.add(p.id);
-    UOR.toast('Checkout opens soon — saved to your wishlist for now');
+    var had = UOR.wish.has(p.id);
+    UOR.wish.set(p.id, { qty: qty, colour: current });
+    UOR.toast((had ? 'Updated: ' : 'Added ') + qty + ' × ' + p.name + (had ? ' in your wishlist' : ''));
+  });
+  // keep the stepper in step with changes made from the wishlist drawer
+  document.addEventListener('uor:wish', function () {
+    var e = UOR.wish.get(p.id);
+    if (e && e.qty !== qty && !qtyBox.contains(document.activeElement)) { qty = e.qty; paintQty(); }
   });
 
   // ---- reviews (Supabase; only approved ones are readable)

@@ -18,29 +18,66 @@ window.UOR = window.UOR || {};
   UOR.esc = esc;
 
   // ---- wishlist store: local first (instant, optimistic), synced to Supabase by backend.js
-  var KEY = 'uor-wishlist';
+  // Each entry is { id, qty, colour }. Older saves were bare product ids; they're upgraded on load.
+  var KEY = 'uor-wishlist', QTY_MAX = 20;
   var wish = [];
-  try { wish = JSON.parse(localStorage.getItem(KEY) || '[]').filter(function (id) { return typeof id === 'string'; }); } catch (e) { wish = []; }
+  function clampQty(n) { n = Math.round(+n) || 1; return n < 1 ? 1 : n > QTY_MAX ? QTY_MAX : n; }
+  function normal(e) {
+    if (typeof e === 'string') e = { id: e };
+    if (!e || typeof e.id !== 'string') return null;
+    return { id: e.id, qty: clampQty(e.qty), colour: typeof e.colour === 'string' && e.colour ? e.colour : null };
+  }
+  function dedupe(list) {
+    var seen = {};
+    return list.map(normal).filter(function (e) { if (!e || seen[e.id]) return false; seen[e.id] = 1; return true; });
+  }
+  try { wish = dedupe(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) { wish = []; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(wish)); } catch (e) { /* storage blocked: keep in memory */ } }
+  function find(id) { for (var i = 0; i < wish.length; i++) if (wish[i].id === id) return i; return -1; }
+  // a saved colour must still exist for that piece; otherwise use its first colour
+  function colourFor(id, key) {
+    var p = UOR.byId(id);
+    if (!p) return key || null;
+    return key && p.colors.indexOf(key) > -1 ? key : p.colors[0];
+  }
+  UOR.QTY_MAX = QTY_MAX;
   UOR.wish = {
-    has: function (id) { return wish.indexOf(id) > -1; },
-    all: function () { return wish.slice(); },
-    toggle: function (id) {
-      var on = !this.has(id);
-      if (on) wish.unshift(id); else wish.splice(wish.indexOf(id), 1);
-      save(); sync(id);
-      if (this.onToggle) this.onToggle(id, on);
+    has: function (id) { return find(id) > -1; },
+    all: function () { return wish.map(function (e) { return e.id; }); },
+    items: function () { return wish.map(function (e) { return { id: e.id, qty: e.qty, colour: colourFor(e.id, e.colour) }; }); },
+    get: function (id) { var i = find(id); return i < 0 ? null : { id: id, qty: wish[i].qty, colour: colourFor(id, wish[i].colour) }; },
+    // heart: add (qty 1) or remove
+    toggle: function (id, colour) {
+      var i = find(id), on = i < 0;
+      if (on) wish.unshift({ id: id, qty: 1, colour: colourFor(id, colour) }); else wish.splice(i, 1);
+      save(); sync();
+      if (this.onToggle) this.onToggle(id, on, on ? wish[0] : null);
       return on;
     },
     add: function (id) { if (!this.has(id)) this.toggle(id); },
-    replace: function (ids) {
-      wish = ids.filter(function (id, i) { return ids.indexOf(id) === i; });
+    remove: function (id) { if (this.has(id)) this.toggle(id); },
+    // add or update quantity / colour; returns the saved entry
+    set: function (id, change) {
+      var i = find(id), e;
+      if (i < 0) {
+        e = { id: id, qty: clampQty(change.qty), colour: colourFor(id, change.colour) };
+        wish.unshift(e); save(); sync();
+        if (this.onToggle) this.onToggle(id, true, e);
+        return e;
+      }
+      e = wish[i];
+      if (change.qty != null) e.qty = clampQty(change.qty);
+      if (change.colour) e.colour = colourFor(id, change.colour);
       save(); sync();
+      if (this.onUpdate) this.onUpdate(e);
+      return e;
     },
-    onToggle: null
+    replace: function (list) { wish = dedupe(list); save(); sync(); },
+    onToggle: null,
+    onUpdate: null
   };
 
-  function wishCount() { return wish.filter(UOR.byId).length; }
+  function wishCount() { return wish.filter(function (e) { return UOR.byId(e.id); }).length; }
   function sync() {
     var n = wishCount();
     document.querySelectorAll('.wish-count').forEach(function (el) {
@@ -54,6 +91,7 @@ window.UOR = window.UOR || {};
       b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + b.dataset.name + (on ? ' from' : ' to') + ' wishlist');
     });
     renderDrawer();
+    document.dispatchEvent(new CustomEvent('uor:wish')); // pages showing the list repaint on this
   }
 
   UOR.heartBtn = function (p) {
@@ -66,7 +104,7 @@ window.UOR = window.UOR || {};
     var b = e.target.closest('.heart[data-id]');
     if (!b) return;
     e.preventDefault(); e.stopPropagation();
-    var on = UOR.wish.toggle(b.dataset.id);
+    var on = UOR.wish.toggle(b.dataset.id, b.dataset.colour); // product page sets data-colour to the chosen colour
     if (on && !UOR.reduced()) {
       document.querySelectorAll('.heart[data-id="' + b.dataset.id + '"]').forEach(function (h) {
         h.classList.remove('pulse'); void h.offsetWidth; h.classList.add('pulse');
@@ -313,23 +351,114 @@ window.UOR = window.UOR || {};
     d.innerHTML = '<div class="scrim" data-close></div>' +
       '<aside class="drawer" id="wishlist" role="dialog" aria-modal="true" aria-labelledby="wish-title">' +
       '<div class="drawer-head"><h2 id="wish-title">Wish<em>list</em></h2><button class="drawer-close" type="button" data-close aria-label="Close wishlist">×</button></div>' +
-      '<ul class="drawer-list"></ul></aside>';
+      '<ul class="drawer-list wish-rows"></ul>' + orderFoot() + '</aside>';
     while (d.firstChild) document.body.appendChild(d.firstChild);
   }
 
-  function renderDrawer() {
-    var list = document.querySelector('.drawer-list');
+  // ---- wishlist rows, shared by the drawer and the account page --------
+  function wishEntries() {
+    return UOR.wish.items().map(function (e) { var p = UOR.byId(e.id); return p ? { p: p, qty: e.qty, colour: e.colour } : null; }).filter(Boolean);
+  }
+  function colourName(key) { return UOR.palettes[key] ? UOR.palettes[key].name : ''; }
+  UOR.stepper = function (qty, label, id) {
+    var data = id ? ' data-id="' + id + '"' : '';
+    return '<div class="qty" role="group" aria-label="Quantity of ' + esc(label) + '">' +
+      '<button class="qty-btn" type="button" data-step="-1"' + data + ' aria-label="One fewer"' + (qty <= 1 ? ' disabled' : '') + '>−</button>' +
+      '<output class="qty-val" aria-live="polite">' + qty + '</output>' +
+      '<button class="qty-btn" type="button" data-step="1"' + data + ' aria-label="One more"' + (qty >= QTY_MAX ? ' disabled' : '') + '>+</button></div>';
+  };
+  function orderFoot() {
+    return '<div class="order-foot"><p class="order-sum"></p>' +
+      '<a class="btn wa-order" href="contact.html" target="_blank" rel="noopener">' + UOR.WA_ICON + '<span>Order these on WhatsApp</span></a>' +
+      '<p class="order-note">We\'ll reply with prices and availability.</p></div>';
+  }
+  UOR.orderFoot = orderFoot;
+  function summary(list) {
+    var units = list.reduce(function (n, e) { return n + e.qty; }, 0);
+    return list.length + (list.length === 1 ? ' piece' : ' pieces') + ' · ' + units + (units === 1 ? ' item' : ' items');
+  }
+  // keep keyboard focus on the same control after a row list is redrawn
+  function focusKey(el) {
+    if (!el || !el.dataset || !el.dataset.id) return null;
+    return el.dataset.id + '|' + (el.dataset.step || (el.classList.contains('wish-remove') ? 'remove' : ''));
+  }
+  UOR.renderWishRows = function (list) {
     if (!list) return;
-    var items = wish.map(UOR.byId).filter(Boolean); // skip pieces no longer in the catalog
-    if (!items.length) {
+    var key = list.contains(document.activeElement) ? focusKey(document.activeElement) : null;
+    var rows = wishEntries();
+    if (!rows.length) {
       list.innerHTML = '<li class="drawer-empty"><span class="stamp">Nothing<br>saved<br>yet</span>Tap the heart on any piece to keep it here.</li>';
+    } else {
+      list.innerHTML = rows.map(function (r) {
+        var p = r.p;
+        return '<li class="drawer-item"><a class="drawer-thumb" href="' + UOR.productHref(p) + '" style="--bg:' + p.bg + '" tabindex="-1" aria-hidden="true">' + UOR.art(p, r.colour) + '</a>' +
+          '<div class="wish-info"><a class="wish-name" href="' + UOR.productHref(p) + '">' + esc(p.name) + '</a>' +
+          '<small>' + esc(colourName(r.colour)) + '</small>' +
+          '<div class="wish-controls">' + UOR.stepper(r.qty, p.name, p.id) +
+          '<button class="wish-remove" type="button" data-id="' + p.id + '" aria-label="Remove ' + esc(p.name) + ' from wishlist">Remove</button></div></div></li>';
+      }).join('');
+    }
+    if (key) {
+      var parts = key.split('|'), sel = parts[1] === 'remove' ? '.wish-remove' : '[data-step="' + parts[1] + '"]';
+      var el = list.querySelector(sel + '[data-id="' + parts[0] + '"]');
+      if (el && !el.disabled) el.focus(); else { var any = list.querySelector('[data-id="' + parts[0] + '"]:not([disabled])'); if (any) any.focus(); }
+    }
+    // order footer(s) next to this list
+    var foot = list.parentElement.querySelector('.order-foot');
+    if (foot) {
+      foot.querySelector('.order-sum').textContent = rows.length ? summary(rows) : 'Your wishlist is empty';
+      var btn = foot.querySelector('.wa-order');
+      btn.classList.toggle('is-disabled', !rows.length);
+      btn.setAttribute('aria-disabled', !rows.length);
+      if (UOR.wa()) btn.href = UOR.wa(orderText(rows));
+      else { btn.href = 'contact.html'; btn.removeAttribute('target'); }
+    }
+  };
+
+  // the WhatsApp order message; stays under ~1800 characters by dropping links first
+  function orderText(rows) {
+    var first = UOR.auth && UOR.auth.user && UOR.auth.user() && UOR.auth.name ? (UOR.auth.name() || '').split(/\s+/)[0] : '';
+    var head = 'Hi Under One Roof!' + (first ? ' I\'m ' + first + '.' : '') + ' I\'d like to order these pieces. Could you share the price and availability?';
+    var units = rows.reduce(function (n, r) { return n + r.qty; }, 0);
+    var tail = 'Total: ' + units + (units === 1 ? ' item' : ' items');
+    function build(withLinks, upto) {
+      var lines = rows.slice(0, upto).map(function (r, i) {
+        var line = (i + 1) + '. ' + r.p.name + (r.colour ? ' (' + colourName(r.colour) + ')' : '') + ' × ' + r.qty;
+        return withLinks ? line + '\n   ' + new URL(UOR.productHref(r.p), location.href).href : line;
+      });
+      if (upto < rows.length) lines.push('…and ' + (rows.length - upto) + ' more pieces from my wishlist');
+      return head + '\n\n' + lines.join('\n') + '\n\n' + tail;
+    }
+    var text = build(true, rows.length);
+    if (text.length > 1800) text = build(false, rows.length);
+    for (var n = rows.length - 1; text.length > 1800 && n > 0; n--) text = build(false, n);
+    return text;
+  }
+  UOR.orderText = function () { return orderText(wishEntries()); };
+
+  function renderDrawer() { UOR.renderWishRows(document.querySelector('.drawer-list')); }
+
+  // stepper, Remove and Order controls anywhere a wishlist row list is shown
+  document.addEventListener('click', function (e) {
+    var step = e.target.closest('.qty-btn[data-id]');
+    if (step) {
+      var cur = UOR.wish.get(step.dataset.id);
+      if (cur) UOR.wish.set(step.dataset.id, { qty: cur.qty + (+step.dataset.step) });
       return;
     }
-    list.innerHTML = items.map(function (p) {
-      return '<li class="drawer-item"><div class="drawer-thumb" style="--bg:' + p.bg + '">' + UOR.art(p) + '</div>' +
-        '<div><a href="' + UOR.productHref(p) + '">' + esc(p.name) + '</a><small>' + esc(p.mini) + '</small></div>' + UOR.heartBtn(p) + '</li>';
-    }).join('');
-  }
+    var rm = e.target.closest('.wish-remove[data-id]');
+    if (rm) {
+      var p = UOR.byId(rm.dataset.id);
+      UOR.wish.remove(rm.dataset.id);
+      UOR.toast('Removed ' + (p ? p.name : 'piece') + ' from your wishlist');
+      return;
+    }
+    var order = e.target.closest('.wa-order');
+    if (order) {
+      if (order.classList.contains('is-disabled')) { e.preventDefault(); UOR.toast('Add a piece to your wishlist first'); return; }
+      if (UOR.wa()) order.href = UOR.wa(UOR.orderText()); // latest quantities and name
+    }
+  });
 
   var lastFocus = null;
   function openDrawer() {
