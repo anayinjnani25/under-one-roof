@@ -12,7 +12,9 @@ UOR.SUPABASE = {
    e.g. '+91 98765 43210'. While it's empty, the floating WhatsApp button stays
    hidden and the Contact page says chat is coming soon. */
 UOR.WHATSAPP = {
-  number: '+91 99675 96601',
+  number: '+91 88678 48787',
   // the name shoppers will see at the top of the WhatsApp chat
-  chatName: 'Sunitha Collection Pochampali'
+  chatName: 'Mitali S Rao'
+  // Previous number (temporarily swapped out, may return):
+  //   number: '+91 99675 96601', chatName: 'Sunitha Collection Pochampali'
 };
