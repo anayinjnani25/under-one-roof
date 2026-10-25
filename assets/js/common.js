@@ -234,8 +234,7 @@ window.UOR = window.UOR || {};
         }
         return '<li role="option" id="sr-' + i + '" class="search-hit"><a href="' + UOR.productHref(h.p) + '" tabindex="-1">' +
           '<span class="sr-thumb" style="--bg:' + h.p.bg + '">' + UOR.art(h.p) + '</span>' +
-          '<span class="sr-text"><strong>' + esc(h.p.name) + '</strong><small>' + esc(h.p.mini) + ' · ' + esc(catName(h.p.cat)) + '</small></span>' +
-          '<span class="sr-price">' + UOR.price(h.p.price) + '</span></a></li>';
+          '<span class="sr-text"><strong>' + esc(h.p.name) + '</strong><small>' + esc(h.p.mini) + ' · ' + esc(catName(h.p.cat)) + '</small></span></a></li>';
       }).join('');
       mark();
     }

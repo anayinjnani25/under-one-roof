@@ -597,7 +597,11 @@ body.page-cat .stamp { box-shadow: inset 0 0 0 3px var(--paper-dark), inset 0 0 
 }
 .swatch:hover { transform: scale(1.08); }
 .swatch[aria-checked="true"] { box-shadow: 0 0 0 3px var(--page), 0 0 0 4.5px var(--ink); }
-.price { font-family: var(--f-display); font-size: 2.6rem; line-height: 1; margin-bottom: 10px; font-variation-settings: 'opsz' 96; }
+.price { font-family: var(--f-display); font-size: 2.2rem; line-height: 1.1; margin-bottom: 10px; font-variation-settings: 'opsz' 96; }
+.pd-price { font-style: italic; font-weight: 300; }
+.price-note { font-size: 1.12rem; line-height: 1.5; margin-bottom: 16px; }
+.btn.wa-price { gap: 10px; margin-bottom: 16px; }
+.wa-price .wa-ico svg { width: 18px; height: 18px; display: block; }
 .panel-nav { display: flex; gap: 8px; margin-top: 4px; }
 .panel-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--beige); background: none; cursor: pointer; font-family: var(--f-type); }
 .panel-nav button:disabled { opacity: .35; cursor: default; }

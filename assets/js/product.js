@@ -14,7 +14,19 @@ UOR.ready.then(function () {
   $('.pd-mini').textContent = p.mini;
   $('.pd-desc').textContent = p.desc;
   $('.pd-care').textContent = UOR.care[p.cat];
-  $('.pd-price').textContent = UOR.price(p.price);
+  // prices aren't shown: shoppers ask for them on WhatsApp, with the piece and colour pre-filled
+  var priceBtn = $('.wa-price');
+  $('.wa-ico', priceBtn).innerHTML = UOR.WA_ICON;
+  function priceAsk() {
+    return 'Hi Under One Roof! Could you tell me the price of the ' + p.name +
+      (current ? ' in ' + UOR.palettes[current].name : '') + '? ' + location.href.split('#')[0];
+  }
+  if (UOR.wa()) {
+    priceBtn.href = UOR.wa(priceAsk());
+    priceBtn.addEventListener('click', function () { priceBtn.href = UOR.wa(priceAsk()); }); // picks up the latest colour
+  } else {
+    priceBtn.removeAttribute('target'); priceBtn.removeAttribute('rel'); // no number set: fall back to the Contact page
+  }
   $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p));
 
   // ---- colour options
