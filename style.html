@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Paper Atelier — style tile</title>
+  <meta name="description" content="Style tile for the Under One Roof redesign: palette, type, components and motion.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F4EDE0">
+  <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Pinyon+Script&family=Special+Elite&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Pinyon+Script&family=Special+Elite&display=swap"></noscript>
+  <link rel="stylesheet" href="assets/css/atelier.css?v=202610271344">
+  <style>
+    /* page layout for the style tile only; the components live in atelier.css */
+    .tile-bar { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px var(--gutter); background: rgba(244, 237, 224, .92); backdrop-filter: blur(8px); border-bottom: 1px dashed var(--kraft); }
+    .tile-bar .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--f-display); font-size: 1.25rem; }
+    .tile-bar .brand img { width: 30px; height: 30px; }
+    .tile-bar nav { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+    .tile-bar nav a { font-family: var(--f-type); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; padding: 8px; color: var(--ink-soft); }
+    .tile-bar nav a:hover { color: var(--thread); }
+    @media (max-width: 980px) { .tile-bar nav { display: none; } .wish-pin { margin-left: auto; } }
+    .wish-pin { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow-rest); font-family: var(--f-type); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+    .wish-pin b { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 11px; background: var(--thread); color: var(--card); font-weight: 400; font-size: .7rem; letter-spacing: 0; transition: transform .45s var(--ease-settle); }
+    .wish-pin b.bump { transform: scale(1.35); }
+
+    .sec { position: relative; padding: clamp(70px, 12vh, 140px) 0; }
+    .sec-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 44px; }
+    .sec-head .at-label { display: block; margin-bottom: 10px; }
+    .torn-edge { position: absolute; left: 0; right: 0; height: 22px; background: inherit; z-index: 2; }
+
+    /* hero spread */
+    .hero { min-height: 100svh; display: grid; place-items: center; overflow: hidden; padding-top: 30px; }
+    .hero .at-giant { position: absolute; left: 0; right: 0; top: 50%; margin-top: -.62em; text-align: center; color: var(--ink); white-space: nowrap; z-index: 0; }
+    .hero-stage { position: relative; z-index: 1; width: clamp(230px, 26vw, 360px); margin-top: 18vh; }
+    .hero .polaroid { --r: -4deg; }
+    .hero .note { position: absolute; left: max(var(--gutter), 6vw); bottom: 16vh; max-width: 15em; }
+    .hero .note .at-label { display: block; margin-top: 12px; }
+    .hero .cta { position: absolute; right: max(var(--gutter), 7vw); bottom: 18vh; }
+    .hero .rubber { position: absolute; right: max(var(--gutter), 9vw); top: 12vh; }
+    .hero .sprig.l { width: clamp(150px, 16vw, 230px); left: -46%; top: 8%; transform: rotate(-18deg); }
+    .hero .sprig.r { width: clamp(110px, 11vw, 160px); right: -36%; bottom: 4%; }
+    .hero .doodle.spark { width: 44px; height: 44px; right: -18%; top: -6%; }
+    @media (max-width: 760px) {
+      .hero { display: block; padding: 40px 0 80px; min-height: 0; }
+      .hero .at-giant { position: relative; top: 0; margin-top: 30px; font-size: 28vw; }
+      .polaroid .caption .at-script { font-size: 1.3rem; }
+      .hero-stage { margin: 60px auto 0; width: 64vw; }
+      .hero .note, .hero .cta, .hero .rubber { position: relative; left: auto; right: auto; top: auto; bottom: auto; margin: 40px var(--gutter) 0; display: block; }
+      .hero .cta { display: inline-block; }
+      .hero .rubber { position: absolute; top: 18px; right: 18px; margin: 0; }
+    }
+
+    /* palette */
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 26px 20px; }
+    .chip { background: var(--card); padding: 10px 10px 14px; box-shadow: var(--shadow-rest); position: relative; }
+    .chip i { display: block; aspect-ratio: 3 / 2; background: var(--c); }
+    .chip strong { display: block; margin-top: 10px; font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; }
+    .chip span { font-family: var(--f-type); font-size: .68rem; color: var(--ink-soft); letter-spacing: .08em; }
+
+    /* type */
+    .type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px; align-items: end; }
+    .type-grid .spec { border-top: 1px dashed var(--kraft); padding-top: 14px; }
+    .type-grid .spec .at-label { display: block; margin-bottom: 10px; }
+
+    /* strips wall */
+    .wall { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 8px; max-width: 1040px; margin: 0 auto; }
+
+    /* pieces */
+    .pieces { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 70px 44px; align-items: start; }
+    .pieces figure { margin: 0; position: relative; }
+    .pieces figcaption { margin-top: 18px; }
+    .cut-solo { width: 78%; margin: 30px auto 0; }
+    .rubbers { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; padding: 20px 0; }
+    .tapes { display: grid; gap: 30px; padding: 30px 10px; }
+    .tapes .tape { position: relative; top: auto; left: auto; opacity: .82; }
+    .stamps { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 34px; }
+
+    /* poster (product page concept) */
+    .poster { background: var(--card); border-radius: 18px; padding: clamp(24px, 4vw, 56px); overflow: hidden; position: relative; box-shadow: var(--shadow-rest); }
+    .poster .at-giant { position: absolute; left: 0; right: 0; top: 4%; text-align: center; color: var(--moss); opacity: .92; font-size: clamp(5rem, 17vw, 15rem); }
+    .poster-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr); gap: 30px; align-items: center; min-height: 640px; }
+    .poster-piece { position: relative; z-index: 2; }
+    .poster-piece .cutout { width: 136%; margin: -12% -18% 0; }
+    .poster-left h3 { font-family: var(--f-display); font-weight: 400; font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1; margin: 0 0 14px; }
+    .poster-left p { color: var(--ink-soft); max-width: 18em; }
+    .paint { display: flex; gap: 10px; margin: 16px 0 6px; flex-wrap: wrap; }
+    .paint button { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 3px var(--card), 0 0 0 1px rgba(31, 26, 21, .25); transition: transform .35s var(--ease); }
+    .paint button[aria-pressed="true"] { box-shadow: inset 0 0 0 3px var(--card), 0 0 0 2px var(--thread); transform: scale(1.08); }
+    .poster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
+    .heart { width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--card); cursor: pointer; display: grid; place-items: center; position: relative; }
+    .heart svg { width: 24px; height: 24px; overflow: visible; }
+    .heart .h { fill: transparent; stroke: var(--ink); stroke-width: 1.6; transition: fill .3s, stroke .3s; }
+    .heart .loop { fill: none; stroke: var(--thread); stroke-width: 1.6; stroke-dasharray: 3 3; opacity: 0; }
+    .heart[aria-pressed="true"] .h { fill: var(--thread); stroke: var(--thread); }
+    .heart.stitch .loop { opacity: 1; animation: stitch .8s var(--ease) forwards; }
+    @keyframes stitch { from { stroke-dashoffset: 120; } to { stroke-dashoffset: 0; } }
+    .poster .sprig.a { width: 200px; left: 30%; top: 16%; transform: rotate(-30deg); }
+    .poster .sprig.b { width: 140px; right: 30%; bottom: 6%; transform: rotate(160deg); }
+    @media (max-width: 900px) {
+      .poster-grid { grid-template-columns: 1fr; min-height: 0; }
+      .poster-piece { max-width: 420px; margin: 40px auto 0; }
+      .poster .at-giant { top: 2%; }
+    }
+
+    /* collage grid (Pinterest masonry) */
+    .collage { columns: 4 230px; column-gap: 34px; }
+    .collage > * { break-inside: avoid; margin: 0 0 40px; display: block; }
+    .collage > [hidden] { display: none; }
+    .clip { position: relative; background: var(--card); padding: 12px 12px 16px; text-decoration: none; }
+    .clip .win { background: var(--bg); position: relative; }
+    .clip .win .art { width: 86%; margin: 0 auto; filter: var(--cutout); padding: 8% 0 4%; }
+    .clip h4 { margin: 12px 0 2px; font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; }
+    .clip p { margin: 0; font-style: italic; color: var(--ink-soft); font-size: 1rem; }
+    .clip .rubber { position: absolute; top: 14px; right: 14px; z-index: 3; }
+
+    /* night word wall */
+    .night { background: var(--night); color: var(--card); }
+    .night .at-label { color: var(--kraft); }
+    .night .at-h2 { color: var(--card); }
+    .night .wall .strip { box-shadow: 0 10px 20px -12px #000; }
+
+    /* motion demos */
+    .demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 50px; align-items: start; }
+    .book { perspective: 1800px; position: relative; aspect-ratio: 4 / 3; max-width: 520px; }
+    .book .page { position: absolute; inset: 0; background: var(--card) radial-gradient(circle at 1px 1px, rgba(90, 74, 58, .18) 1px, transparent 1.4px) 0 0 / 18px 18px; box-shadow: var(--shadow-rest); padding: 26px; display: grid; align-content: center; justify-items: center; text-align: center; }
+    .book .leaf { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; transition: transform 1.15s cubic-bezier(.6, .05, .25, 1); }
+    .book .leaf .page { backface-visibility: hidden; }
+    .book .leaf .back { transform: rotateY(180deg); }
+    .book.turned .leaf { transform: rotateY(-180deg); }
+    .book .page .at-h2 { font-size: 2.4rem; }
+    .vt-row { display: flex; gap: 22px; flex-wrap: wrap; }
+    .vt-card { width: 140px; border: 0; padding: 10px 10px 34px; background: var(--card); cursor: pointer; box-shadow: var(--shadow-rest); transform: rotate(var(--r)); transition: transform .45s var(--ease); }
+    .vt-card:hover { transform: rotate(0) translateY(-4px); }
+    .vt-card .win { background: var(--bg); aspect-ratio: 1; display: grid; place-items: center; }
+    .vt-card .art { width: 90%; filter: var(--cutout); }
+    .vt-poster { position: fixed; inset: 0; z-index: 120; background: var(--paper); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 4vw; padding: 6vw; }
+    .vt-poster[hidden] { display: none; }
+    .vt-poster .art { width: min(100%, 520px); justify-self: center; filter: var(--cutout); }
+    .vt-poster .close { position: absolute; top: 20px; right: 20px; }
+    @media (max-width: 700px) { .vt-poster { grid-template-columns: 1fr; align-content: center; } }
+    .thread-sec { position: relative; }
+    .thread-sec .thread-svg { z-index: 0; }
+    .thread-sec .at-wrap { position: relative; z-index: 1; }
+
+    .tile-foot { padding: 50px 0 70px; border-top: 1px dashed var(--kraft); }
+    .tile-foot .at-wrap { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; }
+    .motion-switch { display: inline-flex; border: 1px solid var(--kraft); border-radius: 22px; padding: 3px; background: var(--card); }
+    .motion-switch button { border: 0; background: none; padding: 8px 14px; border-radius: 18px; cursor: pointer; font-family: var(--f-type); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+    .motion-switch button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+  </style>
+</head>
+<body class="atelier">
+  <!-- rubber-stamp ink texture -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter>
+  </svg>
+
+  <header class="tile-bar">
+    <a class="brand" href="index.html"><img src="assets/logo/mark.svg" alt="" width="30" height="30"><span>Under <em>One</em> Roof</span></a>
+    <span class="strip" data-type="type" data-tone="aged">style tile · for sign-off</span>
+    <nav aria-label="Style tile sections">
+      <a href="#palette">Palette</a><a href="#type">Type</a><a href="#pieces">Pieces</a><a href="#poster">Product</a><a href="#collage">Collage</a><a href="#motion">Motion</a>
+    </nav>
+    <span class="wish-pin" aria-live="polite">Wishlist <b class="wish-n">0</b></span>
+  </header>
+
+  <main id="main">
+    <!-- 1. hero spread -->
+    <section class="hero" data-parallax aria-label="Hero spread">
+      <h1 class="at-giant" data-depth="-.35">torans</h1>
+      <div class="hero-stage" data-depth=".55">
+        <svg class="sprig l" data-sprig="mango" aria-hidden="true"></svg>
+        <svg class="sprig r" data-sprig="marigold" aria-hidden="true"></svg>
+        <div class="polaroid place" style="--r:-4deg">
+          <span class="tape tc t-gold"></span>
+          <div class="window" style="--bg:#EFE2C9"></div>
+          <div class="breakout cutout" data-art="haveli-toran" data-depth="1"></div>
+          <div class="caption"><span class="at-script">for your doorway</span><span class="at-label">No. 01</span></div>
+        </div>
+        <svg class="doodle spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 1 C22 14 26 18 39 20 C26 22 22 26 20 39 C18 26 14 22 1 20 C14 18 18 14 20 1Z"/></svg>
+      </div>
+      <p class="note"><span class="at-script">stitched by hand, one bead at a time</span><span class="at-label">Entry 01 — The doorway</span></p>
+      <a class="strip strip-cta cta" href="#pieces" data-type="serif" data-tone="ink">see the shelf <span class="arrow">→</span></a>
+      <span class="rubber" aria-hidden="true">made<br>by hand</span>
+    </section>
+
+    <!-- 2. palette -->
+    <section class="sec" id="palette">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">01 — Palette</span><h2 class="at-h2">Paper, ink &amp; <em>one red thread</em></h2></div>
+          <p class="at-script">let the pieces bring the colour</p></div>
+        <div class="swatches">
+          <div class="chip place" style="--r:-1.5deg;--c:#F4EDE0"><span class="tape tl t-plain"></span><i></i><strong>Paper cream</strong><span>#F4EDE0 · page</span></div>
+          <div class="chip place" style="--r:1deg;--c:#FBF7F0"><i></i><strong>Warm white</strong><span>#FBF7F0 · cards</span></div>
+          <div class="chip place" style="--r:-.6deg;--c:#E9DDC7"><i></i><strong>Aged paper</strong><span>#E9DDC7 · layers</span></div>
+          <div class="chip place" style="--r:1.6deg;--c:#1F1A15"><span class="tape tr t-gold"></span><i></i><strong>Ink</strong><span>#1F1A15 · text</span></div>
+          <div class="chip place" style="--r:-1deg;--c:#5A4A3A"><i></i><strong>Soft ink</strong><span>#5A4A3A · secondary</span></div>
+          <div class="chip place" style="--r:.8deg;--c:#A3341F"><span class="tape tl"></span><i></i><strong>Thread red</strong><span>#A3341F · the one accent</span></div>
+          <div class="chip place" style="--r:-1.8deg;--c:#5E6B3A"><i></i><strong>Moss</strong><span>#5E6B3A · quiet support</span></div>
+          <div class="chip place" style="--r:1.2deg;--c:#B08D57"><i></i><strong>Antique gold</strong><span>#B08D57 · quiet support</span></div>
+          <div class="chip place" style="--r:-.4deg;--c:#1A1714"><span class="tape tr t-moss"></span><i></i><strong>Night page</strong><span>#1A1714 · dramatic sections</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. type -->
+    <section class="sec" id="type" style="padding-top:0">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">02 — Type</span><h2 class="at-h2">One loud word, <em>then quiet</em></h2></div></div>
+        <div class="type-grid">
+          <div class="spec"><span class="at-label">Display · Fraunces, used huge</span><p class="at-giant" style="font-size:clamp(5rem,10vw,9rem)">garland</p></div>
+          <div class="spec"><span class="at-label">Headings · Fraunces</span><p class="at-h1">Small things, <em>made slowly.</em></p></div>
+          <div class="spec"><span class="at-label">Script · Pinyon (one line, margins only)</span><p class="at-script" style="font-size:2.6rem;margin:0">a gift that stays</p></div>
+          <div class="spec"><span class="at-label">Labels · Special Elite</span><p class="at-label" style="font-size:.9rem;margin:0">No. 07 · 24 Oct · Doorway torans</p></div>
+          <div class="spec"><span class="at-label">Body · Cormorant Garamond</span><p style="margin:0">Each toran is cut, stitched and mirrored by hand over a few slow days, so no two are quite the same — which is rather the point.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. word strips -->
+    <section class="sec" style="padding-top:0" aria-labelledby="strips-h">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">03 — Word strips</span><h2 class="at-h2" id="strips-h">Cut from <em>old pages</em></h2></div>
+          <p class="at-script">titles, chips &amp; taglines</p></div>
+        <div class="wall strips-light"></div>
+      </div>
+    </section>
+
+    <!-- 5. pieces: cut-outs, polaroids, tape, stamps -->
+    <section class="sec" id="pieces" style="padding-top:0">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">04 — Pieces on paper</span><h2 class="at-h2">Cut out, <em>taped down</em></h2></div>
+          <p class="at-script">every piece casts a real shadow</p></div>
+        <div class="pieces">
+          <figure>
+            <div class="cut-solo cutout" data-art="temple-jhumka"></div>
+            <figcaption><span class="at-label">b) Cut-out with sticker edge</span></figcaption>
+          </figure>
+          <figure>
+            <div class="polaroid place" style="--r:3deg"><span class="tape tl"></span><div class="window" style="--bg:#E6D5B4"></div><div class="breakout cutout" data-art="pompom-swag"></div><div class="caption"><span class="at-script">three swags</span><span class="at-label">No. 13</span></div></div>
+            <figcaption><span class="at-label">c) Polaroid, piece breaking out</span></figcaption>
+          </figure>
+          <figure>
+            <div class="polaroid camera place" style="--r:-2.5deg"><div class="modes"><span>video</span><b>photo</b><span>square</span></div><div class="window" style="--bg:#EBD3C3"></div><div class="breakout cutout" data-art="moon-mandala"></div><span class="lens"></span></div>
+            <figcaption><span class="at-label">c) Camera frame</span></figcaption>
+          </figure>
+          <figure>
+            <div class="tapes" aria-hidden="true"><span class="tape" style="--r:-4deg"></span><span class="tape t-gold" style="--r:3deg"></span><span class="tape t-moss" style="--r:-2deg"></span><span class="tape t-plain" style="--r:5deg"></span></div>
+            <figcaption><span class="at-label">d) Washi tape</span></figcaption>
+            <div class="rubbers" aria-hidden="true"><span class="rubber">sold<br>out</span><span class="rubber ink" style="--r:8deg">made to<br>order</span><span class="rubber sm moss" style="--r:-4deg">No.<br>07</span></div>
+            <figcaption><span class="at-label">i) Rubber stamps (stock badges)</span></figcaption>
+          </figure>
+        </div>
+        <div style="margin-top:80px"><span class="at-label" style="display:block;margin-bottom:24px">i) Postage stamps — shelf tiles</span><div class="stamps"></div></div>
+      </div>
+    </section>
+
+    <!-- 6. film strip -->
+    <section class="sec" style="padding-top:0" aria-labelledby="film-h">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">05 — Film strip</span><h2 class="at-h2" id="film-h">Recently <em>viewed</em></h2></div>
+          <p class="at-script">drag me</p></div>
+      </div>
+      <div class="film"><div class="film-track"></div></div>
+    </section>
+
+    <!-- 7. product poster -->
+    <section class="sec" id="poster" style="padding-top:0">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">06 — Product page</span><h2 class="at-h2">The <em>poster</em></h2></div>
+          <p class="at-script">one piece, one loud word</p></div>
+        <div class="poster">
+          <p class="at-giant" aria-hidden="true">mango</p>
+          <svg class="sprig a" data-sprig="mango" aria-hidden="true"></svg>
+          <svg class="sprig b" data-sprig="mango" aria-hidden="true"></svg>
+          <div class="poster-grid">
+            <div class="poster-left">
+              <span class="at-label">Doorway torans · No. 03</span>
+              <h3 class="p-name"></h3>
+              <p class="p-mini at-script" style="font-size:1.7rem"></p>
+              <p class="p-desc"></p>
+              <div class="paint" role="radiogroup" aria-label="Colour"></div>
+              <span class="at-label p-colour"></span>
+              <div class="poster-actions">
+                <button class="strip strip-cta add" type="button" data-type="serif" data-tone="ink">Add to wishlist</button>
+                <button class="heart" type="button" aria-pressed="false" aria-label="Save to wishlist">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="loop" d="M12 -3 C 22 -3, 27 6, 25 13 C 23 21, 15 25, 12 25 C 4 25, -2 19, -1 11 C 0 3, 5 -3, 12 -3" /><path class="h" d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.8 4.2 7.2 4.2c2 0 3.6 1.1 4.8 2.9 1.2-1.8 2.8-2.9 4.8-2.9 3.4 0 5.6 3.4 4.4 6.9-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg>
+                </button>
+              </div>
+              <div class="poster-actions" style="margin-top:12px">
+                <a class="strip" href="#poster" data-type="type" data-tone="aged">ask the price on whatsapp →</a>
+                <a class="strip" href="#poster" data-type="serif">share</a>
+              </div>
+            </div>
+            <div class="poster-piece"><div class="cutout p-art"></div></div>
+            <div class="pills p-pills"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. collage grid -->
+    <section class="sec" id="collage" style="padding-top:0">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">07 — Every piece</span><h2 class="at-h2">The <em>collage</em> grid</h2></div>
+          <div class="chips-row"></div></div>
+        <div class="collage"></div>
+      </div>
+    </section>
+
+    <!-- 9. night word wall -->
+    <section class="sec night" aria-labelledby="night-h">
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">08 — The word wall</span><h2 class="at-h2" id="night-h">What the <em>thread</em> remembers</h2></div>
+          <p class="at-script" style="color:var(--kraft)">one by one, as you scroll</p></div>
+        <div class="wall strips-night"></div>
+      </div>
+    </section>
+
+    <!-- 10. motion -->
+    <section class="sec thread-sec" id="motion">
+      <svg class="thread-svg motion-thread" aria-hidden="true"></svg>
+      <div class="at-wrap">
+        <div class="sec-head"><div><span class="at-label">09 — Motion</span><h2 class="at-h2">Smoother <em>than butter</em></h2></div>
+          <p class="at-script">the thread follows your scroll</p></div>
+        <div class="demos">
+          <div>
+            <span class="at-label" style="display:block;margin-bottom:16px">Page turn — moving between pages</span>
+            <div class="book">
+              <div class="page"><span class="at-label">Entry 02</span><p class="at-h2">The <em>shelf</em></p><p class="at-script">you turned the page</p></div>
+              <div class="leaf">
+                <div class="page front"><span class="at-label">Entry 01</span><p class="at-h2">The <em>doorway</em></p><p class="at-script">turn me</p></div>
+                <div class="page back"></div>
+              </div>
+            </div>
+            <p style="margin-top:18px"><button class="strip turn" type="button" data-type="type" data-tone="aged">turn the page →</button></p>
+          </div>
+          <div>
+            <span class="at-label" style="display:block;margin-bottom:16px">Card → product: the piece travels with you</span>
+            <div class="vt-row"></div>
+            <p style="margin-top:20px;max-width:24em;color:var(--ink-soft)">On the shop this works across real page loads (View Transitions); browsers without it simply open the page.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="vt-poster" hidden role="dialog" aria-modal="true" aria-labelledby="vt-name">
+    <div class="vt-art"></div>
+    <div><span class="at-label vt-cat"></span><h2 class="at-h1" id="vt-name"></h2><p class="at-script vt-mini"></p>
+      <p><button class="strip close-vt" type="button" data-type="type" data-tone="ink">← back to the page</button></p></div>
+  </div>
+
+  <footer class="tile-foot">
+    <div class="at-wrap">
+      <span class="at-label">The Paper Atelier · style tile v1</span>
+      <div class="motion-switch" role="group" aria-label="Motion">
+        <button type="button" data-m="full">Full motion</button><button type="button" data-m="calm">Calm</button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/i18n-strings.js?v=202610271344" defer></script>
+  <script src="assets/js/i18n.js?v=202610271344" defer></script>
+  <script src="assets/js/data.js?v=202610271344" defer></script>
+  <script src="assets/js/art.js?v=202610271344" defer></script>
+  <script src="assets/js/atelier.js?v=202610271344" defer></script>
+  <script src="assets/js/style-tile.js?v=202610271344" defer></script>
+</body>
+</html>
