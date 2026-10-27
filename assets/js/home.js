@@ -440,17 +440,7 @@ UOR.ready.then(function () {
   // every piece: a collage of taped clippings (Pinterest-style columns)
   var grid = document.querySelector('.pcollage');
   grid.innerHTML = UOR.products.map(function (p, i) {
-    var badge = p.stock === 'sold_out' ? '<span class="rubber sm" aria-hidden="true">' + UOR.t('stock.sold') + '</span>'
-      : p.stock === 'made_to_order' ? '<span class="rubber sm ink" aria-hidden="true">' + UOR.t('stock.mto') + '</span>' : '';
-    return '<li data-cat="' + p.cat + '" style="view-transition-name:clip-' + p.id + '">' +
-      '<article class="clip place" id="p-' + p.id + '" style="--r:' + ((((i * 37) % 9) - 4) * .5).toFixed(1) + 'deg">' +
-      '<span class="tape ' + TAPES[i % 5] + '"></span>' + badge +
-      '<span class="clip-win" style="--bg:' + p.bg + ';--pad:' + [8, 22, 36][(i * 7) % 3] + '%">' + UOR.art(p) + '</span>' +
-      '<span class="clip-row"><span class="at-label">' + UOR.t('card.no') + ' ' + String(i + 1).padStart(2, '0') + '</span>' + UOR.heartBtn(p) + '</span>' +
-      '<h3 class="clip-name"><a href="' + UOR.catHref(p) + '">' + UOR.esc(p.name) + '</a></h3>' +
-      '<p class="clip-mini">' + UOR.esc(p.mini) + '</p>' +
-      (p.stock && p.stock !== 'in_stock' ? '<span class="sr-only">' + UOR.t(p.stock === 'sold_out' ? 'stock.sold' : 'stock.mto') + '</span>' : '') +
-      '</article></li>';
+    return '<li data-cat="' + p.cat + '" style="view-transition-name:clip-' + p.id + '">' + UOR.clip(p, UOR.catHref(p), i) + '</li>';
   }).join('');
   var chips = document.querySelector('.chips');
   chips.innerHTML = '<button class="strip chip-s" type="button" data-f="all" data-type="serif" data-tone="ink" aria-pressed="true">' + UOR.t('home.all') + '</button>' +

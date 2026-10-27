@@ -17,7 +17,16 @@ UOR.ready.then(function () {
   $('.crumbs').innerHTML = '<a href="index.html#shelf">' + t('pd.shelf') + '</a> / <a href="category.html?c=' + cat.slug + '">' + cat.title + ' ' + cat.accent + '</a> / <span aria-current="page">' + UOR.esc(p.name) + '</span>';
   $('.pd-cat').textContent = t('pd.entry', { no: cat.no, cat: cat.title + ' ' + cat.accent });
   $('.pd-name').textContent = p.name;
-  $('.pd-mini').textContent = p.mini;
+  $('.pd-mini').textContent = UOR.lang === 'en' ? p.mini.toLowerCase() : p.mini;
+  // the poster's giant word: the piece's first word, set huge behind it
+  var word = p.name.split(/\s+/)[0];
+  $('.pd-giant').textContent = UOR.lang === 'en' ? word.toLowerCase() : word;
+  $('.pd-giant').classList.toggle('long', word.length > 7);
+  // botanicals behind the piece: mango leaves for doorway pieces, marigolds for the rest
+  var leafy = { torans: 1, garlands: 1 }[p.cat];
+  $('.pd-sprigs').innerHTML = UOR.sprig(leafy ? 'mango' : 'marigold', 'sp-a') + UOR.sprig(leafy ? 'marigold' : 'mango', 'sp-b');
+  $('.pd-dot-piece').innerHTML = UOR.art(p);
+  $('.pd-dot-piece').style.setProperty('--bg', p.bg);
   $('.pd-desc').textContent = p.desc;
   $('.pd-care').textContent = UOR.care[p.cat];
   var sold = UOR.soldOut(p);
@@ -37,8 +46,8 @@ UOR.ready.then(function () {
   } else {
     priceBtn.removeAttribute('target'); priceBtn.removeAttribute('rel'); // no number set: fall back to the Contact page
   }
-  $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p) +
-    '<button class="share-btn" type="button">' + UOR.WA_ICON + '<span>' + t('pd.share') + '</span></button>');
+  $('.pd-actions').insertAdjacentHTML('beforeend', UOR.heartBtn(p));
+  $('.pd-wa').insertAdjacentHTML('beforeend', '<button class="strip share-btn" type="button" data-type="serif" data-flat>' + UOR.WA_ICON + '<span>' + t('pd.share') + '</span></button>');
 
   // ---- colour options (start on the colour already saved in the wishlist, if any)
   var saved = UOR.wish.get(p.id);
@@ -52,6 +61,7 @@ UOR.ready.then(function () {
     document.querySelectorAll('.swatch').forEach(function (s) { s.setAttribute('aria-checked', s.dataset.k === current); s.tabIndex = s.dataset.k === current ? 0 : -1; });
     if (UOR.wa()) priceBtn.href = UOR.wa(priceAsk());
     customLink.href = 'contact.html?custom=' + encodeURIComponent(p.id) + '&colour=' + encodeURIComponent(current) + '#custom';
+    $('.pd-dot-price').style.setProperty('--bg', UOR.swatch(current)); // the price pill shows the colour being asked about
     var alt = $('.pd-sold-alt a');
     if (alt) alt.href = customLink.href;
   }
@@ -114,25 +124,7 @@ UOR.ready.then(function () {
   stage.addEventListener('click', function () { nudge(1.4); });
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
-  // ---- sliding info panel
-  var panels = $('.panels'), tabs = [].slice.call(document.querySelectorAll('.tab'));
-  var prev = $('.panel-nav .prev'), next = $('.panel-nav .next');
-  function goPanel(i) { panels.scrollTo({ left: i * panels.clientWidth, behavior: reduced ? 'auto' : 'smooth' }); }
-  function active() { return Math.round(panels.scrollLeft / Math.max(1, panels.clientWidth)); }
-  function syncTabs() {
-    var a = active();
-    tabs.forEach(function (tb, i) { tb.setAttribute('aria-selected', i === a); tb.tabIndex = i === a ? 0 : -1; });
-    prev.disabled = a === 0; next.disabled = a === tabs.length - 1;
-  }
-  tabs.forEach(function (tb, i) { tb.addEventListener('click', function () { goPanel(i); }); });
-  $('.tabs').addEventListener('keydown', function (e) {
-    var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
-    var i = clamp(active() + d, 0, tabs.length - 1); goPanel(i); tabs[i].focus();
-  });
-  prev.addEventListener('click', function () { goPanel(active() - 1); });
-  next.addEventListener('click', function () { goPanel(active() + 1); });
-  var pt; panels.addEventListener('scroll', function () { cancelAnimationFrame(pt); pt = requestAnimationFrame(syncTabs); }, { passive: true });
-  syncTabs();
+  // (details sit in ingredient pills; atelier.js opens and closes them)
 
   // ---- quantity + Add to wishlist
   var qty = saved ? saved.qty : 1, qtyBox = $('.pd-qty');
@@ -245,13 +237,14 @@ UOR.ready.then(function () {
     var score = (paired.indexOf(q.cat) > -1 ? 100 : 0) + (shared ? 10 + shared : 0);
     return { q: q, score: score, tie: hash(p.id + '|' + q.id) };
   }).sort(function (a, b) { return b.score - a.score || a.tie - b.tie; }).slice(0, 4);
-  $('.also-grid').innerHTML = also.map(function (x) { return '<li>' + UOR.card(x.q, UOR.productHref(x.q)) + '</li>'; }).join('');
+  $('.also-grid').innerHTML = also.map(function (x, i) { return '<li>' + UOR.clip(x.q, UOR.productHref(x.q), UOR.products.indexOf(x.q)) + '</li>'; }).join('');
 
   // ---- same shelf
   $('.rel-title').innerHTML = t('pd.more', { x: UOR.lang === 'en' ? cat.accent.toLowerCase() : cat.accent });
   $('.rel-grid').innerHTML = UOR.inCat(p.cat).filter(function (q) { return q !== p; }).slice(0, 4).map(function (q) {
-    return '<li>' + UOR.card(q, UOR.productHref(q)) + '</li>';
+    return '<li>' + UOR.clip(q, UOR.productHref(q), UOR.products.indexOf(q)) + '</li>';
   }).join('');
+  UOR.tearAll(); UOR.observe();
 
   var queued = false;
   window.addEventListener('scroll', function () {

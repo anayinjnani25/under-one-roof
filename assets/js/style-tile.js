@@ -6,25 +6,8 @@
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var rnd = UOR.seeded('paper-atelier');
 
-  // ---- botanical sprigs: line-drawn mango leaves and a marigold
-  function leaf(x, y, a, s) {
-    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + s + ')"><path d="M0 0 C 14 -11, 42 -13, 66 0 C 42 13, 14 11, 0 0 Z" fill="rgba(94,107,58,.1)" stroke="currentColor" stroke-width="1.3"/><path d="M2 0 L 60 0" stroke="currentColor" stroke-width=".8" fill="none"/></g>';
-  }
-  var SPRIGS = {
-    mango: '<path d="M110 296 C 104 230, 124 160, 104 18" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
-      leaf(108, 250, -150, 1.05) + leaf(110, 210, -30, 1) + leaf(112, 168, -152, .95) + leaf(114, 128, -28, .9) + leaf(110, 88, -148, .85) + leaf(106, 52, -40, .75) + leaf(104, 20, -95, .7),
-    marigold: (function () {
-      var g = '<path d="M80 300 C 82 250, 76 200, 80 150" fill="none" stroke="currentColor" stroke-width="1.4"/>' + leaf(80, 240, -150, .8) + leaf(80, 210, -30, .7);
-      for (var k = 0; k < 16; k++) g += '<ellipse cx="80" cy="96" rx="9" ry="22" transform="rotate(' + (k * 22.5) + ' 80 118)" fill="rgba(176,141,87,.18)" stroke="#B08D57" stroke-width="1.1"/>';
-      for (k = 0; k < 12; k++) g += '<ellipse cx="80" cy="106" rx="6" ry="13" transform="rotate(' + (k * 30 + 15) + ' 80 118)" fill="rgba(163,52,31,.12)" stroke="#A3341F" stroke-width=".9"/>';
-      return g + '<circle cx="80" cy="118" r="7" fill="#B08D57" opacity=".7"/>';
-    })()
-  };
-  $$('[data-sprig]').forEach(function (s) {
-    var k = s.dataset.sprig;
-    s.setAttribute('viewBox', k === 'mango' ? '0 0 220 300' : '0 0 160 300');
-    s.innerHTML = SPRIGS[k];
-  });
+  // ---- botanical sprigs (drawn by UOR.sprig in atelier.js)
+  $$('[data-sprig]').forEach(function (s) { s.outerHTML = UOR.sprig(s.dataset.sprig, s.getAttribute('class').replace(/\bsprig\b/, '')); });
 
   // ---- cut-out art from the catalog
   $$('[data-art]').forEach(function (el) { var p = UOR.byId(el.dataset.art); if (p) el.innerHTML = UOR.art(p); });

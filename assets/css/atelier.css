@@ -159,6 +159,7 @@ button.strip { border: 0; cursor: pointer; }
 
 /* ---- h) ingredient pills ------------------------------------------------------------- */
 .pills { display: grid; gap: 10px; max-width: 360px; }
+.pills .pill { white-space: normal; padding: 0; font: inherit; font-size: inherit; } /* undo the shop's small tag style of the same name */
 .pill { border: 1px solid rgba(94, 107, 58, .45); border-radius: 30px; background: rgba(251, 247, 240, .7); transition: border-radius var(--t-ui) var(--ease), background var(--t-ui); }
 .pill.open { border-radius: 18px; background: var(--card); }
 .pill-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 6px 16px 6px 6px; background: none; border: 0; cursor: pointer; text-align: left; min-height: 52px; }
@@ -170,7 +171,7 @@ button.strip { border: 0; cursor: pointer; }
 .pill-plus::before, .pill-plus::after { content: ''; position: absolute; left: 3px; right: 3px; top: 10px; height: 1.6px; background: var(--ink); transition: transform var(--t-ui) var(--ease); }
 .pill-plus::after { transform: rotate(90deg); }
 .pill.open .pill-plus::after { transform: rotate(0deg); }
-.pill-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--t-ui) var(--ease); }
+.pill-more { display: grid; grid-template-rows: 0fr; grid-template-columns: minmax(0, 1fr); transition: grid-template-rows var(--t-ui) var(--ease); }
 .pill.open .pill-more { grid-template-rows: 1fr; }
 .pill-more > div { overflow: hidden; }
 .pill-more p { margin: 0; padding: 0 18px 14px 58px; font-size: 1.02rem; color: var(--ink-soft); }
@@ -328,6 +329,97 @@ a.postage:hover { transform: rotate(0deg) translateY(-6px); filter: drop-shadow(
 .wall-strips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; max-width: 1080px; margin: 0 auto; }
 .wall-strips .strip { font-size: clamp(1.05rem, 1.6vw, 1.35rem); box-shadow: 0 12px 22px -12px #000; }
 :lang(te) .wall-strips .strip, :lang(hi) .wall-strips .strip { text-transform: none; letter-spacing: 0; }
+
+/* clickable strips keep a visible focus ring inside their torn edge */
+.strip:focus-visible { outline: 2px dashed currentColor; outline-offset: -5px; }
+/* a row of clippings (suggestions under a product, etc.) */
+.pcollage.pc-row { columns: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 34px; align-items: start; padding-top: 30px; }
+.pcollage.pc-row > li { margin: 0; }
+@media (max-width: 900px) { .pcollage.pc-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 16px; } }
+
+/* =====================================================================================
+   PRODUCT PAGE: the poster
+   ===================================================================================== */
+body.page-product { --page: #F4EDE0; background: var(--paper); }
+.pd-poster { position: relative; overflow: hidden; padding: calc(var(--head-h) + 22px) 0 7vh; }
+/* the giant word sits behind the piece (centre column), the piece overlapping its lower half */
+.pd-giant {
+  position: absolute; left: 50%; top: -4%; transform: translateX(-50%); margin: 0; z-index: 0; pointer-events: none;
+  text-align: center; white-space: nowrap; color: var(--moss); opacity: .92;
+  font-family: var(--f-display); font-weight: 600; font-variation-settings: 'opsz' 144; letter-spacing: -.055em; line-height: .8;
+  font-size: clamp(5rem, 13vw, 13rem);
+}
+.pd-giant.long { font-size: clamp(4rem, 9vw, 9rem); }
+:lang(te) .pd-giant, :lang(hi) .pd-giant { letter-spacing: 0; font-size: clamp(3.4rem, 8vw, 8rem); line-height: 1.1; }
+.pd-wrap { position: relative; z-index: 1; }
+.pd-poster .crumbs { min-height: 1.4em; margin-bottom: 10px; }
+.pd-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.3fr) minmax(0, .85fr); gap: clamp(20px, 3vw, 48px); align-items: center; min-height: calc(100svh - var(--head-h) - 120px); }
+.pd-info { position: relative; z-index: 2; }
+.pd-info .pd-cat { display: block; margin-bottom: 12px; }
+.pd-info h1 { font-family: var(--f-display); font-weight: 400; font-variation-settings: 'opsz' 144; font-size: clamp(2.3rem, 4vw, 3.8rem); line-height: .98; letter-spacing: -.03em; margin: 0 0 10px; }
+.pd-info .pd-mini { margin: 0 0 20px; font-size: clamp(1.6rem, 2.2vw, 2.1rem); }
+:lang(te) .pd-info .pd-mini, :lang(hi) .pd-info .pd-mini { font-family: var(--f-body); font-style: italic; font-size: 1.3rem; }
+.pd-choose { display: block; margin-bottom: 8px; }
+/* colour choices as round paint chips */
+.pd-info .swatches { gap: 10px; margin: 0 0 6px; }
+.pd-info .swatch { width: 40px; height: 40px; box-shadow: inset 0 0 0 3px var(--card), 0 0 0 1px rgba(31, 26, 21, .25); transition: transform .35s var(--ease), box-shadow .2s; }
+.pd-info .swatch[aria-checked="true"] { box-shadow: inset 0 0 0 3px var(--card), 0 0 0 2px var(--thread); transform: scale(1.08); }
+.pd-info .swatch-name { font-family: var(--f-type); font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 18px; }
+.pd-poster .pd-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 12px; }
+.pd-poster .pd-actions .heart { width: 50px; height: 50px; background: var(--card); }
+.pd-poster .add-bag { min-height: 46px; }
+.pd-poster .add-bag.is-sold { background: var(--kraft); color: var(--ink-soft); cursor: not-allowed; }
+.pd-wa { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pd-wa .strip { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; text-decoration: none; }
+.pd-wa .strip svg, .pd-wa .wa-ico svg { width: 17px; height: 17px; display: block; }
+.pd-wa .share-btn { border: 0; border-radius: 0; padding: .28em .8em .32em; background: var(--card); color: var(--ink); font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.12rem; }
+.pd-poster .custom-link { font-size: 1.02rem; }
+.pd-poster .pd-stock { margin: -8px 0 16px; }
+
+.pd-center { position: relative; }
+.pd-sprigs .sprig { position: absolute; z-index: 0; }
+.pd-sprigs .sp-a { width: 34%; left: -4%; top: 2%; transform: rotate(-26deg); }
+.pd-sprigs .sp-b { width: 24%; right: -2%; bottom: 8%; transform: rotate(160deg); }
+.pd-poster .pd-stage { position: relative; z-index: 1; max-width: 560px; }
+.pd-poster .jelly .art { filter: var(--cutout); }
+.pd-poster .pd-hint { bottom: -4px; }
+.pd-note { text-align: center; margin: 14px 0 0; }
+:lang(te) .pd-note, :lang(hi) .pd-note { font-family: var(--f-body); font-style: italic; font-size: 1.2rem; }
+.pd-pills { position: relative; z-index: 2; justify-self: end; width: 100%; }
+.pd-pills .pill-more a { color: var(--thread); font-weight: 600; }
+@media (max-width: 1000px) {
+  .pd-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+  .pd-center { grid-column: 1 / -1; grid-row: 1; max-width: 520px; width: 100%; margin: 0 auto; }
+  .pd-pills { justify-self: stretch; max-width: none; }
+  .pd-giant { font-size: clamp(5rem, 20vw, 12rem); }
+}
+@media (max-width: 680px) {
+  .pd-grid { grid-template-columns: 1fr; gap: 26px; }
+  .pd-center { max-width: 400px; }
+  .pd-giant { font-size: 30vw; top: -2%; }
+  .pd-giant.long { font-size: 21vw; }
+}
+
+/* suggestions and reviews: journal pages */
+.page-product .also, .page-product .related, .page-product .reviews { padding-top: 7vh; padding-bottom: 5vh; padding-left: var(--gutter); padding-right: var(--gutter); }
+.page-product .reviews-head > * { min-width: 0; }
+.page-product .also h2, .page-product .related h2, .page-product .reviews h2 { font-variation-settings: 'opsz' 144; letter-spacing: -.03em; font-size: clamp(2.2rem, 4.6vw, 3.8rem); }
+.page-product .eyebrow { font-family: var(--f-type); color: var(--ink-soft); }
+.page-product .review { background: var(--card); border-radius: 0; box-shadow: var(--shadow-rest); padding: 22px 22px 20px; position: relative; }
+.page-product .review::before { /* a strip of tape on every note */
+  content: ''; position: absolute; top: -10px; left: 50%; width: 76px; height: 20px; margin-left: -38px; opacity: .8; transform: rotate(-3deg);
+  background: repeating-linear-gradient(45deg, rgba(176, 141, 87, .6) 0 5px, rgba(251, 247, 240, .85) 5px 10px);
+}
+.page-product .review:nth-child(2) { transform: rotate(.8deg); }
+.page-product .review:nth-child(3) { transform: rotate(-.6deg); }
+.page-product .review p { font-family: var(--f-display); font-style: italic; font-weight: 300; font-size: 1.22rem; line-height: 1.4; }
+.page-product .review-empty { box-shadow: none; background: transparent; }
+.page-product .review-empty::before { display: none; }
+.page-product .review-form, .page-product .review-gate { /* a lined order slip */
+  background: var(--card) repeating-linear-gradient(transparent 0 31px, rgba(90, 74, 58, .14) 31px 32px);
+  border-radius: 0; box-shadow: var(--shadow-rest); position: relative;
+}
+.page-product .review-form .field input, .page-product .review-form .field textarea { background: rgba(251, 247, 240, .9); }
 
 /* ---- calm mode: everything still and instant (device setting, or the footer switch) -------- */
 :root[data-motion="calm"] *, :root[data-motion="calm"] *::before, :root[data-motion="calm"] *::after {

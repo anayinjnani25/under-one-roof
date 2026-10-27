@@ -56,6 +56,39 @@ window.UOR = window.UOR || {};
   window.addEventListener('resize', function () { clearTimeout(tearT); tearT = setTimeout(function () { UOR.tearAll(); }, 200); });
   if (document.fonts) document.fonts.ready.then(function () { UOR.tearAll(); }); // text width changes when fonts arrive
 
+  // ---- botanical sprigs (line-drawn mango leaves, a marigold): UOR.sprig('mango' | 'marigold')
+  function leaf(x, y, a, s) {
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + s + ')"><path d="M0 0 C 14 -11, 42 -13, 66 0 C 42 13, 14 11, 0 0 Z" fill="rgba(94,107,58,.1)" stroke="currentColor" stroke-width="1.3"/><path d="M2 0 L 60 0" stroke="currentColor" stroke-width=".8" fill="none"/></g>';
+  }
+  var SPRIGS = {
+    mango: ['0 0 220 300', '<path d="M110 296 C 104 230, 124 160, 104 18" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+      leaf(108, 250, -150, 1.05) + leaf(110, 210, -30, 1) + leaf(112, 168, -152, .95) + leaf(114, 128, -28, .9) + leaf(110, 88, -148, .85) + leaf(106, 52, -40, .75) + leaf(104, 20, -95, .7)],
+    marigold: ['0 0 160 300', (function () {
+      var g = '<path d="M80 300 C 82 250, 76 200, 80 150" fill="none" stroke="currentColor" stroke-width="1.4"/>' + leaf(80, 240, -150, .8) + leaf(80, 210, -30, .7), k;
+      for (k = 0; k < 16; k++) g += '<ellipse cx="80" cy="96" rx="9" ry="22" transform="rotate(' + (k * 22.5) + ' 80 118)" fill="rgba(176,141,87,.18)" stroke="#B08D57" stroke-width="1.1"/>';
+      for (k = 0; k < 12; k++) g += '<ellipse cx="80" cy="106" rx="6" ry="13" transform="rotate(' + (k * 30 + 15) + ' 80 118)" fill="rgba(163,52,31,.12)" stroke="#A3341F" stroke-width=".9"/>';
+      return g + '<circle cx="80" cy="118" r="7" fill="#B08D57" opacity=".7"/>';
+    })()]
+  };
+  UOR.sprig = function (kind, cls) {
+    var s = SPRIGS[kind] || SPRIGS.mango;
+    return '<svg class="sprig ' + (cls || '') + '" viewBox="' + s[0] + '" aria-hidden="true" focusable="false">' + s[1] + '</svg>';
+  };
+
+  // ---- a product as a taped clipping (heart, stock stamp, name linking to href)
+  var TAPES = ['tc', 'tl t-gold', 'tr t-moss', 'tc t-plain', 'tl'];
+  UOR.clip = function (p, href, i) {
+    var t = UOR.t, stock = p.stock && p.stock !== 'in_stock' ? p.stock : '';
+    var badge = stock ? '<span class="rubber sm' + (stock === 'sold_out' ? '' : ' ink') + '" aria-hidden="true">' + t(stock === 'sold_out' ? 'stock.sold' : 'stock.mto') + '</span>' : '';
+    return '<article class="clip place" id="p-' + p.id + '" style="--r:' + ((((i * 37) % 9) - 4) * .5).toFixed(1) + 'deg">' +
+      '<span class="tape ' + TAPES[i % 5] + '"></span>' + badge +
+      '<span class="clip-win" style="--bg:' + p.bg + ';--pad:' + [8, 22, 36][(i * 7) % 3] + '%">' + UOR.art(p) + '</span>' +
+      '<span class="clip-row"><span class="at-label">' + t('card.no') + ' ' + String(i + 1).padStart(2, '0') + '</span>' + UOR.heartBtn(p) + '</span>' +
+      '<h3 class="clip-name"><a href="' + href + '">' + UOR.esc(p.name) + '</a></h3>' +
+      '<p class="clip-mini">' + UOR.esc(p.mini) + '</p>' +
+      (stock ? '<span class="sr-only">' + t(stock === 'sold_out' ? 'stock.sold' : 'stock.mto') + '</span>' : '') + '</article>';
+  };
+
   // ---- placing: .place elements drop onto the page as they scroll in (staggered per group)
   var placeIO = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
     var batch = entries.filter(function (e) { return e.isIntersecting; });
