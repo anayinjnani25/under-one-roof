@@ -18,10 +18,18 @@ UOR.ready.then(function () {
     document.title = c.title + ' — Under One Roof';
     $('.col-title').textContent = c.title;
     $('.col-blurb').textContent = c.blurb;
+    $('.col-count').textContent = t('search.pieces', { n: c.ids.length });
+    var cover = UOR.byId(c.cover);
+    if (cover) {
+      $('.col-cover').innerHTML = '<div class="polaroid place" style="--r:-4deg"><span class="tape tc t-gold"></span>' +
+        '<div class="window" style="--bg:' + cover.bg + '"></div><div class="breakout cutout">' + UOR.art(cover) + '</div>' +
+        '<div class="caption"><span class="at-script">' + UOR.esc(cover.name) + '</span></div></div>';
+    }
     UOR.waContext = 'Hi Under One Roof! I have a question about the ' + c.title + ' collection.';
     $('.col-grid').innerHTML = c.ids.map(function (id, i) {
       var p = UOR.byId(id);
-      return '<li>' + UOR.card(p, UOR.productHref(p), i + 1) + '</li>';
+      return '<li>' + UOR.clip(p, UOR.productHref(p), i) + '</li>';
     }).join('');
+    UOR.tearAll(); UOR.observe();
   });
 });
