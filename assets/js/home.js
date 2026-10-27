@@ -423,28 +423,58 @@ UOR.ready.then(function () {
   // =====================================================================
   // 2. Shop front + collection
   // =====================================================================
+  // the shelf: one postage stamp per category, taped down at a slight tilt
+  var TAPES = ['tc', 'tl t-gold', 'tr t-moss', 'tc t-plain', 'tl'];
   var catGrid = document.querySelector('.cat-grid');
-  catGrid.innerHTML = UOR.categories.map(function (c) {
+  catGrid.innerHTML = UOR.categories.map(function (c, i) {
     var n = UOR.inCat(c.slug).length, f = UOR.byId(c.feature);
-    return '<li><a class="cat-card" href="category.html?c=' + c.slug + '">' +
-      '<span class="label"><span>' + UOR.t('card.no') + ' ' + c.no + '</span><span>' + UOR.t('search.pieces', { n: n }) + '</span></span>' +
-      '<div class="cat-art">' + UOR.art(f) + '</div>' +
-      '<h3>' + c.title + ' <em>' + c.accent + '</em></h3><p>' + c.blurb + '</p>' +
-      '<span class="open">' + UOR.t('home.open') + '</span></a></li>';
+    return '<li><a class="place stamp-card" href="category.html?c=' + c.slug + '" style="--r:' + [-2.2, 1.6, -1, 2.4, -1.8][i % 5] + 'deg">' +
+      '<span class="postage" style="--r:0deg"><span class="tape ' + TAPES[i % 5] + '"></span>' +
+      '<span class="postage-in" style="--bg:' + f.bg + '">' + UOR.art(f) +
+      '<span class="postage-val">' + UOR.t('card.no') + ' ' + c.no + '</span>' +
+      '<span class="strip" data-type="serif" data-flat>' + c.title + ' <em>' + c.accent + '</em></span></span></span>' +
+      '<span class="stamp-meta"><span class="at-label">' + UOR.t('search.pieces', { n: n }) + '</span>' +
+      '<span class="stamp-blurb">' + c.blurb + '</span><span class="stamp-open">' + UOR.t('home.open') + '</span></span></a></li>';
   }).join('');
 
-  var grid = document.querySelector('.pgrid');
+  // every piece: a collage of taped clippings (Pinterest-style columns)
+  var grid = document.querySelector('.pcollage');
   grid.innerHTML = UOR.products.map(function (p, i) {
-    return '<li data-cat="' + p.cat + '">' + UOR.card(p, UOR.catHref(p), i + 1) + '</li>';
+    var badge = p.stock === 'sold_out' ? '<span class="rubber sm" aria-hidden="true">' + UOR.t('stock.sold') + '</span>'
+      : p.stock === 'made_to_order' ? '<span class="rubber sm ink" aria-hidden="true">' + UOR.t('stock.mto') + '</span>' : '';
+    return '<li data-cat="' + p.cat + '" style="view-transition-name:clip-' + p.id + '">' +
+      '<article class="clip place" id="p-' + p.id + '" style="--r:' + ((((i * 37) % 9) - 4) * .5).toFixed(1) + 'deg">' +
+      '<span class="tape ' + TAPES[i % 5] + '"></span>' + badge +
+      '<span class="clip-win" style="--bg:' + p.bg + ';--pad:' + [8, 22, 36][(i * 7) % 3] + '%">' + UOR.art(p) + '</span>' +
+      '<span class="clip-row"><span class="at-label">' + UOR.t('card.no') + ' ' + String(i + 1).padStart(2, '0') + '</span>' + UOR.heartBtn(p) + '</span>' +
+      '<h3 class="clip-name"><a href="' + UOR.catHref(p) + '">' + UOR.esc(p.name) + '</a></h3>' +
+      '<p class="clip-mini">' + UOR.esc(p.mini) + '</p>' +
+      (p.stock && p.stock !== 'in_stock' ? '<span class="sr-only">' + UOR.t(p.stock === 'sold_out' ? 'stock.sold' : 'stock.mto') + '</span>' : '') +
+      '</article></li>';
   }).join('');
   var chips = document.querySelector('.chips');
-  chips.innerHTML = '<button class="chip" type="button" data-f="all" aria-pressed="true">' + UOR.t('home.all') + '</button>' +
-    UOR.categories.map(function (c) { return '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + UOR.t('chip.' + c.slug) + '</button>'; }).join('');
+  chips.innerHTML = '<button class="strip chip-s" type="button" data-f="all" data-type="serif" data-tone="ink" aria-pressed="true">' + UOR.t('home.all') + '</button>' +
+    UOR.categories.map(function (c) { return '<button class="strip chip-s" type="button" data-f="' + c.slug + '" data-type="type" data-tone="aged" aria-pressed="false">' + UOR.t('chip.' + c.slug) + '</button>'; }).join('');
   chips.addEventListener('click', function (e) {
-    var b = e.target.closest('.chip'); if (!b) return;
-    chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b); });
-    grid.querySelectorAll('li').forEach(function (li) { li.hidden = b.dataset.f !== 'all' && li.dataset.cat !== b.dataset.f; });
+    var b = e.target.closest('.chip-s'); if (!b) return;
+    chips.querySelectorAll('.chip-s').forEach(function (c) {
+      c.setAttribute('aria-pressed', c === b);
+      c.dataset.tone = c === b ? 'ink' : 'aged'; c.dataset.type = c === b ? 'serif' : 'type';
+    });
+    UOR.tearAll(chips);
+    UOR.viewSwap(function () {
+      grid.querySelectorAll('li').forEach(function (li) { li.hidden = b.dataset.f !== 'all' && li.dataset.cat !== b.dataset.f; });
+      // pieces shown by a filter are already "placed"; don't make them drop in again
+      grid.querySelectorAll('li:not([hidden]) .clip').forEach(function (c) { c.classList.add('placed'); });
+    });
   });
+
+  // the word wall: craft phrases on torn strips, put down one by one as you scroll
+  var WALL_T = ['aged', 'news', '', 'kraft', 'aged', '', 'news'], WALL_S = ['serif', 'type', 'caps', 'bold', '', 'serif', 'type'];
+  document.querySelector('.wall-strips').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(function (k, i) {
+    return '<span class="strip place" data-tone="' + WALL_T[i % 7] + '" data-type="' + WALL_S[(i * 3) % 7] + '">' + UOR.esc(UOR.t('home.w' + k)) + '</span>';
+  }).join('');
+  UOR.tearAll(); UOR.observe();
 
   // =====================================================================
   // 3. Multi-lane carousel: each lane moves only under its own hover/wheel/drag
@@ -588,13 +618,15 @@ UOR.ready.then(function () {
     var box = document.querySelector('.coll-banner');
     if (!c || !box) return;
     var cover = UOR.byId(c.cover);
-    box.innerHTML = '<a class="coll-banner-card" href="collection.html?c=' + encodeURIComponent(c.slug) + '" style="--bg:' + (cover ? cover.bg : 'var(--paper)') + '">' +
-      '<span class="coll-banner-art" aria-hidden="true">' + (cover ? UOR.art(cover) : '') + '</span>' +
+    // a band torn from a magazine, with the cover piece in a taped polaroid
+    box.innerHTML = '<a class="coll-banner-card" data-tear="deep" href="collection.html?c=' + encodeURIComponent(c.slug) + '" style="--bg:' + (cover ? cover.bg : 'var(--paper)') + '">' +
+      '<span class="coll-banner-art polaroid" style="--r:-4deg" aria-hidden="true"><span class="tape tc t-gold"></span><span class="window" style="--bg:' + (cover ? cover.bg : 'var(--aged)') + '">' + (cover ? UOR.art(cover) : '') + '</span></span>' +
       '<span class="coll-banner-text"><span class="eyebrow">' + UOR.t('col.now') + '</span>' +
       '<strong id="coll-banner-h">' + UOR.esc(c.title) + '</strong>' +
       (c.blurb ? '<span class="coll-banner-blurb">' + UOR.esc(c.blurb) + '</span>' : '') +
       '<span class="coll-banner-go">' + UOR.t('col.see', { n: c.ids.length }) + ' →</span></span></a>';
     box.hidden = false;
+    UOR.tearAll(box);
     measureLanes();
   });
 });

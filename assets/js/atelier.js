@@ -16,6 +16,12 @@ window.UOR = window.UOR || {};
   UOR.calm = function () { return root.dataset.motion === 'calm'; };
   UOR.setMotion = function (m) { try { localStorage.setItem(KEY, m); } catch (e) { /* storage blocked */ } apply(); };
 
+  // ---- the rubber-stamp ink texture (.rubber uses filter:url(#ink)); a missing filter would hide them
+  if (!document.getElementById('ink')) {
+    document.body.insertAdjacentHTML('afterbegin', '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">' +
+      '<filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></svg>');
+  }
+
   // ---- seeded randomness, so torn edges and tilts look the same on every visit
   function seeded(s) {
     var h = 2166136261;
@@ -100,7 +106,11 @@ window.UOR = window.UOR || {};
     var ran = false;
     function go() { if (!ran) { ran = true; fn(); } }
     if (!document.startViewTransition || UOR.calm()) { go(); return; }
-    try { document.startViewTransition(go); } catch (e) { go(); return; }
+    try {
+      var t = document.startViewTransition(go), quiet = function () {};
+      // a skipped transition is fine (the change still happened); keep it out of the console
+      [t.ready, t.finished, t.updateCallbackDone].forEach(function (p) { if (p) p.catch(quiet); });
+    } catch (e) { go(); return; }
     setTimeout(go, 300);
   };
 
