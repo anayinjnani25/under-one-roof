@@ -19,7 +19,7 @@ window.UOR = window.UOR || {};
   if (lang !== 'en') {
     var font = document.createElement('link');
     font.rel = 'stylesheet';
-    font.href = 'https://fonts.googleapis.com/css2?family=' + (lang === 'te' ? 'Noto+Serif+Telugu' : 'Noto+Serif+Devanagari') + ':wght@400;500;600&display=swap';
+    font.href = 'assets/css/fonts-' + lang + '.css'; // hosted on the site (tools/fetch-fonts.py)
     document.head.appendChild(font);
   }
 

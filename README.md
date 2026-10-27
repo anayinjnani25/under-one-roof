@@ -89,7 +89,12 @@ The security advisor's one remaining warning, "Leaked password protection", is a
 - Guests' wishlists always work, stored in the browser.
 
 ## Publishing changes
-After editing anything in `assets/`, run `python tools/stamp-assets.py` before you commit. It adds a fresh `?v=` version to every script and stylesheet link, so visitors' browsers load the new files together rather than mixing new and cached ones.
+Edit the source files in `assets/js/` and `assets/css/` as usual, then run `python tools/stamp-assets.py` before you commit. It does two things:
+1. **Builds the bundles** in `assets/dist/` (via `tools/build-assets.py`): every page loads `dist/core.js` (Supabase plus the shared scripts, the same on every page so browsers cache it once), its own small `dist/<page>.js`, and one stylesheet, `dist/site.css` (`dist/admin.css` on the admin page). Scripts are minified with terser through `npx`, which needs Node.js; without Node the files are just joined, which still works.
+2. **Stamps a fresh `?v=` version** on every script and stylesheet link, so visitors' browsers load the new files together.
 
+Never edit `assets/dist/` by hand: it is rebuilt every time.
+
+**Fonts are hosted on the site** (`assets/fonts/`, with `assets/css/fonts.css`, plus `fonts-te.css` / `fonts-hi.css` that load only for Telugu or Hindi). They were downloaded once with `python tools/fetch-fonts.py`; run it again only to change fonts. All are under the SIL Open Font License. Supabase's library is pinned in `assets/vendor/`.
 ## Logo
 Replace `assets/logo/mark.svg`. The header, footer and favicon all point to this one file. The wordmark text is `WORDMARK` in `assets/js/common.js`.
