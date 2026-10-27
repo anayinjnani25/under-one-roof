@@ -125,6 +125,20 @@ window.UOR = window.UOR || {};
     document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
   });
 
+  // ---- footer switch: Full motion / Calm. Page animations read the choice when the page loads,
+  // so it reloads once to apply it everywhere (the opening animation included).
+  function paintMotionSwitch() {
+    document.querySelectorAll('.motion-switch [data-motion]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.motion === root.dataset.motion); });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.motion-switch [data-motion]'); if (!b || b.dataset.motion === root.dataset.motion) return;
+    UOR.setMotion(b.dataset.motion);
+    location.reload();
+  });
+  // the footer is drawn by the page script once the catalog is ready; mark the switch right after
+  if (UOR.ready) UOR.ready.then(function () { setTimeout(paintMotionSwitch, 0); });
+  document.addEventListener('uor:motion', paintMotionSwitch);
+
   // ---- ingredient pills: one open at a time per list
   document.addEventListener('click', function (e) {
     var b = e.target.closest('.pill-btn'); if (!b) return;
@@ -146,6 +160,19 @@ window.UOR = window.UOR || {};
     } catch (e) { go(); return; }
     setTimeout(go, 300);
   };
+
+  // ---- between pages (View Transitions, where the browser supports them): leaving for a product
+  // page names that piece's picture 'piece', and the product page names its stage the same
+  // (inline script in product.html), so the picture glides into place instead of blinking.
+  window.addEventListener('pageswap', function (e) {
+    if (!e.viewTransition) return;
+    if (UOR.calm()) { e.viewTransition.skipTransition(); return; }
+    var url = e.activation && e.activation.entry && e.activation.entry.url;
+    var m = url && /product\.html\?(?:.*&)?id=([\w-]+)/.exec(url);
+    var card = m && document.getElementById('p-' + m[1]);
+    var art = card && card.querySelector('.art');
+    if (art) art.style.viewTransitionName = 'piece';
+  });
 
   // ---- sticky-note toast
   var noteEl, noteT;

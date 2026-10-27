@@ -440,7 +440,7 @@ UOR.ready.then(function () {
   // every piece: a collage of taped clippings (Pinterest-style columns)
   var grid = document.querySelector('.pcollage');
   grid.innerHTML = UOR.products.map(function (p, i) {
-    return '<li data-cat="' + p.cat + '" style="view-transition-name:clip-' + p.id + '">' + UOR.clip(p, UOR.catHref(p), i) + '</li>';
+    return '<li data-cat="' + p.cat + '">' + UOR.clip(p, UOR.catHref(p), i) + '</li>';
   }).join('');
   var chips = document.querySelector('.chips');
   chips.innerHTML = '<button class="strip chip-s" type="button" data-f="all" data-type="serif" data-tone="ink" aria-pressed="true">' + UOR.t('home.all') + '</button>' +
@@ -452,6 +452,10 @@ UOR.ready.then(function () {
       c.dataset.tone = c === b ? 'ink' : 'aged'; c.dataset.type = c === b ? 'serif' : 'type';
     });
     UOR.tearAll(chips);
+    // name the clippings only while they rearrange (named all the time, they'd also be captured on every page change)
+    var lis = [].slice.call(grid.querySelectorAll('li'));
+    lis.forEach(function (li, k) { li.style.viewTransitionName = 'clip-' + k; });
+    setTimeout(function () { lis.forEach(function (li) { li.style.viewTransitionName = ''; }); }, 1200);
     UOR.viewSwap(function () {
       grid.querySelectorAll('li').forEach(function (li) { li.hidden = b.dataset.f !== 'all' && li.dataset.cat !== b.dataset.f; });
       // pieces shown by a filter are already "placed"; don't make them drop in again

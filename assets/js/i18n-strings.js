@@ -15,7 +15,7 @@ UOR.I18N = {
     "foot.blurb": "Torans, garlands, hangings and jewelry, every piece made by hand in small batches. No two come out quite the same.",
     "foot.shelf": "The shelf", "foot.visit": "Visit", "foot.every": "Every piece", "foot.about": "About", "foot.journal": "Journal",
     "foot.faq": "Delivery & FAQ", "foot.contact": "Contact", "foot.custom": "Custom orders", "foot.account": "Your account",
-    "foot.wishlist": "Your wishlist", "foot.made": "Made by hand · Stitched in rust",
+    "foot.wishlist": "Your wishlist", "foot.made": "Made by hand · Stitched in rust", "foot.motion": "Motion", "foot.full": "Full motion", "foot.calm": "Calm",
 
     "wish.title": "Wish<em>list</em>", "wish.close": "Close wishlist", "wish.emptyStamp": "Nothing<br>saved<br>yet",
     "wish.emptyText": "Tap the heart on any piece to keep it here.", "wish.remove": "Remove", "wish.removeAria": "Remove {name} from wishlist",
@@ -102,7 +102,7 @@ UOR.I18N = {
     "foot.blurb": "తోరణాలు, మాలలు, అలంకరణలు, ఆభరణాలు — ప్రతి వస్తువూ చిన్న బ్యాచ్‌లలో చేత్తో చేసినదే. ఏ రెండూ ఒకేలా ఉండవు.",
     "foot.shelf": "మా అల్మారా", "foot.visit": "చూడండి", "foot.every": "అన్ని వస్తువులు", "foot.about": "మా గురించి", "foot.journal": "జర్నల్",
     "foot.faq": "డెలివరీ & ప్రశ్నలు", "foot.contact": "సంప్రదించండి", "foot.custom": "ప్రత్యేక ఆర్డర్లు", "foot.account": "మీ ఖాతా",
-    "foot.wishlist": "మీ విష్‌లిస్ట్", "foot.made": "చేత్తో చేసినది · ఎరుపు దారంతో కుట్టినది",
+    "foot.wishlist": "మీ విష్‌లిస్ట్", "foot.made": "చేత్తో చేసినది · ఎరుపు దారంతో కుట్టినది", "foot.motion": "కదలికలు", "foot.full": "పూర్తి కదలికలు", "foot.calm": "నిశ్చలం",
 
     "wish.title": "విష్<em>‌లిస్ట్</em>", "wish.close": "విష్‌లిస్ట్ మూసివేయండి", "wish.emptyStamp": "ఇంకా<br>ఏమీ<br>లేదు",
     "wish.emptyText": "ఏ వస్తువుపైనైనా హృదయం గుర్తును నొక్కితే అది ఇక్కడ ఉంటుంది.", "wish.remove": "తీసివేయండి", "wish.removeAria": "{name}ను విష్‌లిస్ట్ నుండి తీసివేయండి",
@@ -306,7 +306,7 @@ UOR.I18N = {
     "foot.blurb": "तोरण, मालाएँ, लटकन और गहने — हर कृति छोटे-छोटे बैच में हाथ से बनी। कोई भी दो बिल्कुल एक जैसी नहीं होतीं।",
     "foot.shelf": "हमारी अलमारी", "foot.visit": "देखें", "foot.every": "सभी कृतियाँ", "foot.about": "हमारे बारे में", "foot.journal": "जर्नल",
     "foot.faq": "डिलीवरी और सवाल", "foot.contact": "संपर्क", "foot.custom": "कस्टम ऑर्डर", "foot.account": "आपका खाता",
-    "foot.wishlist": "आपकी विशलिस्ट", "foot.made": "हाथ से बना · लाल धागे से सिला",
+    "foot.wishlist": "आपकी विशलिस्ट", "foot.made": "हाथ से बना · लाल धागे से सिला", "foot.motion": "गति", "foot.full": "पूरी गति", "foot.calm": "शांत",
 
     "wish.title": "विश<em>लिस्ट</em>", "wish.close": "विशलिस्ट बंद करें", "wish.emptyStamp": "अभी<br>कुछ<br>नहीं",
     "wish.emptyText": "किसी भी कृति पर दिल का निशान दबाएँ, वह यहाँ सहेज ली जाएगी।", "wish.remove": "हटाएँ", "wish.removeAria": "{name} को विशलिस्ट से हटाएँ",

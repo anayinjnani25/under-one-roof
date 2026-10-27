@@ -230,6 +230,11 @@ a.postage:hover { transform: rotate(0deg) translateY(-6px); filter: drop-shadow(
 @view-transition { navigation: auto; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .55s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
 ::view-transition-group(*) { animation-duration: .7s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+/* the travelling piece: keep the card's picture fully visible while it glides to the product stage
+   (the product page draws its own picture a moment later, once the catalog has loaded) */
+::view-transition-old(piece) { animation: none; opacity: 1; object-fit: contain; }
+::view-transition-new(piece) { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 
 /* =====================================================================================
    HOMEPAGE (below the opening animation, which stays exactly as it was)
@@ -517,6 +522,23 @@ body.page-cat { --page: #EFE5D3; background: var(--page); }
 .order-sum { font-family: var(--f-type); color: var(--ink-soft); }
 .btn.wa-order { min-height: 50px; }
 
+/* footer: the Full motion / Calm switch */
+.foot-note { align-items: center; flex-wrap: wrap; gap: 12px; }
+.foot-note .motion-switch { display: inline-flex; padding: 3px; border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 1px var(--kraft); }
+.foot-note .motion-switch button { border: 0; background: none; cursor: pointer; padding: 7px 13px; min-height: 36px; border-radius: 18px; font-family: var(--f-type); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.foot-note .motion-switch button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+:lang(te) .foot-note .motion-switch button, :lang(hi) .foot-note .motion-switch button { text-transform: none; letter-spacing: 0; font-family: var(--f-body); font-size: .95rem; }
+
+/* recently viewed: a strip of film */
+.recent { background: var(--night); color: var(--card); position: relative; padding: 34px 0 30px; }
+.recent::before, .recent::after { content: ''; position: absolute; left: 0; right: 0; height: 12px; opacity: .85; background: radial-gradient(circle at 9px 6px, var(--paper) 0 3.2px, transparent 3.6px) 0 0 / 22px 12px; }
+.recent::before { top: 8px; } .recent::after { bottom: 8px; }
+.recent h2 { color: var(--card); }
+.recent .recent-clear { color: var(--kraft); }
+.recent .recent-card { border-radius: 1px; }
+.recent .recent-art .art { filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .35)); }
+.recent .recent-name { color: var(--ink); background: rgba(251, 247, 240, .9); }
+
 /* =====================================================================================
    COLLECTION PAGE: a magazine spread
    ===================================================================================== */
@@ -563,6 +585,81 @@ body.page-account { --page: #F4EDE0; background: var(--paper); }
 .page-account .acct-wishlist .drawer-list { padding: 18px 2px 4px; }
 .page-account .acct-wishlist .order-foot { border-radius: 0; }
 .page-account .empty-card { border-radius: 0; border-color: var(--kraft); }
+
+/* =====================================================================================
+   CONTENT PAGES (blog, about, contact, FAQ): journal entries
+   ===================================================================================== */
+body.page-info { --page: #F4EDE0; background: var(--paper); }
+.page-info .page-hero .eyebrow, .page-info .eyebrow { font-family: var(--f-type); color: var(--ink-soft); }
+.page-info .page-hero h1 { font-variation-settings: 'opsz' 144; letter-spacing: -.04em; line-height: .92; font-size: clamp(3rem, 8vw, 6.6rem); }
+.page-info .page-section > h2, .page-info .card-title { font-variation-settings: 'opsz' 144; letter-spacing: -.03em; }
+/* a strip of washi tape, reused by the cards below */
+.page-info .post-card::before, .page-info .values li::before, .page-info .panel-card::before, .page-info .faq-sec::before, .page-info .about-figure::before, .page-info .contact-aside::before {
+  content: ''; position: absolute; z-index: 3; top: -12px; left: 50%; width: 92px; height: 24px; margin-left: -46px; opacity: .82; pointer-events: none; transform: rotate(-3deg);
+  background: repeating-linear-gradient(45deg, rgba(176, 141, 87, .65) 0 5px, rgba(251, 247, 240, .85) 5px 10px);
+}
+
+/* fields the script hides until needed ("Describe the colour", "Measurement") must stay hidden */
+.field[hidden] { display: none; }
+
+/* blog: clippings */
+.page-info .post-list { gap: 46px; padding-top: 14px; }
+.page-info .post-card { position: relative; background: var(--card); border-radius: 0; box-shadow: var(--shadow-lift); transform: rotate(-.6deg); }
+.page-info .post-list li:nth-child(even) .post-card { transform: rotate(.7deg); }
+.page-info .post-list li:nth-child(even) .post-card::before { left: 18%; transform: rotate(5deg); background: repeating-linear-gradient(90deg, rgba(163, 52, 31, .5) 0 6px, rgba(233, 221, 199, .9) 6px 12px); }
+.page-info .post-art { border-radius: 0; box-shadow: 0 0 0 6px var(--card), 0 0 0 7px rgba(31, 26, 21, .1); }
+.page-info .post-art .art { filter: var(--cutout); }
+.page-info .post-body h2 { font-variation-settings: 'opsz' 96; letter-spacing: -.02em; }
+.page-info .soon { /* rubber stamp */
+  display: inline-grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; text-align: center; line-height: 1.2; padding: 8px;
+  border: 2.5px solid var(--thread); box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5.5px var(--thread);
+  font-size: .6rem; transform: rotate(-12deg); filter: url(#ink); margin-top: 6px;
+}
+
+/* about: a taped polaroid, a drop cap, index cards */
+.page-info .about-figure { position: relative; }
+.page-info .about-art { border-radius: 0; box-shadow: 0 0 0 14px var(--card), 0 0 0 15px rgba(31, 26, 21, .08), var(--shadow-lift); transform: rotate(2deg); margin: 14px; }
+.page-info .about-art .art { filter: var(--cutout); }
+.page-info .about-figure::before { top: -6px; }
+.page-info .prose p:first-child::first-letter { float: left; font-family: var(--f-display); font-size: 4.2em; line-height: .82; padding: 6px 10px 0 0; color: var(--thread); font-variation-settings: 'opsz' 144; }
+:lang(te) .page-info .prose p:first-child::first-letter, :lang(hi) .page-info .prose p:first-child::first-letter { float: none; font-size: inherit; padding: 0; color: inherit; }
+.page-info .values { gap: 34px; padding-top: 14px; }
+.page-info .values li { position: relative; border-radius: 0; background: var(--card) repeating-linear-gradient(transparent 0 29px, rgba(90, 74, 58, .12) 29px 30px); background-position: 0 58px; box-shadow: var(--shadow-rest); }
+.page-info .values li:nth-child(1) { transform: rotate(-1deg); } .page-info .values li:nth-child(2) { transform: rotate(.8deg); } .page-info .values li:nth-child(3) { transform: rotate(-.4deg); }
+.page-info .values li::after { content: ''; position: absolute; left: 0; right: 0; top: 52px; border-top: 1.5px solid rgba(163, 52, 31, .45); } /* the index card's red rule */
+.page-info .step-no { border-width: 2.5px; box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 4.5px var(--thread); width: 44px; height: 44px; transform: rotate(-10deg); filter: url(#ink); font-family: var(--f-type); }
+
+/* contact: the forms are lined order slips; how-it-works is a sticky note */
+.page-info .panel-card { position: relative; border-radius: 0; background: var(--card); box-shadow: var(--shadow-lift); }
+.page-info .custom-form { background: var(--card) repeating-linear-gradient(transparent 0 35px, rgba(90, 74, 58, .07) 35px 36px); }
+.page-info .wa-form { transform: rotate(-.4deg); }
+.page-info .wa-form::before { background: repeating-linear-gradient(90deg, rgba(163, 52, 31, .5) 0 6px, rgba(233, 221, 199, .9) 6px 12px); }
+.page-info .panel-card .field input, .page-info .panel-card .field select, .page-info .panel-card .field textarea { background-color: var(--paper); }
+.page-info .contact-aside { position: relative; background: #F2E6B8; padding: 28px 24px 18px; box-shadow: 0 16px 30px -16px rgba(31, 26, 21, .45); transform: rotate(1.2deg); }
+.page-info .contact-aside::before { background: rgba(217, 196, 163, .85); }
+.page-info .wa-steps li { border-bottom-color: rgba(90, 74, 58, .2); }
+.page-info .wa-steps li::before { background: transparent; color: var(--thread); border: 2px solid var(--thread); font-family: var(--f-type); transform: rotate(-8deg); }
+
+/* FAQ: index cards that open */
+.page-info .jump { gap: 6px; }
+.page-info .jump a {
+  border: 0; border-radius: 0; background: var(--aged); box-shadow: var(--shadow-rest); font-family: var(--f-type); font-size: .95rem;
+  clip-path: polygon(0 8%, 5% 0, 30% 6%, 60% 0, 88% 5%, 100% 0, 98% 50%, 100% 100%, 70% 94%, 40% 100%, 10% 95%, 0 100%, 2% 50%);
+  transition: transform var(--t-ui) var(--ease), background .2s;
+}
+.page-info .jump a:hover { background: var(--kraft); transform: translateY(-2px); }
+.page-info .faq { max-width: 900px; }
+.page-info .faq-sec { position: relative; margin-top: 46px; padding: 26px clamp(18px, 4vw, 34px) 14px; background: var(--card); box-shadow: var(--shadow-lift); }
+.page-info .faq-sec:nth-of-type(odd) { transform: rotate(-.35deg); }
+.page-info .faq-sec:nth-of-type(even) { transform: rotate(.35deg); }
+.page-info .faq-sec:nth-of-type(even)::before { left: 22%; transform: rotate(4deg); background: radial-gradient(circle at 5px 5px, rgba(94, 107, 58, .65) 1.6px, transparent 2px) 0 0 / 10px 10px, rgba(233, 221, 199, .85); }
+.page-info .faq-sec h2 { padding-bottom: 12px; border-bottom: 1.5px solid rgba(163, 52, 31, .45); font-variation-settings: 'opsz' 96; letter-spacing: -.02em; }
+.page-info .faq-item { border-bottom-color: rgba(90, 74, 58, .16); }
+.page-info .faq-item:last-child { border-bottom: 0; }
+.page-info .faq-q::after { box-shadow: inset 0 0 0 1.5px var(--thread); color: var(--thread); }
+.page-info .faq-a:not([hidden]) { animation: unfold .5s var(--ease); transform-origin: top; }
+@keyframes unfold { from { opacity: 0; transform: perspective(600px) rotateX(-24deg) translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (max-width: 700px) { .page-info .post-card, .page-info .faq-sec, .page-info .values li, .page-info .contact-aside, .page-info .wa-form { transform: none !important; } }
 
 /* ---- calm mode: everything still and instant (device setting, or the footer switch) -------- */
 :root[data-motion="calm"] *, :root[data-motion="calm"] *::before, :root[data-motion="calm"] *::after {

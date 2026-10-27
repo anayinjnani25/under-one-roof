@@ -15,6 +15,13 @@ window.UOR = window.UOR || {};
   var lang = LANGS[fromUrl] ? fromUrl : LANGS[stored] ? stored : 'en';
   if (LANGS[fromUrl]) { try { localStorage.setItem(KEY, fromUrl); } catch (e) { /* ignore */ } }
   document.documentElement.lang = lang;
+  // Telugu and Devanagari fonts are only fetched when that language is in use
+  if (lang !== 'en') {
+    var font = document.createElement('link');
+    font.rel = 'stylesheet';
+    font.href = 'https://fonts.googleapis.com/css2?family=' + (lang === 'te' ? 'Noto+Serif+Telugu' : 'Noto+Serif+Devanagari') + ':wght@400;500;600&display=swap';
+    document.head.appendChild(font);
+  }
 
   var D = UOR.I18N || { en: {} };
   UOR.lang = lang;
