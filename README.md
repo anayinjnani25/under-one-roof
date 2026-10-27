@@ -44,6 +44,15 @@ Open `https://anayinjnani25.github.io/under-one-roof/admin.html` and sign in wit
 - Orders aren't recorded anywhere: shoppers order by WhatsApp, so the WhatsApp chat is the order record.
 - Offline, the shop shows a small "You're offline" banner and keeps working; the admin page refuses to save until you're back online.
 
+## Design: "The Paper Atelier"
+A luxury maker's journal: cream paper, cut-out pieces with sticker edges, torn word strips, taped polaroids, rubber stamps, one red thread.
+- `assets/css/atelier.css` holds the design system (colours, type, components) and each page's look; `assets/css/style.css` is the older base underneath it.
+- `assets/js/atelier.js` holds the shared behaviour: torn edges, things being "placed" as you scroll, ingredient pills, the taped product clipping (`UOR.clip`), botanical sprigs (`UOR.sprig`), page-to-page transitions and the motion switch.
+- `style.html` (unlinked, hidden from search) is the style tile showing every component.
+- The homepage opening animation and the shelf-page thread were kept exactly as they were.
+- **Motion:** the footer has a *Full motion / Calm* switch. By default the site follows the device's "reduce motion" setting; a visitor's choice is remembered (`uor-motion` in the browser) and applies everywhere, the opening animation included.
+- Telugu and Devanagari fonts load only when that language is chosen.
+
 ## Header
 Products (a dropdown of every shelf), Categories, Blog, About and Contact, followed by account, wishlist and Search (Ctrl K or ⌘K opens it). Below 1240px wide, the links move into a menu button.
 
