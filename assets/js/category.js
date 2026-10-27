@@ -13,9 +13,13 @@ UOR.ready.then(function () {
   document.querySelector('.cat-no').textContent = UOR.t('cat.entry', { no: cat.no, n: items.length });
   document.querySelector('.cat-title').innerHTML = cat.title + ' <em>' + cat.accent + '</em>';
   document.querySelector('.cat-blurb').textContent = cat.blurb;
+  // the shelf's word, huge and faint behind the first screen
+  document.querySelector('.cat-giant').textContent = UOR.lang === 'en' ? cat.accent.toLowerCase() : cat.accent;
+  // the other shelves, as torn word strips (this one inked)
   document.querySelector('.cat-tabs').innerHTML = UOR.categories.map(function (c) {
-    return '<a class="chip" href="category.html?c=' + c.slug + '"' + (c === cat ? ' aria-current="page" aria-pressed="true"' : ' aria-pressed="false"') + '>' + c.title + ' ' + c.accent + '</a>';
+    return '<a class="strip" href="category.html?c=' + c.slug + '"' + (c === cat ? ' aria-current="page" data-tone="ink" data-type="serif"' : ' data-tone="aged" data-type="type"') + '>' + c.title + ' ' + c.accent + '</a>';
   }).join('');
+  UOR.tearAll();
 
   var swirl = document.querySelector('.swirl');
   var svg = document.querySelector('.swirl-svg');

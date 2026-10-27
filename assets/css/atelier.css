@@ -421,6 +421,50 @@ body.page-product { --page: #F4EDE0; background: var(--paper); }
 }
 .page-product .review-form .field input, .page-product .review-form .field textarea { background: rgba(251, 247, 240, .9); }
 
+/* =====================================================================================
+   SHELF PAGES (category.html): the thread is untouched; the cards become polaroids
+   ===================================================================================== */
+body.page-cat { --page: #EFE5D3; background: var(--page); }
+.page-cat .cat-hero { overflow: visible; }
+.cat-giant {
+  position: absolute; left: 50%; top: calc(var(--head-h) + 2vh); transform: translateX(-50%); margin: 0; z-index: -1; pointer-events: none;
+  white-space: nowrap; color: var(--ink); opacity: .07;
+  font-family: var(--f-display); font-weight: 600; font-variation-settings: 'opsz' 144; letter-spacing: -.055em; line-height: .8;
+  font-size: clamp(6rem, 24vw, 22rem);
+}
+:lang(te) .cat-giant, :lang(hi) .cat-giant { letter-spacing: 0; line-height: 1.1; font-size: clamp(4rem, 16vw, 14rem); }
+.page-cat .cat-hero { position: relative; z-index: 0; }
+.page-cat .cat-hero .eyebrow { font-family: var(--f-type); color: var(--ink-soft); }
+.page-cat .cat-title { font-variation-settings: 'opsz' 144; letter-spacing: -.035em; }
+.page-cat .cat-hero .rubber { position: absolute; right: max(var(--gutter), calc(50% - 540px)); top: calc(var(--head-h) + 5vh); }
+.page-cat .cat-tabs { gap: 4px 6px; }
+.page-cat .cat-tabs .strip { text-decoration: none; min-height: 40px; display: inline-flex; align-items: center; }
+@media (max-width: 700px) { .page-cat .cat-hero .rubber { display: none; } }
+
+/* polaroids along the thread: white frame, the coloured window as the photo, the piece breaking out the top, tape */
+.page-cat .swirl-node .pcard { background: var(--card); border-radius: 0; padding: 12px 12px 18px; box-shadow: var(--shadow-lift); isolation: auto; }
+.page-cat .swirl-node .pcard::before { /* washi tape */
+  content: ''; position: absolute; z-index: 4; top: -12px; left: 50%; width: 92px; height: 24px; margin-left: -46px; opacity: .82; mix-blend-mode: multiply;
+  transform: rotate(-3deg); clip-path: polygon(0 8%, 4% 0, 8% 10%, 12% 2%, 100% 0, 97% 18%, 100% 36%, 96% 55%, 100% 74%, 97% 92%, 100% 100%, 4% 100%, 0 88%, 3% 70%, 0 52%, 3% 34%);
+  background: repeating-linear-gradient(90deg, rgba(163, 52, 31, .55) 0 6px, rgba(233, 221, 199, .9) 6px 12px);
+}
+.page-cat .swirl-node:nth-child(4n+1) .pcard::before { background: repeating-linear-gradient(45deg, rgba(176, 141, 87, .7) 0 5px, rgba(251, 247, 240, .85) 5px 10px); left: 22%; transform: rotate(-8deg); }
+.page-cat .swirl-node:nth-child(4n+3) .pcard::before { background: radial-gradient(circle at 5px 5px, rgba(94, 107, 58, .65) 1.6px, transparent 2px) 0 0 / 10px 10px, rgba(233, 221, 199, .85); left: 76%; transform: rotate(7deg); }
+.page-cat .swirl-node .pcard { display: flex; flex-direction: column; }
+.page-cat .swirl-node .pcard-frame { order: 1; }
+.page-cat .swirl-node .pcard-chrome { order: 2; margin-bottom: -30px; height: 30px; } /* shares a line with the heart */
+.page-cat .swirl-node .pcard-row { order: 3; }
+.page-cat .swirl-node .pcard-name { order: 4; }
+.page-cat .swirl-node .pcard-mini { order: 5; }
+.page-cat .swirl-node .pcard-chrome i { display: none; }
+.page-cat .swirl-node .pcard-chrome .label { margin-left: 0; font-family: var(--f-type); color: var(--ink-soft); }
+.page-cat .swirl-node .pcard-frame { border: 0; border-radius: 0; background: var(--bg); margin: 0 0 10px; }
+.page-cat .swirl-node .pcard-art .art { filter: var(--cutout); }
+@media (max-width: 640px) { .page-cat .swirl-node .pcard-art { left: -5%; width: 110%; } } /* stays on screen at phone width */
+.page-cat .swirl-node .pcard-name { font-weight: 400; font-variation-settings: 'opsz' 60; letter-spacing: -.01em; }
+.page-cat .swirl-node .pcard-mini { color: var(--ink-soft); }
+.page-cat .swirl-end .eyebrow { font-family: var(--f-type); }
+
 /* ---- calm mode: everything still and instant (device setting, or the footer switch) -------- */
 :root[data-motion="calm"] *, :root[data-motion="calm"] *::before, :root[data-motion="calm"] *::after {
   animation-duration: .01ms !important; animation-iteration-count: 1 !important;
