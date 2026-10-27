@@ -33,36 +33,129 @@ UOR.ready.then(function () {
   var pts = [], cum = [], maxY = [], nodeIdx = [], total = 0, revealShown = 0, revealTarget = 0, running = false;
   var needleG, maskPath;
 
-  // small seeded random numbers, so a shelf's thread takes the same route on every visit
-  function seeded(s) {
-    var h = 2166136261;
-    for (var c = 0; c < s.length; c++) { h ^= s.charCodeAt(c); h = Math.imul(h, 16777619); }
-    return function () { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
-  }
-
-  // A sweep from A to B that uses the whole page: it swings out towards one edge, crosses
-  // to the other, then settles into B, with a stitched knot halfway. A shelf alternates
-  // which edge it visits first, so the thread weaves back and forth across the screen.
-  function sweep(A, B, rnd, Wc, H) {
-    var dir = B[0] >= A[0] ? 1 : -1, dy = Math.max(B[1] - A[1], 220);
-    var L = 18, R = Wc - 18, behind = dir > 0 ? L : R, ahead = dir > 0 ? R : L;
-    var first = rnd() < .5 ? behind : ahead, second = first === behind ? ahead : behind;
-    var y1 = A[1] + dy * (.28 + rnd() * .1), y2 = Math.min(A[1] + dy * (.68 + rnd() * .12), H - 30);
-    var P = [A, [A[0] + (first - A[0]) * (.82 + rnd() * .12), y1], [B[0] + (second - B[0]) * (.82 + rnd() * .12), y2], B];
-    // Catmull-Rom through the waypoints, with a knot halfway along the long crossing
-    var poly = [], ext = [P[0]].concat(P, [P[P.length - 1]]);
+  // Route from A to B that never passes behind a card (or another stamp) and never crosses the
+  // thread already drawn. Candidate curves bend through a waypoint anywhere across the page;
+  // of the ones that stay clear, the widest sweep wins, so the thread still covers the screen.
+  function catmull(P, n) {
+    var out = [], ext = [P[0]].concat(P, [P[P.length - 1]]);
     for (var s = 1; s < ext.length - 2; s++) {
       var p0 = ext[s - 1], p1 = ext[s], p2 = ext[s + 1], p3 = ext[s + 2];
-      for (var k = (s === 1 ? 0 : 1); k <= 40; k++) {
-        var t = k / 40, t2 = t * t, t3 = t2 * t;
-        var pt = [0, 1].map(function (c) {
+      for (var k = (s === 1 ? 0 : 1); k <= n; k++) {
+        var t = k / n, t2 = t * t, t3 = t2 * t;
+        out.push([0, 1].map(function (c) {
           return .5 * (2 * p1[c] + (-p0[c] + p2[c]) * t + (2 * p0[c] - 5 * p1[c] + 4 * p2[c] - p3[c]) * t2 + (-p0[c] + 3 * p1[c] - 3 * p2[c] + p3[c]) * t3);
-        });
-        poly.push(pt);
-        if (s === 2 && k === 20) poly.push({ knot: pt });
+        }));
       }
     }
-    follow(poly);
+    return out;
+  }
+  function crosses(a, b, c, d) { // do segments ab and cd properly intersect?
+    function o(p, q, r) { var v = (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]); return v > 1e-9 ? 1 : v < -1e-9 ? -1 : 0; }
+    return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0;
+  }
+  var CELL = 60, grid = {};
+  function cellsOf(a, b) {
+    var out = [], x0 = Math.floor(Math.min(a[0], b[0]) / CELL), x1 = Math.floor(Math.max(a[0], b[0]) / CELL);
+    var y0 = Math.floor(Math.min(a[1], b[1]) / CELL), y1 = Math.floor(Math.max(a[1], b[1]) / CELL);
+    for (var x = x0; x <= x1; x++) for (var y = y0; y <= y1; y++) out.push(x + ',' + y);
+    return out;
+  }
+  function addSegs(path) {
+    for (var i = 1; i < path.length; i++) {
+      var sg = [path[i - 1], path[i]];
+      cellsOf(sg[0], sg[1]).forEach(function (k) { (grid[k] = grid[k] || []).push(sg); });
+    }
+  }
+  // weighted so that, if nothing is perfect, a hairpin or tight gap is given up long before a
+  // card overlap (50 a point) or a crossing (1000)
+  function violations(path, A, boxes, Wc, H) {
+    var bad = 0, i, j;
+    for (i = 0; i < path.length; i++) {
+      var q = path[i];
+      if (q[0] < 6 || q[0] > Wc - 6 || q[1] < 4 || q[1] > H - 4) bad += 50;
+      for (j = 0; j < boxes.length; j++) { var bx = boxes[j]; if (q[0] > bx[0] && q[0] < bx[2] && q[1] > bx[1] && q[1] < bx[3]) { bad += 50; break; } }
+    }
+    // no hairpins: the thread never turns back on itself sharply
+    for (i = 4; i < path.length - 4; i++) {
+      var ux = path[i][0] - path[i - 4][0], uy = path[i][1] - path[i - 4][1], vx = path[i + 4][0] - path[i][0], vy = path[i + 4][1] - path[i][1];
+      var ul = Math.hypot(ux, uy), vl = Math.hypot(vx, vy);
+      if (ul > 1 && vl > 1 && (ux * vx + uy * vy) / (ul * vl) < -0.2) { bad += 3; break; } // a turn sharper than ~100°
+    }
+    // keep a clear gap: no part runs within GAP of another part of the thread (itself or earlier legs)
+    var GAP = 26;
+    for (i = 0; i < path.length; i += 2) {
+      for (j = i + 16; j < path.length; j += 2) if (Math.hypot(path[i][0] - path[j][0], path[i][1] - path[j][1]) < GAP) { bad += 3; i = path.length; break; }
+    }
+    for (i = 0; i < path.length; i += 2) {
+      var qx = path[i][0], qy = path[i][1];
+      if (Math.hypot(qx - A[0], qy - A[1]) < 50) continue; // leaving A, it is bound to be near the thread arriving at A
+      var near = false;
+      cellsOf([qx - GAP, qy - GAP], [qx + GAP, qy + GAP]).forEach(function (k) {
+        (grid[k] || []).forEach(function (sg) { if (!near && Math.hypot(sg[1][0] - qx, sg[1][1] - qy) < GAP) near = true; });
+      });
+      if (near) { bad += 3; break; }
+    }
+    for (i = 2; i < path.length; i++) for (j = 1; j < i - 1; j++) {   // the curve crossing itself
+      if (crosses(path[j - 1], path[j], path[i - 1], path[i])) { bad += 1000; i = path.length; break; }
+    }
+    for (i = 1; i < path.length; i++) {
+      var s0 = path[i - 1], s1 = path[i], seen = [];
+      cellsOf(s0, s1).forEach(function (k) {
+        (grid[k] || []).forEach(function (sg) {
+          if (seen.indexOf(sg) > -1) return; seen.push(sg);
+          // the thread already drawn ends at A: touching it there is not a crossing
+          if (Math.hypot(sg[1][0] - A[0], sg[1][1] - A[1]) < 6 || Math.hypot(sg[0][0] - A[0], sg[0][1] - A[1]) < 6) return;
+          if (crosses(s0, s1, sg[0], sg[1])) bad += 1000;
+        });
+      });
+    }
+    return bad;
+  }
+  function route(A, B, boxes, Wc, H) {
+    var lo = Math.min(A[1], B[1]), hi = Math.max(A[1], B[1]), dy = hi - lo;
+    var ys = dy >= 120 ? [lo + dy * .25, lo + dy * .5, lo + dy * .75, hi + 60] : [hi + 60, hi + 120, hi + 180, (A[1] + B[1]) / 2];
+    var xs = [.03, .1, .2, .32, .44, .56, .68, .8, .9, .97].map(function (f) { return f * Wc; }).concat([(A[0] + B[0]) / 2]);
+    // clear horizontal corridors: heights where a line across the whole page touches no card
+    var corridors = [], run = null;
+    for (var y = Math.max(20, lo - 260); y <= Math.min(H - 20, hi + 260); y += 8) {
+      var free = !boxes.some(function (bx) { return y > bx[1] && y < bx[3]; });
+      if (free && !run) run = [y, y]; else if (free) run[1] = y; else if (run) { corridors.push((run[0] + run[1]) / 2); run = null; }
+    }
+    if (run) corridors.push((run[0] + run[1]) / 2);
+    var cands = [catmull([A, B], 50)];
+    xs.forEach(function (x) { ys.concat(corridors).forEach(function (y) { cands.push(catmull([A, [x, Math.min(y, H - 30)], B], 40)); }); });
+    // two bends anywhere in the band around A and B (a fixed pseudo-random set, so the route is
+    // the same on every visit): these find the wide swings between staggered cards
+    var r = 2166136261 ^ Math.round(A[0] * 7 + B[1] * 13);
+    function rnd() { r = Math.imul(r ^ (r >>> 15), 2246822507); r = Math.imul(r ^ (r >>> 13), 3266489909); r ^= r >>> 16; return (r >>> 0) / 4294967296; }
+    var top = Math.max(20, lo - 220), bot = Math.min(H - 30, hi + 220);
+    for (var k = 0; k < 240; k++) {
+      cands.push(catmull([A, [Wc * (.03 + rnd() * .94), top + rnd() * (bot - top)], [Wc * (.03 + rnd() * .94), top + rnd() * (bot - top)], B], 30));
+    }
+    // wider sweeps: out to one side along a corridor, across to the other, then into B
+    var edges = [.04 * Wc, .96 * Wc];
+    corridors.forEach(function (cy) {
+      edges.forEach(function (x1) { edges.forEach(function (x2) {
+        if (x1 !== x2) cands.push(catmull([A, [x1, cy], [x2, cy], B], 34));
+      }); });
+      cands.push(catmull([A, [edges[0], cy], B], 40), catmull([A, [edges[1], cy], B], 40));
+    });
+    var best = null, bestScore = -Infinity, fallback = null, fewest = Infinity;
+    cands.forEach(function (c) {
+      var v = violations(c, A, boxes, Wc, H);
+      // how far the curve swings away from the straight line A-B (bigger = covers more of the page)
+      var dev = 0, len = 0, ax = B[0] - A[0], ay = B[1] - A[1], al = Math.hypot(ax, ay) || 1;
+      for (var i = 0; i < c.length; i++) {
+        dev = Math.max(dev, Math.abs((c[i][0] - A[0]) * ay - (c[i][1] - A[1]) * ax) / al);
+        if (i) len += Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]);
+      }
+      var score = dev - len * .04;
+      if (!v && score > bestScore) { best = c; bestScore = score; }
+      if (v < fewest) { fewest = v; fallback = c; }
+    });
+    var path = best || fallback;
+    addSegs(path);
+    follow(path);
   }
 
   // walk the points ~4px apart; a knot becomes a small stitched loop
@@ -92,10 +185,11 @@ UOR.ready.then(function () {
   // right, middle-left (repeating) with their stamp on the side facing the middle.
   var ACROSS = [0, .64, 1, .36];
   function build() {
-    var Wc = swirl.clientWidth, mobile = Wc < 640;
+    var Wc = swirl.clientWidth, mobile = Wc < 840; // below this the cards can't leave room for a clear route
     var spine = mobile ? 26 : Wc / 2;
-    var cw = mobile ? Wc - 64 : clamp(Wc * .2, 240, 330);
+    var cw = mobile ? Math.min(Wc - 64, 420) : clamp(Wc * .2, 240, 330);
     nodes.forEach(function (n) { n.style.width = cw + 'px'; });
+    swirl.classList.toggle('narrow', mobile); // the column layout keeps each piece's art inside the card's width
     // tallest card (long names wrap, more so in Telugu and Hindi)
     var ch = nodes.reduce(function (h, n) { return Math.max(h, n.querySelector('.pcard').offsetHeight); }, 0);
     var lift = cw * .34; // pop-out art rises this far above each card
@@ -124,10 +218,22 @@ UOR.ready.then(function () {
     }
     nodes.forEach(function (n, i) { n.style.left = centers[i][0] + 'px'; n.style.top = centers[i][1] + 'px'; });
     stamps.forEach(function (s, i) { s.style.left = marks[i][0] + 'px'; s.style.top = marks[i][1] + 'px'; });
+    // each card's real box, pop-out art included, measured from layout (offsets ignore the
+    // reveal animation's transforms); the node is centred on its point by translate(-50%,-50%)
+    function boxOf(el, node) {
+      var x = 0, y = 0;
+      for (var e = el; e && e !== node; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; }
+      x += node.offsetLeft - node.offsetWidth / 2; y += node.offsetTop - node.offsetHeight / 2;
+      return [x, y, x + el.offsetWidth, y + el.offsetHeight];
+    }
+    var cardBoxes = nodes.map(function (n) {
+      var a = boxOf(n.querySelector('.pcard'), n), b = boxOf(n.querySelector('.pcard-art'), n);
+      return [Math.min(a[0], b[0]) - 8, Math.min(a[1], b[1]) - 8, Math.max(a[2], b[2]) + 8, Math.max(a[3], b[3]) + 8]; // +8: the slight tilt
+    });
     var H = centers[centers.length - 1][1] + ch / 2 + 90;
     swirl.style.height = H + 'px';
 
-    // sample the path between milestones (phones: S-curves with a loop; wide: edge-to-edge sweeps)
+    // sample the path between milestones (phones: gentle S-curves down the spine; wide: routed sweeps)
     pts = []; nodeIdx = [];
     var start = [spine, 40], loopR = mobile ? 15 : 30;
     centers = marks;
@@ -150,15 +256,22 @@ UOR.ready.then(function () {
     if (mobile) {
       segment(start, centers[0], false, 60);
       nodeIdx.push(pts.length - 1);
-      for (var i = 1; i < centers.length; i++) { segment(centers[i - 1], centers[i], true, 160); nodeIdx.push(pts.length - 1); }
+      for (var i = 1; i < centers.length; i++) { segment(centers[i - 1], centers[i], false, 160); nodeIdx.push(pts.length - 1); }
       segment(centers[centers.length - 1], [spine, H - 20], false, 60);
     } else {
-      // wide screens: big sweeps edge to edge between milestones (same shelf, same route every visit)
-      var rnd = seeded(cat.slug);
-      sweep(start, centers[0], rnd, Wc, H);
-      nodeIdx.push(pts.length - 1);
-      for (var q = 1; q < centers.length; q++) { sweep(centers[q - 1], centers[q], rnd, Wc, H); nodeIdx.push(pts.length - 1); }
-      sweep(centers[centers.length - 1], [spine, H - 20], rnd, Wc, H);
+      // wide screens: wide sweeps that keep clear of every card and never cross themselves
+      grid = {};
+      var pad = 16, boxes = cardBoxes.map(function (c) { return [c[0] - pad, c[1] - pad, c[2] + pad, c[3] + pad]; });
+      var stampBoxes = centers.map(function (mk) { return [mk[0] - 26, mk[1] - 26, mk[0] + 26, mk[1] + 26]; });
+      var legs = [[start, centers[0], 0]];
+      for (var q = 1; q < centers.length; q++) legs.push([centers[q - 1], centers[q], q]);
+      legs.push([centers[centers.length - 1], [spine, H - 20], -1]);
+      legs.forEach(function (leg, li) {
+        // other stamps are obstacles too (not the two this leg joins)
+        var obs = boxes.concat(stampBoxes.filter(function (b, k) { return k !== leg[2] && k !== leg[2] - 1 && !(leg[2] === -1 && k === centers.length - 1); }));
+        route(leg[0], leg[1], obs, Wc, H);
+        if (li < legs.length - 1) nodeIdx.push(pts.length - 1);
+      });
     }
 
     cum = [0]; maxY = [pts[0][1]];
@@ -239,6 +352,15 @@ UOR.ready.then(function () {
   window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { build(); onScroll(); }, 150); });
+  // a card that changes size (a late font, a long Telugu name) gets the route re-planned around it
+  if ('ResizeObserver' in window) {
+    var sizes = new WeakMap();
+    var ro = new ResizeObserver(function (entries) {
+      var changed = entries.some(function (e) { var h = Math.round(e.contentRect.height), was = sizes.get(e.target); sizes.set(e.target, h); return was !== undefined && was !== h; });
+      if (changed) { clearTimeout(rt); rt = setTimeout(function () { build(); onScroll(); }, 120); }
+    });
+    nodes.forEach(function (n) { ro.observe(n.querySelector('.pcard')); });
+  }
 
   build();
   onScroll();

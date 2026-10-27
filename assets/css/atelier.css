@@ -465,7 +465,7 @@ body.page-cat { --page: #EFE5D3; background: var(--page); }
 .page-cat .swirl-node .pcard-chrome .label { margin-left: 0; font-family: var(--f-type); color: var(--ink-soft); }
 .page-cat .swirl-node .pcard-frame { border: 0; border-radius: 0; background: var(--bg); margin: 0 0 10px; }
 .page-cat .swirl-node .pcard-art .art { filter: var(--cutout); }
-@media (max-width: 640px) { .page-cat .swirl-node .pcard-art { left: -5%; width: 110%; } } /* stays on screen at phone width */
+.page-cat .swirl.narrow .swirl-node .pcard-art { left: -5%; width: 110%; } /* column layout: art stays clear of the thread and the screen edge */
 .page-cat .swirl-node .pcard-name { font-weight: 400; font-variation-settings: 'opsz' 60; letter-spacing: -.01em; }
 .page-cat .swirl-node .pcard-mini { color: var(--ink-soft); }
 .page-cat .swirl-end .eyebrow { font-family: var(--f-type); }
