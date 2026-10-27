@@ -1,13 +1,12 @@
 /* Under One Roof — product detail: jello-spring object, sliding info panel, sharing,
    suggestions, reviews. Text on screen follows the chosen language; WhatsApp messages
    to the shop stay in English (UOR.en / UOR.palNameEn). */
-// first paint, before the live catalog arrives: the poster's words from the catalog bundled with
+// first paint, before the live catalog arrives: the name and short line from the catalog bundled with
 // the site (English only; Telugu/Hindi names come from Supabase). The block below redraws them.
 (function () {
   var early = UOR.lang === 'en' && UOR.byId && UOR.byId(UOR.query ? UOR.query('id') : null);
   if (!early) return;
   var set = function (s, v) { var el = document.querySelector(s); if (el && !el.textContent.trim()) el.textContent = v; };
-  set('.pd-giant', early.name.split(/\s+/)[0].toLowerCase());
   set('.pd-name', early.name);
   set('.pd-mini', early.mini.toLowerCase());
 })();
@@ -29,10 +28,6 @@ UOR.ready.then(function () {
   $('.pd-cat').textContent = t('pd.entry', { no: cat.no, cat: cat.title + ' ' + cat.accent });
   $('.pd-name').textContent = p.name;
   $('.pd-mini').textContent = UOR.lang === 'en' ? p.mini.toLowerCase() : p.mini;
-  // the poster's giant word: the piece's first word, set huge behind it
-  var word = p.name.split(/\s+/)[0];
-  $('.pd-giant').textContent = UOR.lang === 'en' ? word.toLowerCase() : word;
-  $('.pd-giant').classList.toggle('long', word.length > 7);
   // botanicals behind the piece: mango leaves for doorway pieces, marigolds for the rest
   var leafy = { torans: 1, garlands: 1 }[p.cat];
   $('.pd-sprigs').innerHTML = UOR.sprig(leafy ? 'mango' : 'marigold', 'sp-a') + UOR.sprig(leafy ? 'marigold' : 'mango', 'sp-b');
