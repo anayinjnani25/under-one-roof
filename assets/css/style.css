@@ -489,7 +489,7 @@ html.reduced .intro { height: 100vh; height: 100svh; }
   margin-top: 40px;
 }
 .foot-grid { display: grid; grid-template-columns: 1.4fr repeat(2, 1fr); gap: 36px; }
-.foot-grid h4 { font-family: var(--f-type); font-weight: 400; font-size: var(--fs-label); letter-spacing: .18em; text-transform: uppercase; color: var(--brown); margin: 0 0 14px; }
+.foot-grid .foot-h { font-family: var(--f-type); font-weight: 400; font-size: var(--fs-label); letter-spacing: .18em; text-transform: uppercase; color: var(--brown); margin: 0 0 14px; }
 .foot-grid ul { list-style: none; margin: 0; padding: 0; }
 .foot-grid li { margin-bottom: 6px; }
 .foot-grid a { text-decoration: none; }
@@ -903,10 +903,10 @@ body.intro-live .wa-float { opacity: 0; visibility: hidden; transition: opacity 
 /* ---- Telugu & Hindi: no all-caps or letter-spacing (they break Indic scripts), roomier lines */
 :lang(te) .eyebrow, :lang(te) .label, :lang(te) .nav-top, :lang(te) .site-nav .acct-link, :lang(te) .wish-btn, :lang(te) .btn,
 :lang(te) .chip, :lang(te) .tab, :lang(te) .order-sum, :lang(te) .search-hint, :lang(te) .menu-all a, :lang(te) .care-link,
-:lang(te) .stamp, :lang(te) .dock-hint, :lang(te) .more-arrow, :lang(te) .scroll-hint, :lang(te) .cat-card .open, :lang(te) .foot-grid h4, :lang(te) .wa-tip, :lang(te) .lang-pick select,
+:lang(te) .stamp, :lang(te) .dock-hint, :lang(te) .more-arrow, :lang(te) .scroll-hint, :lang(te) .cat-card .open, :lang(te) .foot-grid .foot-h, :lang(te) .wa-tip, :lang(te) .lang-pick select,
 :lang(hi) .eyebrow, :lang(hi) .label, :lang(hi) .nav-top, :lang(hi) .site-nav .acct-link, :lang(hi) .wish-btn, :lang(hi) .btn,
 :lang(hi) .chip, :lang(hi) .tab, :lang(hi) .order-sum, :lang(hi) .search-hint, :lang(hi) .menu-all a, :lang(hi) .care-link,
-:lang(hi) .stamp, :lang(hi) .dock-hint, :lang(hi) .more-arrow, :lang(hi) .scroll-hint, :lang(hi) .cat-card .open, :lang(hi) .foot-grid h4, :lang(hi) .wa-tip, :lang(hi) .lang-pick select {
+:lang(hi) .stamp, :lang(hi) .dock-hint, :lang(hi) .more-arrow, :lang(hi) .scroll-hint, :lang(hi) .cat-card .open, :lang(hi) .foot-grid .foot-h, :lang(hi) .wa-tip, :lang(hi) .lang-pick select {
   text-transform: none; letter-spacing: 0;
 }
 :lang(te) .eyebrow, :lang(te) .label, :lang(te) .nav-top, :lang(te) .site-nav .acct-link, :lang(te) .wish-btn, :lang(te) .tab, :lang(te) .chip,

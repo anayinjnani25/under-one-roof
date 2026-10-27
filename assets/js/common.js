@@ -374,10 +374,10 @@ window.UOR = window.UOR || {};
     return '<div class="wrap"><div class="foot-grid">' +
       '<div><a class="brand" href="index.html"><img class="brand-mark" src="' + UOR.LOGO + '" alt="" width="34" height="34"><span class="brand-word" lang="en">' + WORDMARK + '</span></a>' +
       '<p style="margin-top:16px;max-width:26em;color:var(--brown)">' + t('foot.blurb') + '</p></div>' +
-      '<div><h4>' + t('foot.shelf') + '</h4><ul>' + UOR.categories.map(function (c) {
+      '<div><h2 class="foot-h">' + t('foot.shelf') + '</h2><ul>' + UOR.categories.map(function (c) {
         return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
       }).join('') + '</ul></div>' +
-      '<div><h4>' + t('foot.visit') + '</h4><ul><li><a href="index.html#collection">' + t('foot.every') + '</a></li><li><a href="about.html">' + t('foot.about') + '</a></li><li><a href="blog.html">' + t('foot.journal') + '</a></li><li><a href="faq.html">' + t('foot.faq') + '</a></li><li><a href="contact.html">' + t('foot.contact') + '</a></li><li><a href="contact.html#custom">' + t('foot.custom') + '</a></li><li><a href="account.html">' + t('foot.account') + '</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">' + t('foot.wishlist') + '</button></li></ul></div>' +
+      '<div><h2 class="foot-h">' + t('foot.visit') + '</h2><ul><li><a href="index.html#collection">' + t('foot.every') + '</a></li><li><a href="about.html">' + t('foot.about') + '</a></li><li><a href="blog.html">' + t('foot.journal') + '</a></li><li><a href="faq.html">' + t('foot.faq') + '</a></li><li><a href="contact.html">' + t('foot.contact') + '</a></li><li><a href="contact.html#custom">' + t('foot.custom') + '</a></li><li><a href="account.html">' + t('foot.account') + '</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">' + t('foot.wishlist') + '</button></li></ul></div>' +
       '</div><div class="foot-note label"><span>© ' + new Date().getFullYear() + ' Under One Roof</span>' +
       '<span class="motion-switch" role="group" aria-label="' + esc(t('foot.motion')) + '"><button type="button" data-motion="full">' + t('foot.full') + '</button><button type="button" data-motion="calm">' + t('foot.calm') + '</button></span>' +
       '<span>' + t('foot.made') + '</span></div></div>';
