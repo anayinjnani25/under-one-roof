@@ -59,8 +59,40 @@ UOR.ready.then(function () {
   var saved = UOR.wish.get(p.id);
   var jelly = $('.jelly'), current = saved ? saved.colour : p.colors[0];
   var customLink = $('.custom-link');
-  function paint() {
-    jelly.innerHTML = UOR.art(p, current);
+
+  // ---- the gallery (gallery.js). Pieces with photos show their photos (the product's own photo
+  // first, then the extra ones); pieces without show their drawing in each of their colours.
+  var gallery = UOR.gallery({
+    stage: $('.pd-stage'), jelly: jelly, thumbs: $('.pd-thumbs'), dots: $('.pd-dots'), live: $('.pd-live'), name: p.name,
+    onChange: function (s) { if (s.colour && s.colour !== current && p.colors.indexOf(s.colour) > -1) { current = s.colour; paint(true); } }
+  });
+  function photoSlide(ph) {
+    var img = function (lazy) { return '<img class="art" src="' + UOR.esc(ph.url) + '" alt="" decoding="async" crossorigin="anonymous"' + (lazy ? ' loading="lazy"' : '') + '>'; };
+    return { url: ph.url, colour: ph.colour, alt: ph.alt || p.name, bg: p.bg, html: function () { return img(false); }, thumb: function () { return img(true); } };
+  }
+  function drawnSlides() {
+    return p.colors.map(function (k) {
+      return { colour: k, alt: UOR.palName(k), bg: p.bg, html: function () { return UOR.art(p, k); }, thumb: function () { return UOR.art(p, k); } };
+    });
+  }
+  var cover = p.image ? [photoSlide({ url: p.image, colour: null, alt: p.name })] : [];
+  var slides = cover.length ? cover : drawnSlides();
+  // start on the picture of the colour already chosen (from the wishlist), else the first
+  gallery.set(slides, Math.max(0, slides.findIndex(function (s) { return s.colour === current; })));
+  UOR.productImages(p.id).then(function (extra) {
+    if (!extra.length) return;
+    var photos = cover.concat(extra.map(photoSlide));
+    var keep = cover.length ? gallery.index() : Math.max(0, photos.findIndex(function (s) { return s.colour === current; }));
+    slides = photos;
+    gallery.set(photos, keep);
+  });
+
+  function paint(fromGallery) {
+    // a colour chip jumps to that colour's picture when there is one
+    if (!fromGallery) {
+      var gi = gallery.find(function (s) { return s.colour === current; });
+      if (gi > -1 && gi !== gallery.index()) gallery.go(gi);
+    }
     $('.swatch-name').textContent = UOR.palName(current);
     var heart = $('.pd-actions .heart');
     if (heart) heart.dataset.colour = current; // the heart saves the colour on screen
@@ -127,7 +159,7 @@ UOR.ready.then(function () {
     last = { x: e.clientX, y: e.clientY, t: now };
   });
   stage.addEventListener('pointerleave', function () { last = null; });
-  stage.addEventListener('click', function () { nudge(1.4); });
+  stage.addEventListener('click', function () { if (!gallery.swiped()) nudge(1.4); });
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
   // (details sit in ingredient pills; atelier.js opens and closes them)

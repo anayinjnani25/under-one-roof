@@ -52,7 +52,9 @@ print('building assets/dist' + ('' if npx else ' (no Node found: joining without
 vendor = (js / CORE[0]).read_text(encoding='utf-8')          # already minified
 ours = ';\n'.join((js / f).read_text(encoding='utf-8') for f in CORE[1:])
 write('core.js', vendor + ';\n' + minify_js(ours))
+EXTRA = {'product': ['gallery.js']}  # files bundled in front of a page's own script
 for page in PAGES:
-    write(page + '.js', minify_js((js / (page + '.js')).read_text(encoding='utf-8')))
+    src = ';\n'.join((js / f).read_text(encoding='utf-8') for f in EXTRA.get(page, []) + [page + '.js'])
+    write(page + '.js', minify_js(src))
 for out, parts in STYLES.items():
     write(out, minify_css('\n'.join((css / p).read_text(encoding='utf-8') for p in parts)))

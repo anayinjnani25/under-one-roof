@@ -160,3 +160,13 @@ body.page-admin { --page: #F4EDE0; --cream: #F4EDE0; --ink: #1F1A15; --brown: #5
 .page-admin .ad-table-wrap, .page-admin .ad-card { background: #FBF7F0; }
 .page-admin .ad-tab[aria-selected="true"] { border-bottom-color: #A3341F; }
 .page-admin .s-in_stock, .page-admin .s-pub { background: #DDE2C8; }
+
+/* more photos strip in the product editor */
+.p-more-new[hidden], .p-more-add[hidden] { display: none; }
+.p-more-list { list-style: none; margin: 4px 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.p-more-item { width: 132px; display: grid; gap: 6px; padding: 6px; background: #FBF7F0; border: 1px solid var(--paper-dark); border-radius: 6px; cursor: grab; }
+.p-more-item img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--paper); border-radius: 4px; }
+.p-more-item select { font: inherit; font-size: .9rem; padding: 4px; border: 1px solid var(--beige); border-radius: 4px; background: var(--cream); }
+.p-more-btns { display: flex; justify-content: space-between; }
+.p-more-btns button { width: 36px; height: 32px; border: 1px solid var(--beige); border-radius: 16px; background: var(--cream); cursor: pointer; }
+.p-more-btns button:disabled { opacity: .35; cursor: default; }

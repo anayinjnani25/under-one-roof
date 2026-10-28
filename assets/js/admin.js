@@ -184,6 +184,7 @@
     pf.art_type.value = UOR.ART_TYPES.indexOf(art.type) > -1 ? art.type : 'pendant';
     pf.art_extra.value = Object.keys(extra).length ? JSON.stringify(extra) : '';
     preview();
+    loadMore();
     openDlg($('.p-dialog'));
   }
   $('.p-new').addEventListener('click', function () { openProduct(null); });
@@ -239,6 +240,84 @@
     if (photo.small) up.push(bucket.upload(stem + '@600.webp', photo.small, { contentType: 'image/webp', cacheControl: '31536000', upsert: false }));
     return Promise.all(up).then(function (rs) { rs.forEach(unwrap); return name; });
   }
+
+  // ---- more photos (product_images): saved straight away, independent of the main Save
+  var more = [], moreNote = $('.p-more-note');
+  function loadMore() {
+    more = [];
+    say(moreNote, '');
+    $('.p-more-new').hidden = !!editing;
+    $('.p-more-add').hidden = !editing;
+    paintMore();
+    if (!editing) return;
+    sb.from('product_images').select('id,image_url,sort,colour').eq('product_id', editing.id).order('sort').order('id').then(unwrap)
+      .then(function (r) { more = r.data; paintMore(); }, function (e) { fail(moreNote, e); });
+  }
+  function paintMore() {
+    var colours = editing ? editing.colors || [] : [];
+    $('.p-more-list').innerHTML = more.map(function (m, i) {
+      return '<li class="p-more-item" draggable="true" data-id="' + m.id + '"><img src="' + esc(UOR.imageUrl(m.image_url)) + '" alt="" loading="lazy">' +
+        '<select aria-label="Colour this photo shows"><option value="">Any colour</option>' + colours.map(function (k) {
+          return '<option value="' + k + '"' + (m.colour === k ? ' selected' : '') + '>' + esc(UOR.palNameEn(k)) + '</option>'; }).join('') + '</select>' +
+        '<span class="p-more-btns"><button type="button" class="m-up" aria-label="Move earlier"' + (i ? '' : ' disabled') + '>←</button>' +
+        '<button type="button" class="m-down" aria-label="Move later"' + (i < more.length - 1 ? '' : ' disabled') + '>→</button>' +
+        '<button type="button" class="m-rm" aria-label="Remove this photo">×</button></span></li>';
+    }).join('');
+  }
+  function saveOrder() {
+    if (!online(moreNote)) return;
+    Promise.all(more.map(function (m, i) { m.sort = (i + 1) * 10; return sb.from('product_images').update({ sort: m.sort }).eq('id', m.id).then(unwrap); }))
+      .then(function () { say(moreNote, 'Order saved', 'ok'); }, function (e) { fail(moreNote, e); });
+  }
+  pf.morePhotos.addEventListener('change', function () {
+    var files = [].slice.call(pf.morePhotos.files).filter(function (f) { return /^image\//.test(f.type); });
+    pf.morePhotos.value = '';
+    if (!files.length || !editing || !online(moreNote)) return;
+    var bucket = sb.storage.from(UOR.SUPABASE.imageBucket), done = 0;
+    say(moreNote, 'Uploading ' + files.length + ' photo' + (files.length === 1 ? '' : 's') + '…');
+    files.reduce(function (chain, file, k) {
+      return chain.then(function () {
+        return Promise.all([resize(file, 1600), resize(file, 600)]).then(function (b) {
+          var webp = b[0] && b[0].type === 'image/webp', stem = editing.id + '-' + Date.now() + '-' + k;
+          var name = webp ? stem + '@1600.webp' : stem + '.png';
+          var up = [bucket.upload(name, b[0], { contentType: b[0].type, cacheControl: '31536000', upsert: false })];
+          if (webp) up.push(bucket.upload(stem + '@600.webp', b[1], { contentType: 'image/webp', cacheControl: '31536000', upsert: false }));
+          return Promise.all(up).then(function (rs) { rs.forEach(unwrap); })
+            .then(function () { return sb.from('product_images').insert({ product_id: editing.id, image_url: name, sort: (more.length + 1) * 10 }).select('id,image_url,sort,colour').single(); })
+            .then(unwrap).then(function (r) { more.push(r.data); done++; paintMore(); say(moreNote, done + ' of ' + files.length + ' uploaded…'); });
+        });
+      });
+    }, Promise.resolve()).then(function () { say(moreNote, 'Added ' + done + ' photo' + (done === 1 ? '' : 's'), 'ok'); }, function (e) { fail(moreNote, e); });
+  });
+  $('.p-more-list').addEventListener('click', function (e) {
+    var li = e.target.closest('[data-id]'); if (!li) return;
+    var i = more.findIndex(function (m) { return String(m.id) === li.dataset.id; }), m = more[i];
+    if (e.target.closest('.m-up') && i > 0) { more.splice(i - 1, 0, more.splice(i, 1)[0]); paintMore(); saveOrder(); }
+    else if (e.target.closest('.m-down') && i < more.length - 1) { more.splice(i + 1, 0, more.splice(i, 1)[0]); paintMore(); saveOrder(); }
+    else if (e.target.closest('.m-rm')) {
+      if (!online(moreNote) || !confirm('Remove this photo?')) return;
+      sb.from('product_images').delete().eq('id', m.id).then(unwrap).then(function () {
+        if (!/^https?:/.test(m.image_url)) sb.storage.from(UOR.SUPABASE.imageBucket).remove([m.image_url, m.image_url.replace('@1600.webp', '@600.webp')]);
+        more.splice(i, 1); paintMore(); say(moreNote, 'Photo removed', 'ok');
+      }, function (er) { fail(moreNote, er); });
+    }
+  });
+  $('.p-more-list').addEventListener('change', function (e) {
+    var li = e.target.closest('[data-id]'); if (!li || !online(moreNote)) return;
+    var m = more.filter(function (x) { return String(x.id) === li.dataset.id; })[0];
+    m.colour = e.target.value || null;
+    sb.from('product_images').update({ colour: m.colour }).eq('id', m.id).then(unwrap).then(function () { say(moreNote, 'Saved', 'ok'); }, function (er) { fail(moreNote, er); });
+  });
+  var dragMore = null;
+  $('.p-more-list').addEventListener('dragstart', function (e) { var li = e.target.closest('[data-id]'); if (li) { dragMore = li.dataset.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragMore); } });
+  $('.p-more-list').addEventListener('dragover', function (e) {
+    var li = e.target.closest('[data-id]'); if (!li || !dragMore || li.dataset.id === dragMore) return;
+    e.preventDefault();
+    var from = more.findIndex(function (m) { return String(m.id) === dragMore; }), to = more.findIndex(function (m) { return String(m.id) === li.dataset.id; });
+    more.splice(to, 0, more.splice(from, 1)[0]); paintMore();
+  });
+  $('.p-more-list').addEventListener('drop', function (e) { e.preventDefault(); });
+  $('.p-more-list').addEventListener('dragend', function () { if (dragMore) { dragMore = null; saveOrder(); } });
 
   pf.addEventListener('submit', function (e) {
     e.preventDefault();

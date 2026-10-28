@@ -78,6 +78,18 @@
 
   UOR.imageUrl = imageUrl;
 
+  // ---- extra pictures for one piece (the product's own photo stays picture 1, added by the page)
+  UOR.productImages = function (productId) {
+    if (!sb) return Promise.resolve([]);
+    return timeout(sb.from('product_images').select('image_url,colour,alt,sort').eq('product_id', productId).order('sort').order('id'), 6000)
+      .then(unwrap).then(function (r) {
+        return r.data.map(function (x) {
+          var alt = x.alt || {};
+          return { url: imageUrl(x.image_url), colour: x.colour || null, alt: alt[UOR.lang] || alt.en || '' };
+        });
+      }).catch(function (e) { log('Extra pictures unavailable:', e); return []; });
+  };
+
   // ---- collections: the live ones (published and inside their dates), pieces in order
   function live(c, now) {
     return c.published && (!c.starts_at || new Date(c.starts_at) <= now) && (!c.ends_at || new Date(c.ends_at) > now);

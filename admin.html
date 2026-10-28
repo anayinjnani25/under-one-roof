@@ -10,7 +10,7 @@
   <link rel="icon" href="assets/logo/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/fraunces-300-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/cormorant-garamond-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/dist/admin.css?v=202610280002">
+  <link rel="stylesheet" href="assets/dist/admin.css?v=202610281136">
 </head>
 <body class="page-admin">
   <header class="ad-head">
@@ -142,6 +142,13 @@
           <label class="field"><span class="label">Description</span><textarea name="hi_description" rows="2" lang="hi"></textarea></label>
         </fieldset>
 
+        <fieldset class="ad-fs p-more"><legend>More photos <small>(shown in the gallery on the piece's page, after the main photo)</small></legend>
+          <p class="ad-hint p-more-new">Save the piece first, then add more photos here.</p>
+          <ol class="p-more-list" aria-live="polite"></ol>
+          <label class="btn btn-ghost p-more-add">Add photos<input type="file" accept="image/*" multiple class="sr-only" name="morePhotos"></label>
+          <p class="ad-hint">Drag to reorder (or use the arrows). Pick a colour on a photo to show it when shoppers choose that colour. Changes here save straight away.</p>
+          <p class="form-note p-more-note" role="status"></p>
+        </fieldset>
         <fieldset class="ad-fs"><legend>Colours</legend><div class="p-colours"></div></fieldset>
         <fieldset class="ad-fs"><legend>Drawing (used when there's no photo)</legend>
           <div class="field-row">
@@ -220,7 +227,7 @@
     </form>
   </dialog>
 
-  <script src="assets/dist/core.js?v=202610280002" defer></script>
-  <script src="assets/dist/admin.js?v=202610280002" defer></script>
+  <script src="assets/dist/core.js?v=202610281136" defer></script>
+  <script src="assets/dist/admin.js?v=202610281136" defer></script>
 </body>
 </html>

@@ -53,7 +53,7 @@ UOR.I18N = {
     "chip.oxidised": "Jewelry · Oxidised", "chip.gold-silver": "Jewelry · Gold & Silver",
     "cat.entry": "Entry No. {no} — {n} pieces",
 
-    "pd.shelf": "Shelf", "pd.entry": "Entry No. {no} — {cat}", "pd.share": "Share on WhatsApp",
+    "pd.shelf": "Shelf", "pd.entry": "Entry No. {no} — {cat}", "pd.picOf": "Picture {n} of {total}", "pd.gallery": "Pictures of {name}", "pd.galleryRole": "gallery", "pd.share": "Share on WhatsApp",
     "pd.shareText": "Look at this {name} from Under One Roof — {mini}. (Colour: {colour})",
     "pd.added": "Added {n} × {name}", "pd.updated": "Updated: {n} × {name} in your wishlist", "pd.more": "More <em>{x}</em>",
 
@@ -140,7 +140,7 @@ UOR.I18N = {
     "chip.oxidised": "ఆభరణాలు · ఆక్సిడైజ్డ్", "chip.gold-silver": "ఆభరణాలు · బంగారు & వెండి",
     "cat.entry": "సంచిక {no} — {n} వస్తువులు",
 
-    "pd.shelf": "అల్మారా", "pd.entry": "సంచిక {no} — {cat}", "pd.share": "వాట్సాప్‌లో పంచుకోండి",
+    "pd.shelf": "అల్మారా", "pd.entry": "సంచిక {no} — {cat}", "pd.picOf": "{total}లో {n}వ చిత్రం", "pd.gallery": "{name} చిత్రాలు", "pd.galleryRole": "చిత్రాల వరుస", "pd.share": "వాట్సాప్‌లో పంచుకోండి",
     "pd.shareText": "అండర్ వన్ రూఫ్ నుండి ఈ {name} చూడండి — {mini}. (రంగు: {colour})",
     "pd.added": "{n} × {name} జోడించబడింది", "pd.updated": "విష్‌లిస్ట్‌లో నవీకరించబడింది: {n} × {name}", "pd.more": "మరిన్ని <em>{x}</em>",
 
@@ -344,7 +344,7 @@ UOR.I18N = {
     "chip.oxidised": "गहने · ऑक्सीडाइज़्ड", "chip.gold-silver": "गहने · सुनहरे और चाँदी",
     "cat.entry": "अंक {no} — {n} कृतियाँ",
 
-    "pd.shelf": "अलमारी", "pd.entry": "अंक {no} — {cat}", "pd.share": "व्हाट्सऐप पर शेयर करें",
+    "pd.shelf": "अलमारी", "pd.entry": "अंक {no} — {cat}", "pd.picOf": "{total} में से चित्र {n}", "pd.gallery": "{name} के चित्र", "pd.galleryRole": "चित्र-संग्रह", "pd.share": "व्हाट्सऐप पर शेयर करें",
     "pd.shareText": "अंडर वन रूफ़ का यह {name} देखो — {mini}। (रंग: {colour})",
     "pd.added": "{n} × {name} जोड़ा गया", "pd.updated": "विशलिस्ट में बदला गया: {n} × {name}", "pd.more": "और <em>{x}</em>",
 
