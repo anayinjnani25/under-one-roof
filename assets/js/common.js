@@ -143,6 +143,31 @@ window.UOR = window.UOR || {};
   UOR.catHref = function (p) { return 'category.html?c=' + p.cat + '#p-' + p.id; };
   UOR.productHref = function (p) { return 'product.html?id=' + p.id; };
 
+  // ---- for search engines: one address per page (only ?c= / ?id= kept) plus its Telugu and Hindi versions
+  UOR.SITE = 'https://anayinjnani25.github.io/under-one-roof/';
+  (function () {
+    if (document.querySelector('meta[name="robots"]')) return; // noindex pages
+    var q = new URLSearchParams(location.search), keep = new URLSearchParams();
+    ['c', 'id'].forEach(function (k) { if (q.get(k)) keep.set(k, q.get(k)); });
+    var page = location.pathname.split('/').pop();
+    var base = UOR.SITE + (page === 'index.html' ? '' : page);
+    var at = function (lang) {
+      var s = new URLSearchParams(keep);
+      if (lang && lang !== 'en') s.set('lang', lang);
+      s = s.toString();
+      return base + (s ? '?' + s : '');
+    };
+    var link = function (rel, href, hreflang) {
+      var l = document.createElement('link');
+      l.rel = rel; l.href = href;
+      if (hreflang) l.hreflang = hreflang;
+      document.head.appendChild(l);
+    };
+    link('canonical', at(UOR.lang));
+    ['en', 'te', 'hi'].forEach(function (lang) { link('alternate', at(lang), lang); });
+    link('alternate', at('en'), 'x-default');
+  })();
+
   // ---- header / footer / drawer
   var CHEVRON = '<svg class="chev" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
   var SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>';

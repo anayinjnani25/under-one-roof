@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin.html
+Disallow: /style.html
+
+Sitemap: https://anayinjnani25.github.io/under-one-roof/sitemap.xml

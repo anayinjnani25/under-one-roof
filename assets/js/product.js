@@ -35,6 +35,21 @@ UOR.ready.then(function () {
   $('.pd-dot-piece').style.setProperty('--bg', p.bg);
   $('.pd-desc').textContent = p.desc;
   $('.pd-care').textContent = UOR.care[p.cat];
+  $('meta[name="description"]').setAttribute('content', p.mini + '. ' + p.desc);
+
+  // product details for Google (no price: prices are shared on WhatsApp)
+  var ld = {
+    '@context': 'https://schema.org', '@type': 'Product',
+    name: p.name, description: p.desc, sku: p.id,
+    image: p.image ? new URL(p.image, location.href).href : UOR.SITE + 'assets/logo/og.jpg',
+    category: cat.title + ' ' + cat.accent,
+    brand: { '@type': 'Brand', name: 'Under One Roof' },
+    url: document.querySelector('link[rel="canonical"]').href // this language's address (see common.js)
+  };
+  var ldTag = document.createElement('script');
+  ldTag.type = 'application/ld+json';
+  ldTag.textContent = JSON.stringify(ld);
+  document.head.appendChild(ldTag);
   var sold = UOR.soldOut(p);
   if (p.stock && p.stock !== 'in_stock') {
     $('.pd-mini').insertAdjacentHTML('afterend', '<p class="pd-stock">' + UOR.stockBadge(p) + ' ' + t(sold ? 'stock.soldNote' : 'stock.mtoNote') + '</p>');
@@ -219,6 +234,8 @@ UOR.ready.then(function () {
       var avg = pub.reduce(function (a, r) { return a + r.rating; }, 0) / pub.length;
       $('.rev-summary').innerHTML = '<span class="stars" aria-hidden="true">' + stars(avg) + '</span> <span class="label">' +
         t(pub.length === 1 ? 'rev.summary1' : 'rev.summary', { avg: avg.toFixed(1), n: pub.length }) + '</span>';
+      ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: avg.toFixed(1), reviewCount: pub.length };
+      ldTag.textContent = JSON.stringify(ld);
     } else $('.rev-summary').innerHTML = '<span class="label">' + t('rev.noPub') + '</span>';
     $('.review-list').innerHTML = revs.map(function (r) {
       return '<li class="review' + (r.approved ? '' : ' pending') + '"><span class="stars" role="img" aria-label="' + UOR.esc(t('rev.outOf', { n: r.rating })) + '">' + stars(r.rating) + '</span><p>' + UOR.esc(r.body) + '</p><span class="label">— ' + UOR.esc(r.name) + ' · ' + UOR.date(r.created_at) +

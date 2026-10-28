@@ -13,6 +13,7 @@ import time
 
 root = pathlib.Path(__file__).resolve().parent.parent
 runpy.run_path(str(root / 'tools' / 'build-assets.py'))  # rebuild assets/dist first
+runpy.run_path(str(root / 'tools' / 'build-sitemap.py'))  # and the sitemap for Google
 version = time.strftime('%Y%m%d%H%M')
 pattern = re.compile(r'((?:href|src)="assets/(?:css|js|dist)/[^"?]+\.(?:css|js))(?:\?v=[^"]*)?"')
 

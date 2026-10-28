@@ -104,3 +104,11 @@ The logo is `assets/logo/logo.webp` (Under One Roof, by Savvitaa Rajaputharan). 
 - the **share picture** when a link is sent on WhatsApp or social media (`og.jpg`, 1200×630);
 - the **full logo** at the top of the About page.
 The name next to the mark is set in the logo's own lettering (Lato capitals: "UNDER ONE" in red, "ROOF" in ink); the footer adds "by Savvitaa Rajaputharan". The name text lives in `WORDMARK` in `assets/js/common.js`.
+## Google (Search Console)
+
+- `google780835dcca1b10e8.html` proves to Google Search Console that the site is yours. Leave it as it is.
+- `sitemap.xml` lists every shop page and every published piece. `python tools/stamp-assets.py` rebuilds it
+  (via `tools/build-sitemap.py`), so run that after adding or unpublishing pieces, then commit.
+- Each page adds a canonical link and its Telugu/Hindi alternates (common.js); product pages add Product
+  details for Google (product.js). `robots.txt` is here for a custom domain later: on a github.io
+  project address Google only reads robots.txt from the domain root, so submit the sitemap in Search Console.
