@@ -98,4 +98,9 @@ Never edit `assets/dist/` by hand: it is rebuilt every time.
 
 **Fonts are hosted on the site** (`assets/fonts/`, with `assets/css/fonts.css`, plus `fonts-te.css` / `fonts-hi.css` that load only for Telugu or Hindi). They were downloaded once with `python tools/fetch-fonts.py`; run it again only to change fonts. All are under the SIL Open Font License. Supabase's library is pinned in `assets/vendor/`.
 ## Logo
-Replace `assets/logo/mark.svg`. The header, footer and favicon all point to this one file. The wordmark text is `WORDMARK` in `assets/js/common.js`.
+The logo is `assets/logo/logo.webp` (Under One Roof, by Savvitaa Rajaputharan). From it:
+- the **round mark** in the header, footer and admin (`mark-64.png`, `mark-128.png`): the red watercolour circle, cropped round;
+- the **browser-tab and phone home-screen icons** (`favicon-32.png`, `apple-touch-icon.png`);
+- the **share picture** when a link is sent on WhatsApp or social media (`og.jpg`, 1200×630);
+- the **full logo** at the top of the About page.
+The name next to the mark is set in the logo's own lettering (Lato capitals: "UNDER ONE" in red, "ROOF" in ink); the footer adds "by Savvitaa Rajaputharan". The name text lives in `WORDMARK` in `assets/js/common.js`.

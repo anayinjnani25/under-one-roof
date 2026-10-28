@@ -661,6 +661,16 @@ body.page-info { --page: #F4EDE0; background: var(--paper); }
   font-size: .6rem; transform: rotate(-12deg); filter: url(#ink); margin-top: 6px;
 }
 
+/* about: the full logo above the story (its white paper melts into the page) */
+.page-info .about-logo {
+  display: block; width: min(100%, 600px); height: auto; margin: 0 0 18px -3%; mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 54% 52%, #000 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side at 54% 52%, #000 72%, transparent 100%); /* the logo's paper fades into the page */
+}
+/* footer: the byline under the name */
+.foot-brand { align-items: flex-start; }
+.foot-brand .brand-mark { margin-top: 2px; }
+
 /* about: a taped polaroid, a drop cap, index cards */
 .page-info .about-figure { position: relative; }
 .page-info .about-art { border-radius: 0; box-shadow: 0 0 0 14px var(--card), 0 0 0 15px rgba(31, 26, 21, .08), var(--shadow-lift); transform: rotate(2deg); margin: 14px; }

@@ -36,6 +36,6 @@ def build(families, out_name, subsets):
 
 build(['Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500',
        'Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700',
-       'Pinyon+Script', 'Special+Elite'], 'fonts.css', {'latin', 'latin-ext'})
+       'Pinyon+Script', 'Special+Elite', 'Lato:wght@400'], 'fonts.css', {'latin', 'latin-ext'})  # Lato: the logo's lettering
 build(['Noto+Serif+Telugu:wght@400;500;600'], 'fonts-te.css', {'telugu'})
 build(['Noto+Serif+Devanagari:wght@400;500;600'], 'fonts-hi.css', {'devanagari'})

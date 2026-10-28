@@ -125,8 +125,15 @@ p { margin: 0 0 1em; }
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
 .brand-mark { width: 34px; height: 34px; flex: none; }
-.brand-word { font-family: var(--f-display); font-size: 1.28rem; letter-spacing: -.01em; white-space: nowrap; }
-.brand-word em { font-style: italic; font-weight: 300; }
+/* the name in the logo's lettering: Lato capitals, "UNDER ONE" in red, "ROOF" in ink */
+.brand-word { font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: .98rem; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; line-height: 1.1; }
+.brand-word em { font-style: normal; }
+.brand-word .bw-a { color: var(--rust); }
+.brand-word .bw-b { color: var(--ink); }
+.brand-by { display: block; margin-top: 3px; font-size: .78rem; letter-spacing: .02em; text-transform: none; color: var(--brown); }
+.brand-mark { border-radius: 50%; }
+.search-btn kbd { white-space: nowrap; }
+@media (max-width: 1366px) { .site-head .brand-word { font-size: .9rem; letter-spacing: .08em; } }
 .site-nav { display: flex; align-items: center; gap: clamp(14px, 2vw, 30px); }
 .nav-links { display: flex; align-items: center; gap: clamp(12px, 1.7vw, 26px); list-style: none; margin: 0; padding: 0; }
 .nav-tools { display: flex; align-items: center; gap: clamp(10px, 1.4vw, 20px); }
@@ -212,13 +219,13 @@ html.nav-locked, html.nav-locked body { overflow: hidden; }
   .search-word, .search-btn kbd { display: none; }
   .search-btn { width: 40px; padding: 0; justify-content: center; }
   .nav-tools { gap: 6px; }
-  .brand-word { font-size: 1.02rem; }
+  .brand-word { font-size: .92rem; letter-spacing: .1em; }
 }
 @media (max-width: 420px) {
   .site-head { gap: 8px; }
   .brand { gap: 7px; }
   .brand-mark { width: 30px; height: 30px; }
-  .brand-word { font-size: .94rem; }
+  .brand-word { font-size: .82rem; letter-spacing: .08em; }
   .nav-tools { gap: 0; }
   .search-btn { width: 36px; height: 36px; border-color: transparent; }
   .menu-btn { width: 38px; }
@@ -277,7 +284,7 @@ html.nav-locked, html.nav-locked body { overflow: hidden; }
 .wish-count.bump { transform: scale(1.35); }
 @media (max-width: 760px) {
   .site-nav .nav-opt { display: none; }
-  .brand-word { font-size: 1.1rem; }
+  .brand-word { font-size: .96rem; }
 }
 
 /* ---- intro (homepage opening) -------------------------------------------- */

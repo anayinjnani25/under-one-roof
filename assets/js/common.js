@@ -10,10 +10,11 @@ window.UOR = window.UOR || {};
     return m === 'calm' ? true : m === 'full' ? false : reduced.matches;
   };
 
-  // Logo lives in one file. Replace assets/logo/mark.svg (and the wordmark text
-  // below, if the real logo includes the name) and every placement updates.
-  UOR.LOGO = 'assets/logo/mark.svg';
-  var WORDMARK = 'Under <em>One</em> Roof';
+  // The brand: the red watercolour circle from the logo (assets/logo/logo.webp) as the mark,
+  // and the name in the logo's lettering (Lato, capitals: "UNDER ONE" in red, "ROOF" in ink).
+  UOR.LOGO = 'assets/logo/mark-64.png';
+  var MARK_SET = ' srcset="assets/logo/mark-64.png 1x, assets/logo/mark-128.png 2x"';
+  var WORDMARK = '<span class="bw-a">Under One</span> <span class="bw-b">Roof</span>';
 
   var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.8 4.2 7.2 4.2c2 0 3.6 1.1 4.8 2.9 1.2-1.8 2.8-2.9 4.8-2.9 3.4 0 5.6 3.4 4.4 6.9-1.7 4.8-9.2 9.4-9.2 9.4z"/></svg>';
   UOR.HEART = HEART;
@@ -171,7 +172,7 @@ window.UOR = window.UOR || {};
       return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
     }).join('');
     return '<a class="brand" href="index.html" aria-label="' + esc(t('nav.home')) + '">' +
-      '<img class="brand-mark" src="' + UOR.LOGO + '" alt="" width="34" height="34">' +
+      '<img class="brand-mark" src="' + UOR.LOGO + '"' + MARK_SET + ' alt="" width="34" height="34">' +
       '<span class="brand-word" lang="en">' + WORDMARK + '</span></a>' +
       '<nav class="site-nav" aria-label="' + esc(t('nav.main')) + '">' +
       '<div class="nav-panel" id="nav-panel">' +
@@ -372,7 +373,7 @@ window.UOR = window.UOR || {};
   function footer() {
     var t = UOR.t;
     return '<div class="wrap"><div class="foot-grid">' +
-      '<div><a class="brand" href="index.html"><img class="brand-mark" src="' + UOR.LOGO + '" alt="" width="34" height="34"><span class="brand-word" lang="en">' + WORDMARK + '</span></a>' +
+      '<div><a class="brand foot-brand" href="index.html"><img class="brand-mark" src="' + UOR.LOGO + '"' + MARK_SET + ' alt="" width="34" height="34"><span class="brand-word" lang="en">' + WORDMARK + '<small class="brand-by">by Savvitaa Rajaputharan</small></span></a>' +
       '<p style="margin-top:16px;max-width:26em;color:var(--brown)">' + t('foot.blurb') + '</p></div>' +
       '<div><h2 class="foot-h">' + t('foot.shelf') + '</h2><ul>' + UOR.categories.map(function (c) {
         return '<li><a href="category.html?c=' + c.slug + '">' + c.title + ' ' + c.accent + '</a></li>';
