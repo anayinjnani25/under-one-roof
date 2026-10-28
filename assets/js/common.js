@@ -380,7 +380,7 @@ window.UOR = window.UOR || {};
       }).join('') + '</ul></div>' +
       '<div><h2 class="foot-h">' + t('foot.visit') + '</h2><ul><li><a href="index.html#collection">' + t('foot.every') + '</a></li><li><a href="about.html">' + t('foot.about') + '</a></li><li><a href="blog.html">' + t('foot.journal') + '</a></li><li><a href="faq.html">' + t('foot.faq') + '</a></li><li><a href="contact.html">' + t('foot.contact') + '</a></li><li><a href="contact.html#custom">' + t('foot.custom') + '</a></li><li><a href="account.html">' + t('foot.account') + '</a></li><li><button class="wish-btn" type="button" style="padding:0;font-family:var(--f-body);font-size:inherit;letter-spacing:0;text-transform:none">' + t('foot.wishlist') + '</button></li></ul></div>' +
       '</div><div class="foot-note label"><span>© ' + new Date().getFullYear() + ' Under One Roof</span>' +
-      '<span class="motion-switch" role="group" aria-label="' + esc(t('foot.motion')) + '"><button type="button" data-motion="full">' + t('foot.full') + '</button><button type="button" data-motion="calm">' + t('foot.calm') + '</button></span>' +
+      '<span class="motion-switch" role="group" aria-label="' + esc(t('foot.motion')) + '"><button type="button" data-motion="full" aria-pressed="' + !UOR.reduced() + '">' + t('foot.full') + '</button><button type="button" data-motion="calm" aria-pressed="' + UOR.reduced() + '">' + t('foot.calm') + '</button></span>' +
       '<span>' + t('foot.made') + '</span></div></div>';
   }
 
