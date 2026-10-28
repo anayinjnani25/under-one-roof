@@ -43,7 +43,7 @@
   }).join('');
 
   // ---- product poster
-  var pp = UOR.byId('leaf-toran'), colour = pp.colors[0], wishN = 0;
+  var pp = UOR.byId('haveli-toran'), colour = pp.colors[0], wishN = 0;
   $('.p-name').textContent = pp.name;
   $('.p-mini').textContent = pp.mini.toLowerCase();
   $('.p-desc').textContent = pp.desc;
@@ -94,8 +94,8 @@
   });
 
   // ---- collage grid with word-strip filter chips
-  var picks = ['haveli-toran', 'moon-mandala', 'temple-jhumka', 'pompom-swag', 'bell-cascade', 'lotus-jhumka', 'mirrorwork-toran', 'long-latkan', 'crescent-chandbali', 'sunwheel', 'rope-bangles', 'bunting'];
-  $('.chips-row').innerHTML = ['all', 'torans', 'hangings', 'garlands', 'jewelry'].map(function (c, i) {
+  var picks = ['temple-border-saree', 'haveli-toran', 'temple-jhumka', 'pompom-swag', 'anarkali-gown', 'pearl-hoops', 'block-print-set', 'embroidered-potli', 'crescent-chandbali', 'printed-coord'];
+  $('.chips-row').innerHTML = ['all', 'sarees', 'gowns', 'torans', 'jewelry'].map(function (c, i) {
     return '<button class="strip chip-f" type="button" data-f="' + c + '" data-type="' + (i ? 'type' : 'serif') + '" data-tone="' + (i ? 'aged' : 'ink') + '" aria-pressed="' + !i + '">' + c + '</button>';
   }).join('');
   $('.collage').innerHTML = picks.map(function (id, i) {
@@ -110,7 +110,7 @@
     var b = e.target.closest('.chip-f'); if (!b) return;
     $$('.chip-f').forEach(function (x) { x.setAttribute('aria-pressed', x === b); x.dataset.tone = x === b ? 'ink' : 'aged'; });
     var f = b.dataset.f;
-    function apply() { $$('.clip').forEach(function (c) { c.hidden = !(f === 'all' || c.dataset.cat === f || (f === 'jewelry' && /oxidised|gold-silver/.test(c.dataset.cat))); }); }
+    function apply() { $$('.clip').forEach(function (c) { c.hidden = !(f === 'all' || c.dataset.cat === f || (f === 'jewelry' && /indowestern|temple|oxidised/.test(c.dataset.cat))); }); }
     UOR.viewSwap(apply);
   });
   $$('.clip').forEach(function (c, i) { c.style.viewTransitionName = 'clip-' + i; });
@@ -123,7 +123,7 @@
   });
 
   // ---- card → poster (same-document view transition; the shop uses cross-document ones)
-  var vtIds = ['bell-toran', 'sun-disc', 'festive-arch'], opener = null;
+  var vtIds = ['temple-border-saree', 'temple-jhumka', 'pompom-swag'], opener = null;
   $('.vt-row').innerHTML = vtIds.map(function (id, i) {
     var p = UOR.byId(id);
     return '<button class="vt-card" type="button" data-id="' + id + '" style="--r:' + [-3, 2, -1.5][i] + 'deg" aria-label="Open ' + esc(p.name) + '"><span class="win" style="--bg:' + p.bg + '">' + UOR.art(p) + '</span></button>';

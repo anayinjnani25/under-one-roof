@@ -1,11 +1,11 @@
 # Under One Roof
 
-A storefront for a handcraft brand that sells torans, toran garlands, wall and door hangings, and jewelry. The front end is plain HTML, CSS and JavaScript with no build step and is hosted on GitHub Pages. The backend is **Supabase** (project `under-one-roof`, ref `udgpsxfixpvededukhod`, Mumbai region).
+A storefront for a brand with ten shelves: sarees, dress material, co-ord sets, gowns, indo-western, temple and oxidised jewellery, potlis, torans and bandhanwar. The front end is plain HTML, CSS and JavaScript with no build step and is hosted on GitHub Pages. The backend is **Supabase** (project `under-one-roof`, ref `udgpsxfixpvededukhod`, Mumbai region).
 
 ## Pages
 - `index.html`: The opening sequence (an interactive pixel field, then a spool and needle driven by scroll that reveals the brand name and tears away), the category shelf, the multi-lane worktable carousel and the full collection.
 - `category.html?c=<slug>`: The needle stitches a looping path down the page, and the pieces hang off it like milestones.
-- `product.html?id=<id>`: A **gallery** of the piece's pictures (taped polaroids under the main picture; swipe on phones, arrow keys on computers) with a *peel and place* transition: the picture peels away like a photo lifted off the page while the next is put down and taped, with a short red stitch between them (a plain fade in Calm mode). Then: A product with no background that wobbles like jelly, a sliding panel for colour, story and price, approved reviews and a review form for signed-in members. It also has **Share on WhatsApp** (the phone's own share sheet on mobile, otherwise WhatsApp with no fixed number, so shoppers can send the piece to family), a **Request a custom version** link, and **You might also like** (pieces from shelves that go together: torans, garlands and hangings; oxidised with gold & silver-tone jewelry, same colours first).
+- `product.html?id=<id>`: A **gallery** of the piece's pictures (taped polaroids under the main picture; swipe on phones, arrow keys on computers) with a *peel and place* transition: the picture peels away like a photo lifted off the page while the next is put down and taped, with a short red stitch between them (a plain fade in Calm mode). Then: A product with no background that wobbles like jelly, a sliding panel for colour, story and price, approved reviews and a review form for signed-in members. It also has **Share on WhatsApp** (the phone's own share sheet on mobile, otherwise WhatsApp with no fixed number, so shoppers can send the piece to family), a **Request a custom version** link, and **You might also like** (pieces from shelves that go together, set in `PAIRS` in product.js: clothes with jewellery and potlis, torans with bandhanwar; same colours first).
 - **Recently viewed:** the last 8 pieces a shopper opened appear above the footer on every page. They're stored in that browser only.
 - `faq.html`: Delivery & FAQ, with sections you can link to (`faq.html#delivery`, `#making`, `#returns`, `#custom`, `#care`, `#payments`, `#whatsapp`). **Every answer marked "Fill in" is a placeholder.** Replace the example text in `faq.html` (English) and in `assets/js/i18n-strings.js` (`f.a1`… for Telugu and Hindi) with your real policies.
 - `account.html`: Sign in, create an account, Google (once it's switched on), forgotten and reset password. Once signed in: your name, your notes with their approval status, and your synced wishlist.
@@ -112,3 +112,18 @@ The name next to the mark is set in the logo's own lettering (Lato capitals: "UN
 - Each page adds a canonical link and its Telugu/Hindi alternates (common.js); product pages add Product
   details for Google (product.js). `robots.txt` is here for a custom domain later: on a github.io
   project address Google only reads robots.txt from the domain root, so submit the sitemap in Search Console.
+
+## Shelves
+
+Ten shelves (2026-10-28), one piece on each to start. Pieces without photos are drawn by art.js; the
+clothes and potli drawings are the `saree`, `fabric`, `coord`, `gown` and `potli` types. Add or change
+pieces from the admin page; a new shelf needs a row in the `categories` table plus its slug in `PAIRS`
+(product.js), `JEWELRY` / `CLOTHES` (pages.js) and the `chip.<slug>` strings (i18n-strings.js).
+The previous 5 shelves and 30 pieces are saved in `supabase/backups/`.
+
+### Adding another admin
+
+Admins can be invited by email: add the address to `private.admin_invites` (SQL editor:
+`insert into private.admin_invites (email) values ('name@gmail.com');`). The person becomes an admin
+the first time they sign in **with Google** using that address; the invite is then used up. If they
+already have an account, add their user id to `public.admins` instead. Admins now: anayinjnani25@gmail.com and mitali.rao27@gmail.com (added 2026-10-28).

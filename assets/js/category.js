@@ -10,7 +10,7 @@ UOR.ready.then(function () {
   UOR.waContext = 'Hi Under One Roof! I have a question about your ' + UOR.en(cat, 'title') + ' ' + UOR.en(cat, 'accent') + '.';
 
   document.title = cat.title + ' ' + cat.accent + ' — Under One Roof';
-  document.querySelector('.cat-no').textContent = UOR.t('cat.entry', { no: cat.no, n: items.length });
+  document.querySelector('.cat-no').textContent = UOR.t(items.length === 1 ? 'cat.entry1' : 'cat.entry', { no: cat.no, n: items.length });
   document.querySelector('.cat-title').innerHTML = cat.title + ' <em>' + cat.accent + '</em>';
   document.querySelector('.cat-blurb').textContent = cat.blurb;
   // the shelf's word, huge and faint behind the first screen

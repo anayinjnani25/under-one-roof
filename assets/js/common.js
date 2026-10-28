@@ -328,7 +328,7 @@ window.UOR = window.UOR || {};
           var f = UOR.byId(h.cat.feature);
           return '<li role="option" id="sr-' + i + '" class="search-hit"><a href="category.html?c=' + h.cat.slug + '" tabindex="-1">' +
             '<span class="sr-thumb" style="--bg:' + (f ? f.bg : 'var(--paper)') + '">' + (f ? UOR.art(f) : '') + '</span>' +
-            '<span class="sr-text"><strong>' + h.cat.title + ' <em>' + h.cat.accent + '</em></strong><small>' + UOR.t('search.pieces', { n: UOR.inCat(h.cat.slug).length }) + '</small></span></a></li>';
+            '<span class="sr-text"><strong>' + h.cat.title + ' <em>' + h.cat.accent + '</em></strong><small>' + UOR.t(UOR.inCat(h.cat.slug).length === 1 ? 'search.piece' : 'search.pieces', { n: UOR.inCat(h.cat.slug).length }) + '</small></span></a></li>';
         }
         return '<li role="option" id="sr-' + i + '" class="search-hit"><a href="' + UOR.productHref(h.p) + '" tabindex="-1">' +
           '<span class="sr-thumb" style="--bg:' + h.p.bg + '">' + UOR.art(h.p) + '</span>' +

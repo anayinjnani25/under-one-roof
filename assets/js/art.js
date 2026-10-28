@@ -388,7 +388,120 @@ window.UOR = window.UOR || {};
     return s;
   }
 
-  var DRAW = { toran: toran, hanging: hanging, garland: garland, jhumka: jhumka, chandbali: chandbali, hoops: hoops, necklace: necklace, bangle: bangle, pendant: pendant };
+  // ---- clothes and bags -------------------------------------------------
+  function butta(x, y, col, gold) { // a small five-dot flower, scattered over cloth
+    var s = '';
+    for (var k = 0; k < 5; k++) {
+      var t = k / 5 * Math.PI * 2;
+      s += '<circle cx="' + f(x + Math.cos(t) * 2.6) + '" cy="' + f(y + Math.sin(t) * 2.6) + '" r="1.4" fill="' + col + '"/>';
+    }
+    return s + '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="1.2" fill="' + gold + '"/>';
+  }
+  function scatter(r, n, x0, x1, y0, y1, col, gold) {
+    var s = '', cols = Math.ceil(Math.sqrt(n * (x1 - x0) / (y1 - y0))), rows = Math.ceil(n / cols);
+    for (var i = 0; i < n; i++) {
+      var cx = x0 + ((i % cols) + 0.5) * (x1 - x0) / cols + (r() - 0.5) * 6;
+      var cy = y0 + (Math.floor(i / cols) + 0.5) * (y1 - y0) / rows + (r() - 0.5) * 6;
+      s += butta(cx, cy, col, gold);
+    }
+    return s;
+  }
+
+  function saree(a, pal, m, g, r) {
+    var s = '', hem = function (x) { return 166 - (x - 44) / 112 * 6; };
+    s += '<path d="M24,40 L176,40" stroke="' + pal.dark + '" stroke-width="3" stroke-linecap="round"/>';
+    s += bead(24, 40, 4.2, 'url(#' + g + ')', m.lo) + bead(176, 40, 4.2, 'url(#' + g + ')', m.lo);
+    s += '<path d="M42,42 L158,42 L156,160 L44,166 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += scatter(r, 12, 60, 140, 52, 118, pal.alt, m.base);
+    // the pallu: broad bands across the hanging end
+    s += '<path d="M44,128 L156,124 L156,160 L44,166 Z" fill="' + pal.trim + '"/>';
+    [134, 146].forEach(function (y) {
+      s += '<path d="M46,' + y + ' L154,' + (y - 4) + '" stroke="' + pal.main + '" stroke-width="3"/>';
+      s += '<path d="M46,' + (y + 5) + ' L154,' + (y + 1) + '" stroke="url(#' + g + ')" stroke-width="1.4" stroke-dasharray="3 2"/>';
+    });
+    // woven borders down both sides, edged in zari
+    s += '<path d="M42,42 L54,42 L55.5,165 L44,166 Z" fill="' + pal.trim + '"/><path d="M146,42 L158,42 L156,160 L145,160.6 Z" fill="' + pal.trim + '"/>';
+    s += '<path d="M54,44 L55.5,163 M146,44 L145,159" stroke="url(#' + g + ')" stroke-width="1.6" stroke-dasharray="4 2"/>';
+    for (var x = 48; x <= 152; x += 6) s += '<line x1="' + x + '" y1="' + f(hem(x)) + '" x2="' + f(x + (r() - 0.5) * 2) + '" y2="' + f(hem(x) + 8 + r() * 3) + '" stroke="' + pal.dark + '" stroke-width="1.2" stroke-linecap="round"/>';
+    return s;
+  }
+
+  function fabric(a, pal, m, g, r) {
+    var s = '';
+    // bottom: the plain salwar length
+    s += '<rect x="34" y="132" width="124" height="30" rx="4" fill="' + pal.alt + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<line x1="38" y1="147" x2="154" y2="147" stroke="' + pal.trim + '" stroke-width="1.4" stroke-dasharray="5 3"/>';
+    // middle: the printed kurta length
+    s += '<rect x="40" y="98" width="112" height="36" rx="4" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += scatter(r, 10, 46, 146, 102, 130, pal.alt, m.base);
+    // top: the folded dupatta, its end spilling over the side
+    s += '<rect x="48" y="76" width="96" height="24" rx="3" fill="' + pal.trim + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M48,82 L144,82 M48,94 L144,94" stroke="url(#' + g + ')" stroke-width="1.4" stroke-dasharray="3 2"/>';
+    s += '<path d="M138,78 Q170,88 168,150 L150,152 Q152,104 130,98 Z" fill="' + pal.trim + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M152,140 L168,138" stroke="' + pal.main + '" stroke-width="3"/>';
+    for (var i = 0; i < 4; i++) s += tassel(152 + i * 5, 151 - i * 0.4, 10, pal.main, pal.dark);
+    return s;
+  }
+
+  function coord(a, pal, m, g, r) {
+    var s = '';
+    // the top
+    var top = 'M42,50 L56,44 Q66,52 76,44 L90,50 L102,76 L90,82 L86,68 L86,124 L46,124 L46,68 L42,82 L30,76 Z';
+    s += '<path d="' + top + '" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += scatter(r, 6, 50, 82, 60, 112, pal.alt, m.base);
+    s += '<path d="M56,44 Q66,60 76,44" fill="none" stroke="' + pal.dark + '" stroke-width="1.2"/>';
+    s += '<rect x="46" y="114" width="40" height="10" fill="' + pal.trim + '"/><path d="M46,119 L86,119" stroke="url(#' + g + ')" stroke-width="1.4" stroke-dasharray="3 2"/>';
+    // the pants, cut from the same cloth
+    s += '<path d="M112,46 L160,46 L166,164 L144,164 L136,80 L128,164 L106,164 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += scatter(r, 8, 114, 158, 58, 150, pal.alt, m.base);
+    s += '<rect x="112" y="46" width="48" height="8" fill="' + pal.trim + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M106.6,154 L128.4,154 M143.4,154 L165.4,154" stroke="' + pal.trim + '" stroke-width="7"/>';
+    s += '<path d="M126,54 L126,68" stroke="' + pal.dark + '" stroke-width="1"/>' + bead(126, 70, 2.2, 'url(#' + g + ')', m.lo);
+    return s;
+  }
+
+  function gown(a, pal, m, g, r) {
+    var s = '';
+    s += '<path d="M100,30 L100,22 Q100,14 106,14 Q112,14 112,20" fill="none" stroke="' + m.lo + '" stroke-width="2" stroke-linecap="round"/>';
+    s += '<path d="M66,42 L100,30 L134,42" fill="none" stroke="' + pal.dark + '" stroke-width="2.4" stroke-linecap="round"/>';
+    // flared skirt, then pleats and a heavy border at the hem
+    s += '<path d="M86,82 L114,82 L172,172 Q100,186 28,172 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    for (var i = -4; i <= 4; i++) if (i) s += '<line x1="' + (100 + i * 2.5) + '" y1="84" x2="' + f(100 + i * 16) + '" y2="' + f(178 - Math.abs(i) * 1.2) + '" stroke="' + pal.dark + '" stroke-width=".8" opacity=".35"/>';
+    s += scatter(r, 8, 60, 140, 104, 152, pal.alt, m.base);
+    s += '<path d="M33,166 Q100,180 167,166" fill="none" stroke="' + pal.trim + '" stroke-width="9"/>';
+    s += '<path d="M33,166 Q100,180 167,166" fill="none" stroke="url(#' + g + ')" stroke-width="1.6" stroke-dasharray="4 2"/>';
+    // bodice with little sleeves
+    s += '<path d="M80,42 L68,58 L76,64 L84,54 Z M120,42 L132,58 L124,64 L116,54 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M80,40 L120,40 L116,82 L84,82 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M90,40 L100,54 L110,40" fill="' + pal.alt + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<rect x="83" y="76" width="34" height="7" fill="' + pal.trim + '" stroke="' + pal.dark + '" stroke-width=".8"/>';
+    for (var k = 0; k < 4; k++) s += bead(88 + k * 8, 79.5, 1.6, 'url(#' + g + ')');
+    return s;
+  }
+
+  function potli(a, pal, m, g, r) {
+    var s = '';
+    s += '<path d="M84,80 Q100,26 116,80" fill="none" stroke="' + pal.dark + '" stroke-width="2"/>';
+    s += '<path d="M74,80 Q80,62 88,72 Q94,58 100,70 Q106,58 112,72 Q120,62 126,80 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M62,92 Q46,150 72,170 Q100,184 128,170 Q154,150 138,92 Z" fill="' + pal.main + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    s += '<path d="M68,94 L132,94 L124,78 L76,78 Z" fill="' + pal.alt + '" stroke="' + pal.dark + '" stroke-width="1"/>';
+    for (var x = 82; x <= 118; x += 6) s += '<line x1="' + x + '" y1="80" x2="' + (x + (x - 100) * 0.3) + '" y2="93" stroke="' + pal.dark + '" stroke-width=".7" opacity=".5"/>';
+    s += '<path d="M66,88 Q100,96 134,88" fill="none" stroke="url(#' + g + ')" stroke-width="2.4"/>';
+    // the embroidered flower on the front
+    for (var p = 0; p < 8; p++) s += '<ellipse cx="100" cy="122" rx="5" ry="11" fill="' + (p % 2 ? pal.alt : pal.trim) + '" stroke="' + pal.dark + '" stroke-width=".6" transform="rotate(' + (p * 45) + ' 100 133)"/>';
+    s += '<circle cx="100" cy="133" r="5" fill="url(#' + g + ')" stroke="' + m.lo + '" stroke-width=".7"/>';
+    for (var k = 0; k < 9; k++) {
+      var t = k / 8, bx = 70 + t * 60;
+      s += bead(bx, 160 + Math.sin(t * Math.PI) * 10, 2.2, k % 2 ? pal.alt : 'url(#' + g + ')');
+    }
+    // drawstrings with tassels
+    s += '<path d="M86,90 Q78,108 80,122 M114,90 Q122,108 120,122" fill="none" stroke="' + pal.dark + '" stroke-width="1.2"/>';
+    s += tassel(80, 122, 14, pal.trim, pal.dark) + tassel(120, 122, 14, pal.trim, pal.dark);
+    return s;
+  }
+
+  var DRAW = { toran: toran, hanging: hanging, garland: garland, jhumka: jhumka, chandbali: chandbali, hoops: hoops, necklace: necklace, bangle: bangle, pendant: pendant,
+    saree: saree, fabric: fabric, coord: coord, gown: gown, potli: potli };
   UOR.ART_TYPES = Object.keys(DRAW); // the admin page offers these
 
   UOR.art = function (product, palKey, cls) {

@@ -61,7 +61,8 @@ UOR.ready.then(function () {
     var cf = $('.custom-form');
     if (!cf) return;
     var f = cf.elements, cnote = $('.form-note', cf);
-    var JEWELRY = { oxidised: 1, 'gold-silver': 1 };
+    var JEWELRY = { indowestern: 1, temple: 1, oxidised: 1 };
+    var CLOTHES = { sarees: 1, 'dress-material': 1, 'coord-sets': 1, gowns: 1 }; // sizes go in the notes
     // option values are English (they go into the WhatsApp message); labels follow the page language
     var SIZES = {
       wide: [['As shown', 'cu.s.asShown'], ['Wider', 'cu.s.wider'], ['Narrower', 'cu.s.narrower'], ['Exact measurement', 'cu.s.exact']],
@@ -84,7 +85,8 @@ UOR.ready.then(function () {
       var p = piece();
       if (!p) return 'none';
       if (JEWELRY[p.cat]) return 'jewel';
-      return p.cat === 'hangings' ? 'long' : 'wide';
+      if (CLOTHES[p.cat]) return 'none';
+      return p.cat === 'bandhanwar' ? 'long' : 'wide';
     }
     function fillColours(keep) {
       var p = piece();

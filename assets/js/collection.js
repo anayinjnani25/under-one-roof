@@ -18,7 +18,7 @@ UOR.ready.then(function () {
     document.title = c.title + ' — Under One Roof';
     $('.col-title').textContent = c.title;
     $('.col-blurb').textContent = c.blurb;
-    $('.col-count').textContent = t('search.pieces', { n: c.ids.length });
+    $('.col-count').textContent = t(c.ids.length === 1 ? 'search.piece' : 'search.pieces', { n: c.ids.length });
     var cover = UOR.byId(c.cover);
     if (cover) {
       $('.col-cover').innerHTML = '<div class="polaroid place" style="--r:-4deg"><span class="tape tc t-gold"></span>' +

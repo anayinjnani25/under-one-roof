@@ -29,7 +29,7 @@ UOR.ready.then(function () {
   $('.pd-name').textContent = p.name;
   $('.pd-mini').textContent = UOR.lang === 'en' ? p.mini.toLowerCase() : p.mini;
   // botanicals behind the piece: mango leaves for doorway pieces, marigolds for the rest
-  var leafy = { torans: 1, garlands: 1 }[p.cat];
+  var leafy = { torans: 1, bandhanwar: 1 }[p.cat];
   $('.pd-sprigs').innerHTML = UOR.sprig(leafy ? 'mango' : 'marigold', 'sp-a') + UOR.sprig(leafy ? 'marigold' : 'mango', 'sp-b');
   $('.pd-dot-piece').innerHTML = UOR.art(p);
   $('.pd-dot-piece').style.setProperty('--bg', p.bg);
@@ -284,7 +284,11 @@ UOR.ready.then(function () {
 
   // ---- "You might also like": other shelves that go together, same colours first.
   // Deterministic per piece, so it doesn't reshuffle on reload.
-  var PAIRS = { torans: ['garlands', 'hangings'], garlands: ['torans', 'hangings'], hangings: ['torans', 'garlands'], oxidised: ['gold-silver'], 'gold-silver': ['oxidised'] };
+  var PAIRS = {
+    sarees: ['temple', 'potlis'], 'dress-material': ['indowestern', 'potlis'], 'coord-sets': ['indowestern', 'oxidised'], gowns: ['temple', 'potlis'],
+    indowestern: ['coord-sets', 'gowns'], temple: ['sarees', 'gowns'], oxidised: ['coord-sets', 'sarees'], potlis: ['sarees', 'gowns'],
+    torans: ['bandhanwar'], bandhanwar: ['torans']
+  };
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   var paired = PAIRS[p.cat] || [];
   var also = UOR.products.filter(function (q) { return q.cat !== p.cat; }).map(function (q) {
@@ -299,6 +303,7 @@ UOR.ready.then(function () {
   $('.rel-grid').innerHTML = UOR.inCat(p.cat).filter(function (q) { return q !== p; }).slice(0, 4).map(function (q) {
     return '<li>' + UOR.clip(q, UOR.productHref(q), UOR.products.indexOf(q)) + '</li>';
   }).join('');
+  $('.related').hidden = !$('.rel-grid').children.length; // the only piece on its shelf
   UOR.tearAll(); UOR.observe();
 
   var queued = false;

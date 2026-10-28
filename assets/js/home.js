@@ -433,7 +433,7 @@ UOR.ready.then(function () {
       '<span class="postage-in" style="--bg:' + f.bg + '">' + UOR.art(f) +
       '<span class="postage-val">' + UOR.t('card.no') + ' ' + c.no + '</span>' +
       '<span class="strip" data-type="serif" data-flat>' + c.title + ' <em>' + c.accent + '</em></span></span></span>' +
-      '<span class="stamp-meta"><span class="at-label">' + UOR.t('search.pieces', { n: n }) + '</span>' +
+      '<span class="stamp-meta"><span class="at-label">' + UOR.t(n === 1 ? 'search.piece' : 'search.pieces', { n: n }) + '</span>' +
       '<span class="stamp-blurb">' + c.blurb + '</span><span class="stamp-open">' + UOR.t('home.open') + '</span></span></a></li>';
   }).join('');
 
